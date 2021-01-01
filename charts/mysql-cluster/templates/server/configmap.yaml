@@ -8,5 +8,5 @@ data:
     ndbcluster
     port={{ .Values.mysql.ports.management }}
     datadir={{ .Values.mysql.node.dataDir }}
-    user={{ .Values.securityContext.runAsUser }}
+    user={{ .Values.securityContext.runAsUser | default "mysql" }}
     ndb-connectstring={{ include "mysql-cluster.managementConnectionString" . }}

@@ -16,16 +16,16 @@ mysql:
   sqlNode:
     replicas: 3
 
-podSecurityContext:
-  fsGroup: 1000
+podSecurityContext: {}
+  # fsGroup: 27 # mysql
 
-securityContext:
+securityContext: {}
   # capabilities:
   #   drop:
   #   - ALL
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
-  runAsUser: 1000 # mysql
+  # runAsUser: 27 # mysql
 
 resources:
   limits:

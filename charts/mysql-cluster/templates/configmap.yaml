@@ -7,7 +7,7 @@ data:
     [mysqld]
     ndbcluster
     port={{ $.Values.mysql.ports.management }}
-    user={{ .Values.securityContext.runAsUser }}
+    user={{ .Values.securityContext.runAsUser | default "mysql" }}
     ndb-connectstring={{ include "mysql-cluster.fullname" . }}-mgm:{{ .Values.mysql.ports.management }}
 
     [mysql_cluster]
