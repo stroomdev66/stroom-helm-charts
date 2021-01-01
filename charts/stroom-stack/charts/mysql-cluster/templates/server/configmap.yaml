@@ -1,0 +1,12 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ include "mysql-cluster.fullname" . }}-server
+data:
+  my.cnf: |
+    [mysqld]
+    ndbcluster
+    port={{ .Values.mysql.ports.management }}
+    datadir={{ .Values.mysql.node.dataDir }}
+    user={{ .Values.securityContext.runAsUser }}
+    ndb-connectstring={{ include "mysql-cluster.managementConnectionString" . }}

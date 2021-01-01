@@ -1,0 +1,38 @@
+# Default values for mysql-cluster.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  database:
+    annotations:
+      name: annotations
+      userName: annotationsuser
+      password: stroompassword1
+    auth:
+      name: auth
+      userName: authuser
+      password: stroompassword1
+    config:
+      name: config
+      userName: configuser
+      password: stroompassword1
+    datameta:
+      name: datameta
+      userName: datametauser
+      password: stroompassword1
+    explorer:
+      name: explorer
+      userName: exploreruser
+      password: stroompassword1
+    process:
+      name: process
+      userName: processuser
+      password: stroompassword1
+    stats:
+      name: stats
+      userName: statsuser
+      password: stroompassword1
+    stroom:
+      name: stroom
+      userName: stroomuser
+      password: stroompassword1

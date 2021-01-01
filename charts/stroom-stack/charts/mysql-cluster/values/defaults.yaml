@@ -1,0 +1,36 @@
+mysql:
+  rootUser:
+    password: ""
+    secret:
+      name: ""
+    passwordFromFile: ""
+  serviceUser:
+    password: ""
+    secret:
+      name: ""
+      passwordFromFile: ""
+  managementNode:
+    replicas: 1
+  dataNode:
+    replicas: 2
+  sqlNode:
+    replicas: 3
+
+podSecurityContext:
+  fsGroup: 1000
+
+securityContext:
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  runAsUser: 1000 # mysql
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi

@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "mysql-cluster.fullname" . }}-mgm
+  labels:
+    {{- include "mysql-cluster.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.mysql.managementNode.replicas }}
+  serviceName: {{ include "mysql-cluster.fullname" . }}-mgm
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      {{- include "mysql-cluster.selectorLabels" . | nindent 6 }}
+      nodeType: management
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "mysql-cluster.selectorLabels" . | nindent 8 }}
+        nodeType: management
+    spec:
+      containers:
+        - name: mysql
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - ndb_mgmd
+            - --ndb-nodeid=1
+            - --connect-retries={{ .Values.mysql.node.connectionRetries }}
+          ports:
+            - name: management
+              containerPort: {{ .Values.mysql.ports.management }}
+              protocol: TCP
+{{/*          livenessProbe:*/}}
+{{/*            initialDelaySeconds: 5*/}}
+{{/*            tcpSocket:*/}}
+{{/*              port: management*/}}
+{{/*          readinessProbe:*/}}
+{{/*            initialDelaySeconds: 15*/}}
+{{/*            tcpSocket:*/}}
+{{/*              port: management*/}}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /etc/my.cnf
+              subPath: my.cnf
+              name: config
+              readOnly: true
+            - mountPath: /etc/mysql-cluster.cnf
+              subPath: mysql-cluster.cnf
+              name: config
+              readOnly: true
+      serviceAccountName: {{ include "mysql-cluster.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "mysql-cluster.fullname" . }}
