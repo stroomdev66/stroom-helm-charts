@@ -24,13 +24,13 @@ mysql:
     - stroom
 
   rootUser:
-    # If set, assigns a password from plain text (only use this in development!)
-    password: ""
-
     # If set, use an existing secret to determine the initial password of the user 'root'
     secret:
       name: ""
       key: password
+
+    # If set, assigns a password from plain text (only use this in development!)
+    password: ""
 
     # Path to the file containing the root user password
     passwordFromFile: ""
@@ -41,10 +41,10 @@ mysql:
     userName: stroom
     # Host the user is permitted to login from (defaults to any)
     host: "%"
-    password: ""
     secret:
       name: ""
       key: password
+    password: ""
     passwordFromFile: ""
   ports:
     management: 1186
@@ -64,7 +64,7 @@ mysql:
     dataMemory: 100M
 
     # Enable for Linux systems with kernel version >= 2.6
-    oDirectWrites: true
+    oDirectWrites: false
   sqlNode:
     # Maximum number of slots available for SQL client nodes
     replicas: 3
