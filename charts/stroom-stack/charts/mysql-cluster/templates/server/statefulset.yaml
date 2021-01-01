@@ -61,6 +61,9 @@ spec:
               subPath: my.cnf
               name: config
               readOnly: true
+            - mountPath: /docker-entrypoint-initdb.d
+              name: init-scripts
+              readOnly: true
             - mountPath: {{ $rootPasswordFile }}
               subPath: root
               name: root-password
@@ -90,6 +93,9 @@ spec:
         - name: config
           configMap:
             name: {{ include "mysql-cluster.fullname" . }}-server
+        - name: init-scripts
+          configMap:
+            name: {{ include "mysql-cluster.fullname" . }}-initscripts
         - name: root-password
           secret:
             {{- if .Values.mysql.rootUser.secret.name }}

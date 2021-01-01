@@ -12,6 +12,17 @@ nameOverride: ""
 fullnameOverride: ""
 
 mysql:
+  # User databases to create on startup
+  databases:
+    - annotations
+    - auth
+    - config
+    - datameta
+    - explorer
+    - process
+    - stats
+    - stroom
+
   rootUser:
     # If set, assigns a password from plain text (only use this in development!)
     password: ""
@@ -27,7 +38,9 @@ mysql:
     # If none of these are specified, a secret is generated automatically
   serviceUser:
     # If set, creates a separate user account with ownership over user application databases
-    userName: ""
+    userName: stroom
+    # Host the user is permitted to login from (defaults to any)
+    host: "%"
     password: ""
     secret:
       name: ""

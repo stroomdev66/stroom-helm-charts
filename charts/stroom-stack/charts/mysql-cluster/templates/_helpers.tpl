@@ -67,19 +67,3 @@ Generate a comma-separated list of management node hostnames and ports
 {{- define "mysql-cluster.managementConnectionString" -}}
 {{ include "mysql-cluster.fullname" . }}-mgm:{{ .Values.mysql.ports.management }}
 {{- end }}
-
-{{/*
-Generate a "CREATE USER..." SQL statement for use in init script.
-Accepts a database dictionary parameter.
-*/}}
-{{- define "mysql-cluster.createUserStatement" -}}
-{{- printf "CREATE USER \"%s\"@\"%%\" IDENTIFIED BY \"%s\"" .userName .password }}
-{{- end }}
-
-{{/*
-Generate a "GRANT ALL..." SQL statement for use in init script.
-Accepts a database dictionary parameter.
-*/}}
-{{- define "mysql-cluster.grantAllStatement" -}}
-{{- printf "GRANT ALL ON %s.* TO \"%s\"@\"%%\"" .userName .password }}
-{{- end }}

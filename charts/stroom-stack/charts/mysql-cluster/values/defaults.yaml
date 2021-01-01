@@ -1,6 +1,6 @@
 mysql:
   rootUser:
-    password: ""
+    password: "test"
     secret:
       name: ""
     passwordFromFile: ""

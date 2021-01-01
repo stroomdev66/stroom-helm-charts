@@ -1,16 +1,15 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ include "mysql-cluster.fullname" . }}-initdb
+  name: {{ include "mysql-cluster.fullname" . }}-initscripts
 data:
   init-stroom-db.sql: |
-    -- Script to create the required databases and user accounts
+    -- Script to initialise Stroom databases
 
     {{/* For each database, create it if it doesn't exist and grant access to the service user account */}}
-    {{- range .Values.global.database }}
-    CREATE DATABASE IF NOT EXISTS {{ .name }};
-    {{ include "mysql-cluster.createUserStatement" . }};
-    {{ include "mysql-cluster.grantAllStatement" . }};
+    {{- range .Values.mysql.databases }}
+    CREATE DATABASE IF NOT EXISTS {{ . }};
+    GRANT ALL PRIVILEGES ON {{ . }}.* TO '{{ $.Values.mysql.serviceUser.userName }}'@'{{ $.Values.mysql.serviceUser.host }}';
     {{ "" }}
     {{- end }}
 
