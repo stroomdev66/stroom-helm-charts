@@ -1,4 +1,14 @@
 mysql:
+  initDatabases:
+    - annotations
+    - auth
+    - config
+    - datameta
+    - explorer
+    - process
+    - stats
+    - stroom
+
   rootUser:
     password: "test"
     secret:

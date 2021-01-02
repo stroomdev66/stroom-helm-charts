@@ -7,7 +7,7 @@ data:
     -- Script to initialise Stroom databases
 
     {{/* For each database, create it if it doesn't exist and grant access to the service user account */}}
-    {{- range .Values.mysql.databases }}
+    {{- range .Values.mysql.initDatabases }}
     CREATE DATABASE IF NOT EXISTS {{ . }};
     GRANT ALL PRIVILEGES ON {{ . }}.* TO '{{ $.Values.mysql.serviceUser.userName }}'@'{{ $.Values.mysql.serviceUser.host }}';
     {{ "" }}

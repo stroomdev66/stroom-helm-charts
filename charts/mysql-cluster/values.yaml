@@ -13,15 +13,7 @@ fullnameOverride: ""
 
 mysql:
   # User databases to create on startup
-  databases:
-    - annotations
-    - auth
-    - config
-    - datameta
-    - explorer
-    - process
-    - stats
-    - stroom
+  initDatabases: []
 
   rootUser:
     # If set, use an existing secret to determine the initial password of the user 'root'
