@@ -12,7 +12,7 @@ spec:
     {{- include "mysql-cluster.selectorLabels" . | nindent 4 }}
     nodeType: server
   ports:
-    - port: {{ .Values.mysql.ports.mysqld }}
+    - port: {{ .Values.mysql.serverNode.port }}
       targetPort: server
       protocol: TCP
       name: server

@@ -6,16 +6,16 @@ data:
   my.cnf: |
     [mysqld]
     ndbcluster
-    port={{ $.Values.mysql.ports.management }}
+    port={{ $.Values.mysql.managementNode.port }}
     user={{ .Values.securityContext.runAsUser | default "mysql" }}
-    ndb-connectstring={{ include "mysql-cluster.fullname" . }}-management:{{ .Values.mysql.ports.management }}
+    ndb-connectstring={{ include "mysql-cluster.fullname" . }}-management:{{ .Values.mysql.managementNode.port }}
 
     [mysql_cluster]
-    connect-string={{ include "mysql-cluster.fullname" . }}-management:{{ .Values.mysql.ports.management }}
+    connect-string={{ include "mysql-cluster.fullname" . }}-management:{{ .Values.mysql.managementNode.port }}
 
   mysql-cluster.cnf: |
     [ndb_mgmd default]
-    PortNumber={{ .Values.mysql.ports.management }}
+    PortNumber={{ .Values.mysql.managementNode.port }}
     DataDir={{ .Values.mysql.node.dataDir }}
 
     {{- $currentNodeId := .Values.mysql.managementNode.nodeIdStartAt }}

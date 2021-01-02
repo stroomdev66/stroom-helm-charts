@@ -1,7 +1,7 @@
 {{- $nodeType := "server" }}
 {{- $rootPasswordFile := "/etc/mysql/password/root" }}
 {{- $serviceUserPasswordFile := "/etc/mysql/password/serviceuser" }}
-{{- $passwordFileMode := 0777 }}
+{{- $passwordFileMode := 0400 }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -43,7 +43,7 @@ spec:
             - mysqld
           ports:
             - name: {{ $nodeType }}
-              containerPort: {{ .Values.mysql.ports.mysqld }}
+              containerPort: {{ .Values.mysql.serverNode.port }}
               protocol: TCP
 {{/*          livenessProbe:*/}}
 {{/*            initialDelaySeconds: 5*/}}
@@ -56,7 +56,12 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            requests:
+              cpu: {{ .Values.mysql.serverNode.resources.requests.cpu }}
+              memory: {{ .Values.mysql.serverNode.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.mysql.serverNode.resources.limits.cpu }}
+              memory: {{ .Values.mysql.serverNode.resources.limits.memory }}
           volumeMounts:
             - mountPath: /etc/my.cnf
               subPath: my.cnf
@@ -162,7 +167,8 @@ spec:
         volumeMode:
           {{- toYaml . | nindent 10 }}
         {{- end }}
-        {{- with .Values.volumeClaim.resources }}
         resources:
-          {{- toYaml . | nindent 10 }}
-        {{- end }}
+          requests:
+            storage: {{ .Values.mysql.serverNode.resources.requests.storage }}
+          limits:
+            storage: {{ .Values.mysql.serverNode.resources.limits.storage }}

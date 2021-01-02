@@ -24,18 +24,43 @@ mysql:
       passwordFromFile: ""
   managementNode:
     replicas: 1
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
+        storage: 100Mi
+      limits:
+        cpu: 200m
+        memory: 200Mi
+        storage: 100Mi
   dataNode:
-    replicas: 2
-  sqlNode:
     replicas: 3
+
+    resources:
+      requests:
+        cpu: 1000m
+        memory: 1Gi
+        storage: 5Gi
+      limits:
+        cpu: 2000m
+        memory: 2Gi
+        storage: 10Gi
+  serverNode:
+    replicas: 2
+
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+        storage: 1Gi
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+        storage: 2Gi
 
 volumeClaim:
   storageClassName: local-path
-  resources:
-    requests:
-      storage: 1Gi
-    limits:
-      storage: 1Gi
 
 podSecurityContext: {}
   # fsGroup: 27 # mysql
@@ -47,11 +72,3 @@ securityContext: {}
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
   # runAsUser: 27 # mysql
-
-resources:
-  limits:
-    cpu: 1000m
-    memory: 1Gi
-  requests:
-    cpu: 500m
-    memory: 512Mi

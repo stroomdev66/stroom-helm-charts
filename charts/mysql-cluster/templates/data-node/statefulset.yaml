@@ -32,7 +32,7 @@ spec:
             - --connect-retries={{ .Values.mysql.node.connectionRetries }}
           ports:
             - name: {{ $nodeType }}
-              containerPort: {{ .Values.mysql.ports.data }}
+              containerPort: {{ .Values.mysql.dataNode.port }}
               protocol: TCP
 {{/*          livenessProbe:*/}}
 {{/*            initialDelaySeconds: 5*/}}
@@ -45,7 +45,12 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            requests:
+              cpu: {{ .Values.mysql.dataNode.resources.requests.cpu }}
+              memory: {{ .Values.mysql.dataNode.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.mysql.dataNode.resources.limits.cpu }}
+              memory: {{ .Values.mysql.dataNode.resources.limits.memory }}
           volumeMounts:
             - mountPath: /etc/my.cnf
               subPath: my.cnf
@@ -103,7 +108,8 @@ spec:
         volumeMode:
           {{- toYaml . | nindent 10 }}
         {{- end }}
-        {{- with .Values.volumeClaim.resources }}
         resources:
-          {{- toYaml . | nindent 10 }}
-        {{- end }}
+          requests:
+            storage: {{ .Values.mysql.dataNode.resources.requests.storage }}
+          limits:
+            storage: {{ .Values.mysql.dataNode.resources.limits.storage }}

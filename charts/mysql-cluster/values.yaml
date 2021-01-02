@@ -51,11 +51,25 @@ mysql:
     connectionRetries: 10
   managementNode:
     replicas: 1
+    port: 1186
 
     # Begin numbering management nodes from this value. Management nodes must be within the range 1 and 255
     nodeIdStartAt: 1
+
+    # Resource limits imposed on management nodes
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
+        storage: 100Mi
+
+      limits:
+        cpu: 200m
+        memory: 200Mi
+        storage: 100Mi
   dataNode:
-    replicas: 2
+    replicas: 3
+    port: 2202
 
     # Start numbering from this value. Note: a data node ID must be less than 49
     nodeIdStartAt: 10
@@ -68,10 +82,33 @@ mysql:
 
     # Enable for Linux systems with kernel version >= 2.6
     oDirectWrites: false
+
+    resources:
+      requests:
+        cpu: 1000m
+        memory: 1Gi
+        storage: 5Gi
+
+      limits:
+        cpu: 2000m
+        memory: 2Gi
+        storage: 10Gi
   serverNode:
     # Maximum number of slots available for SQL client nodes
-    replicas: 3
+    replicas: 2
+    port: 3306
     nodeIdStartAt: 100
+
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+        storage: 1Gi
+
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+        storage: 2Gi
 
 # Name of the Kubernetes cluster. Must be correct otherwise MySQL will fail to resolve host addresses
 clusterName: cluster.local
@@ -96,11 +133,6 @@ volumeClaim:
   accessModes:
     - ReadWriteOnce
   volumeMode: {}
-  resources:
-    requests:
-      storage: 1Gi
-    limits:
-      storage: 1Gi
 
 podAnnotations: {}
 
