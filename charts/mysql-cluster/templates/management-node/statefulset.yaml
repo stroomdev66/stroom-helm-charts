@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ $nodeType }}
+  name: {{ include "mysql-cluster.fullname" . }}-{{ $nodeType }}
   labels:
     {{- include "mysql-cluster.labels" . | nindent 4 }}
 spec:

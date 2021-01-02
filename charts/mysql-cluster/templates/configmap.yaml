@@ -22,7 +22,7 @@ data:
 
     {{- range $managementNodeId, $replicas := until (.Values.mysql.managementNode.replicas | int) }}
     [ndb_mgmd]
-    HostName={{ printf "management-%d.%s-management.%s.svc.%s" $managementNodeId (include "mysql-cluster.fullname" $) $.Release.Namespace $.Values.clusterName }}
+    HostName={{ printf "%s-management-%d.%s-management.%s.svc.%s" (include "mysql-cluster.fullname" $ ) $managementNodeId (include "mysql-cluster.fullname" $ ) $.Release.Namespace $.Values.clusterName }}
     NodeId={{ $currentNodeId }}
     {{ $currentNodeId = (add $currentNodeId 1) }}
     {{- end }}
@@ -44,7 +44,7 @@ data:
 
     {{- range $dataNodeId, $replicas := until (.Values.mysql.dataNode.replicas | int) }}
     [ndbd]
-    HostName={{ printf "data-%d.%s-data.%s.svc.%s" $dataNodeId (include "mysql-cluster.fullname" $) $.Release.Namespace $.Values.clusterName }}
+    HostName={{ printf "%s-data-%d.%s-data.%s.svc.%s" (include "mysql-cluster.fullname" $ ) $dataNodeId (include "mysql-cluster.fullname" $ ) $.Release.Namespace $.Values.clusterName }}
     NodeId={{ $currentNodeId }}
     {{ $currentNodeId = (add $currentNodeId 1) }}
     {{- end }}
