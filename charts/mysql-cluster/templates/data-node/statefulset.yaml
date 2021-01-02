@@ -1,17 +1,18 @@
+{{- $nodeType := "data" }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "mysql-cluster.fullname" . }}-data
+  name: {{ $nodeType }}
   labels:
     {{- include "mysql-cluster.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.mysql.dataNode.replicas }}
-  serviceName: {{ include "mysql-cluster.fullname" . }}-data
+  serviceName: {{ include "mysql-cluster.fullname" . }}-{{ $nodeType }}
   podManagementPolicy: Parallel
   selector:
     matchLabels:
       {{- include "mysql-cluster.selectorLabels" . | nindent 6 }}
-      nodeType: data
+      nodeType: {{ $nodeType }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -20,7 +21,7 @@ spec:
       {{- end }}
       labels:
         {{- include "mysql-cluster.selectorLabels" . | nindent 8 }}
-        nodeType: data
+        nodeType: {{ $nodeType }}
     spec:
       containers:
         - name: mysql
@@ -30,7 +31,7 @@ spec:
             - ndbd
             - --connect-retries={{ .Values.mysql.node.connectionRetries }}
           ports:
-            - name: data
+            - name: {{ $nodeType }}
               containerPort: {{ .Values.mysql.ports.data }}
               protocol: TCP
 {{/*          livenessProbe:*/}}
@@ -50,6 +51,8 @@ spec:
               subPath: my.cnf
               name: config
               readOnly: true
+            - mountPath: {{ .Values.mysql.node.dataDir }}
+              name: data
       serviceAccountName: {{ include "mysql-cluster.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
@@ -69,3 +72,38 @@ spec:
         - name: config
           configMap:
             name: {{ include "mysql-cluster.fullname" . }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "mysql-cluster.labels" . | nindent 10 }}
+      spec:
+        volumeName: {{ .Values.volumeClaim.volumeName | quote }}
+        storageClassName: {{ .Values.volumeClaim.storageClassName | quote }}
+        selector:
+          matchLabels:
+            mysql/clusterId: {{ $.Values.mysql.clusterId }}
+            mysql/nodeType: {{ $nodeType }}
+            {{- with .Values.volumeClaim.selector.matchLabels }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.volumeClaim.selector.matchExpressions }}
+          matchExpressions:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- with .Values.volumeClaim.dataSource }}
+        dataSource:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.volumeClaim.accessModes }}
+        accessModes:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.volumeClaim.volumeMode }}
+        volumeMode:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.volumeClaim.resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
