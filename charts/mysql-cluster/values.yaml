@@ -73,6 +73,7 @@ mysql:
     replicas: 3
     nodeIdStartAt: 100
 
+# Name of the Kubernetes cluster. Must be correct otherwise MySQL will fail to resolve host addresses
 clusterName: cluster.local
 
 serviceAccount:
