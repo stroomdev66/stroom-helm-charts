@@ -1,3 +1,5 @@
+fullnameOverride: mysql
+
 mysql:
   clusterId: stroom
   initDatabases:
@@ -27,6 +29,14 @@ mysql:
   sqlNode:
     replicas: 3
 
+volumeClaim:
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 1Gi
+    limits:
+      storage: 1Gi
+
 podSecurityContext: {}
   # fsGroup: 27 # mysql
 
@@ -45,11 +55,3 @@ resources:
   requests:
     cpu: 500m
     memory: 512Mi
-
-volumeClaim:
-  storageClassName: local-path
-  resources:
-    requests:
-      storage: 1Gi
-    limits:
-      storage: 1Gi
