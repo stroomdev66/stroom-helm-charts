@@ -65,5 +65,5 @@ Create the name of the service account to use
 Generate a comma-separated list of management node hostnames and ports
 */}}
 {{- define "mysql-cluster.managementConnectionString" -}}
-{{ include "mysql-cluster.fullname" . }}-mgm:{{ .Values.mysql.ports.management }}
+{{ include "mysql-cluster.fullname" . }}-management:{{ .Values.mysql.ports.management }}
 {{- end }}

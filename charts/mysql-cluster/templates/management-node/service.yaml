@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "mysql-cluster.fullname" . }}-mgm
+  name: {{ include "mysql-cluster.fullname" . }}-management
   labels:
     {{- include "mysql-cluster.labels" . | nindent 4 }}
     nodeType: management

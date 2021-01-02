@@ -1,20 +1,21 @@
+{{- $nodeType := "server" }}
 {{- $rootPasswordFile := "/etc/mysql/password/root" }}
 {{- $serviceUserPasswordFile := "/etc/mysql/password/serviceuser" }}
 {{- $passwordFileMode := 0777 }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "mysql-cluster.fullname" . }}-server
+  name: {{ $nodeType }}
   labels:
     {{- include "mysql-cluster.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.mysql.sqlNode.replicas }}
+  replicas: {{ .Values.mysql.serverNode.replicas }}
   serviceName: {{ include "mysql-cluster.fullname" . }}-server
   podManagementPolicy: Parallel
   selector:
     matchLabels:
       {{- include "mysql-cluster.selectorLabels" . | nindent 6 }}
-      nodeType: server
+      nodeType: {{ $nodeType }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -23,7 +24,7 @@ spec:
       {{- end }}
       labels:
         {{- include "mysql-cluster.selectorLabels" . | nindent 8 }}
-        nodeType: server
+        nodeType: {{ $nodeType }}
     spec:
       containers:
         - name: mysql
@@ -41,7 +42,7 @@ spec:
           args:
             - mysqld
           ports:
-            - name: server
+            - name: {{ $nodeType }}
               containerPort: {{ .Values.mysql.ports.mysqld }}
               protocol: TCP
 {{/*          livenessProbe:*/}}
@@ -61,6 +62,8 @@ spec:
               subPath: my.cnf
               name: config
               readOnly: true
+            - mountPath: {{ .Values.mysql.node.dataDir }}
+              name: data
             - mountPath: /docker-entrypoint-initdb.d
               name: init-scripts
               readOnly: true
@@ -92,7 +95,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ include "mysql-cluster.fullname" . }}-server
+            name: {{ include "mysql-cluster.fullname" . }}-{{ $nodeType }}
         - name: init-scripts
           configMap:
             name: {{ include "mysql-cluster.fullname" . }}-initscripts
@@ -127,4 +130,39 @@ spec:
                 path: serviceuser
                 mode: {{ $passwordFileMode }}
             {{- end }}
+        {{- end }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "mysql-cluster.labels" . | nindent 10 }}
+      spec:
+        volumeName: {{ .Values.volumeClaim.volumeName | quote }}
+        storageClassName: {{ .Values.volumeClaim.storageClassName | quote }}
+        selector:
+          matchLabels:
+            mysql/clusterId: {{ $.Values.mysql.clusterId }}
+            mysql/nodeType: {{ $nodeType }}
+            {{- with .Values.volumeClaim.selector.matchLabels }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.volumeClaim.selector.matchExpressions }}
+          matchExpressions:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- with .Values.volumeClaim.dataSource }}
+        dataSource:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.volumeClaim.accessModes }}
+        accessModes:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.volumeClaim.volumeMode }}
+        volumeMode:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.volumeClaim.resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
         {{- end }}

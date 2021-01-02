@@ -12,6 +12,9 @@ nameOverride: ""
 fullnameOverride: ""
 
 mysql:
+  # Uniquely identifies the cluster. Used to map pods to persistent volumes from the same cluster each time.
+  clusterId: ""
+
   # User databases to create on startup
   initDatabases: []
 
@@ -48,8 +51,16 @@ mysql:
     connectionRetries: 10
   managementNode:
     replicas: 1
+
+    # Begin numbering management nodes from this value. Management nodes must be within the range 1 and 255
+    nodeIdStartAt: 1
   dataNode:
     replicas: 2
+
+    # Start numbering from this value. Note: a data node ID must be less than 49
+    nodeIdStartAt: 10
+
+    # Avoid swapping memory to disk, for performance reasons
     lockPagesInMainMemory: true
 
     # Generally this should be >= the amount of data stored, plus a 20% margin
@@ -57,9 +68,10 @@ mysql:
 
     # Enable for Linux systems with kernel version >= 2.6
     oDirectWrites: false
-  sqlNode:
+  serverNode:
     # Maximum number of slots available for SQL client nodes
     replicas: 3
+    nodeIdStartAt: 100
 
 clusterName: cluster.local
 
@@ -71,6 +83,23 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
+
+# Persistent volume claims in data, management and server nodes are generated from this template
+volumeClaim:
+  volumeName: ""
+  storageClassName: ""
+  selector:
+    matchLabels: {}
+    matchExpressions: {}
+  dataSource: {}
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: {}
+  resources:
+    requests:
+      storage: 1Gi
+    limits:
+      storage: 1Gi
 
 podAnnotations: {}
 
