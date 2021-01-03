@@ -6,7 +6,8 @@ data:
   my.cnf: |
     [mysqld]
     ndbcluster
-    port={{ $.Values.mysql.managementNode.port }}
+    datadir={{ .Values.mysql.node.dataDir }}
+    port={{ $.Values.mysql.serverNode.port }}
     user={{ .Values.securityContext.runAsUser | default "mysql" }}
     ndb-connectstring={{ include "mysql-cluster.fullname" . }}-management:{{ .Values.mysql.managementNode.port }}
 
