@@ -50,10 +50,10 @@ mysql:
     dataDir: /var/lib/mysql
     connectionRetries: 10
   managementNode:
-    replicas: 1
+    replicas: 2
     port: 1186
 
-    # Begin numbering management nodes from this value. Management nodes must be within the range 1 and 255
+    # Begin numbering management nodes from this value. Management nodes must be within the range 1 and 144
     nodeIdStartAt: 1
 
     # Resource limits imposed on management nodes

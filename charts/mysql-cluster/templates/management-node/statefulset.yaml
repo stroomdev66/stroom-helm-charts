@@ -27,10 +27,15 @@ spec:
         - name: mysql
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          args:
-            - ndb_mgmd
-            - --ndb-nodeid=1
-            - --connect-retries={{ .Values.mysql.node.connectionRetries }}
+          # Node ID must be passed in as an arg, otherwise management nodes won't start up.
+          # Calculate from the pod ordinal.
+          # In future, we could get this from a pod label. See: https://github.com/kubernetes/kubernetes/pull/68719
+          command:
+            - sh
+            - -c
+            - |
+              node_id=$(((${HOSTNAME##*-})+1))
+              /entrypoint.sh ndb_mgmd --ndb-nodeid=$node_id --connect-retries={{ .Values.mysql.node.connectionRetries }}
           ports:
             - name: {{ $nodeType }}
               containerPort: {{ .Values.mysql.managementNode.port }}

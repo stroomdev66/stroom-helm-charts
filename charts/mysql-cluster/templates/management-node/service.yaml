@@ -16,3 +16,5 @@ spec:
       targetPort: management
       protocol: TCP
       name: management
+  # Management nodes need to be able to communicate at startup, so ensure they can resolve each others' DNS addresses
+  publishNotReadyAddresses: true

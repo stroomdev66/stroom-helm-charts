@@ -23,7 +23,7 @@ mysql:
       name: ""
       passwordFromFile: ""
   managementNode:
-    replicas: 1
+    replicas: 2
 
     resources:
       requests:
@@ -60,7 +60,7 @@ mysql:
         storage: 2Gi
 
 volumeClaim:
-  storageClassName: local-path
+  storageClassName: ""
 
 podSecurityContext: {}
   # fsGroup: 27 # mysql
