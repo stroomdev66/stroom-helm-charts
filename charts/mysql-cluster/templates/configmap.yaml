@@ -18,6 +18,7 @@ data:
     [ndb_mgmd default]
     PortNumber={{ .Values.mysql.managementNode.port }}
     DataDir={{ .Values.mysql.node.dataDir }}
+    {{ "" }}
 
     {{- $currentNodeId := .Values.mysql.managementNode.nodeIdStartAt }}
 
@@ -25,7 +26,8 @@ data:
     [ndb_mgmd]
     HostName={{ printf "%s-management-%d.%s-management.%s.svc.%s" (include "mysql-cluster.fullname" $ ) $managementNodeId (include "mysql-cluster.fullname" $ ) $.Release.Namespace $.Values.clusterName }}
     NodeId={{ $currentNodeId }}
-    {{ $currentNodeId = (add $currentNodeId 1) }}
+    {{ "" }}
+    {{- $currentNodeId = (add $currentNodeId 1) }}
     {{- end }}
 
     [ndbd default]
@@ -47,7 +49,7 @@ data:
     [ndbd]
     HostName={{ printf "%s-data-%d.%s-data.%s.svc.%s" (include "mysql-cluster.fullname" $ ) $dataNodeId (include "mysql-cluster.fullname" $ ) $.Release.Namespace $.Values.clusterName }}
     NodeId={{ $currentNodeId }}
-    {{ $currentNodeId = (add $currentNodeId 1) }}
+    {{- $currentNodeId = (add $currentNodeId 1) }}
     {{- end }}
 
     {{- $currentNodeId = .Values.mysql.serverNode.nodeIdStartAt }}
@@ -55,5 +57,5 @@ data:
     {{- range $sqlNodeId, $clientConnections := until (.Values.mysql.serverNode.replicas | int) }}
     [mysqld]
     NodeId={{ $currentNodeId }}
-    {{ $currentNodeId = (add $currentNodeId 1) }}
+    {{- $currentNodeId = (add $currentNodeId 1) }}
     {{- end }}
