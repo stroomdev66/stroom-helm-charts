@@ -1,0 +1,14 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ include "mysql.fullname" . }}
+data:
+  my.cnf: |
+    [mysqld]
+    datadir={{ .Values.mysql.dataDir }}
+    port={{ $.Values.mysql.port }}
+    user={{ .Values.securityContext.runAsUser | default "mysql" }}
+
+    {{- range .Values.mysql.additionalConfig }}
+    {{ . }}
+    {{- end }}

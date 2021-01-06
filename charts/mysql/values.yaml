@@ -1,0 +1,107 @@
+# Default values for mysql-cluster.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  repository: mysql/mysql-server
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+nameOverride: ""
+fullnameOverride: ""
+
+mysql:
+  port: 3306
+  dataDir: /var/lib/mysql
+
+  # TODO:
+  # - Encryption (https://dev.mysql.com/doc/refman/8.0/en/using-encrypted-connections.html)
+  # - Additional custom config (config file?) https://dev.mysql.com/doc/refman/8.0/en/docker-mysql-more-topics.html#docker_var_mysql-log-console
+  # - Logging
+
+  # User databases to create on startup
+  initDatabases: []
+
+  rootUser:
+    # If set, use an existing secret to determine the initial password of the user 'root'
+    secret:
+      name: ""
+      key: password
+
+    # If set, assigns a password from plain text (not recommended for development)
+    password: ""
+
+    # Path to the file containing the root user password
+    passwordFromFile: ""
+
+    # If none of the above are specified, a secret is generated automatically
+
+    # Whether to expire the password upon initial startup, requiring it to be changed
+    expirePassword: false
+  serviceUser:
+    # If set, creates a separate user account with ownership over user application databases
+    userName: stroom
+
+    secret:
+      name: ""
+      key: password
+    password: ""
+    passwordFromFile: ""
+
+  # Plain-text configuration to append to the `my.cnf` file
+  additionalConfig: []
+  # - key=value
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 512Mi
+    storage: 1Gi
+
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+    storage: 2Gi
+
+  # Generally this should be >= the amount of data stored, plus a 20% margin
+  dataMemory: 100M
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+volumeClaim:
+  volumeName: ""
+  storageClassName: ""
+  selector:
+    matchLabels: {}
+    matchExpressions: {}
+  dataSource: {}
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: {}
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 1000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
