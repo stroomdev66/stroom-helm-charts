@@ -59,6 +59,9 @@ nodeNamePrefix: node
 # Development mode
 developmentMode: true
 
+# Number of characters to generate for random passwords
+randomPasswordLength: 16
+
 loggingLevel: INFO
 jpaDialect: org.hibernate.dialect.MySQLInnoDBDialect
 jdbc:

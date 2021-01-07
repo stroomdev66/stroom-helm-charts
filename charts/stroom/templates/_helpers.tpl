@@ -64,17 +64,10 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Generates a random password. Parameter is the number of characters to generate.
+Generates a random password
 */}}
 {{- define "stroom.password" -}}
-{{- randAlphaNum ( . | default 16 ) | b64enc }}
-{{- end }}
-
-{{/*
-Generates a MySQL connection string for the specified database name
-*/}}
-{{- define "stroom.dbConnectionString" -}}
-{{- printf "jdbc:mysql://%s:%d/%s?useUnicode=yes&characterEncoding=UTF-8" $.Values.global.mysql.serviceName $.Values.global.mysql.port . }}
+{{- randAlphaNum (.Values.randomPasswordLength | int) | b64enc }}
 {{- end }}
 
 {{/*

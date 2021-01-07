@@ -63,15 +63,15 @@ spec:
               value: .*\((.*)\)
             - name: CHANGE_PASSWORD_URL
               value: {{ include "stroom.rootUrl" . }}/s/changePassword
+            - name: DB_URL
+              value: {{ printf "jdbc:mysql://%s:%d/%s?useUnicode=yes&characterEncoding=UTF-8" .Values.global.mysql.serviceName .Values.global.mysql.port .Values.global.mysql.databases.auth }}
+            - name: DB_USER
+              value: {{ .Values.global.mysql.users.service.name }}
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ include "stroom.fullname" . }}
                   key: mysql-service-password
-            - name: DB_URL
-              value: {{ include "stroom.dbConnectionString" .Values.global.mysql.databases.auth }}
-            - name: DB_USER
-              value: {{ .Values.global.mysql.users.service.name }}
             - name: DURATION_BETWEEN_CHECKS
               value: {{ .Values.authService.durationBetweenChecks }}
             - name: EMAIL_FROM_ADDRESS
