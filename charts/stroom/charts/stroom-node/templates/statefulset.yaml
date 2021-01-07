@@ -1,16 +1,15 @@
-{{- $stroomNode := .Values.stroomNode }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "stroom.fullname" . }}
+  name: {{ include "stroom-node.fullname" . }}
   labels:
-    {{- include "stroom.labels" . | nindent 4 }}
+    {{- include "stroom-node.labels" . | nindent 4 }}
 spec:
-  replicas: {{ $stroomNode.replicaCount }}
-  serviceName: {{ include "stroom.fullname" . }}
+  replicas: {{ .Values.replicaCount }}
+  serviceName: {{ include "stroom-node.fullname" . }}
   selector:
     matchLabels:
-      {{- include "stroom.selectorLabels" . | nindent 6 }}
+      {{- include "stroom-node.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,14 +17,14 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "stroom.selectorLabels" . | nindent 8 }}
+        {{- include "stroom-node.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "stroom.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.stroomNode.image.repository }}:{{ .Values.stroomNode.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: IfNotPresent
           env:
             - name: DOCKER_HOST_HOSTNAME
@@ -37,13 +36,13 @@ spec:
                 fieldRef:
                   fieldPath: status.podIP
             - name: JAVA_OPTS
-              value: {{ $stroomNode.javaOpts }}
+              value: {{ .Values.javaOpts }}
             - name: STROOM_APP_PORT
-              value: {{ $stroomNode.ports.app }}
+              value: {{ .Values.ports.app }}
             - name: STROOM_ADMIN_PORT
-              value: {{ $stroomNode.ports.admin }}
+              value: {{ .Values.ports.admin }}
             - name: STROOM_DEBUG_PORT
-              value: {{ $stroomNode.ports.debug }}
+              value: {{ .Values.ports.debug }}
             - name: STROOM_NODE
               valueFrom:
                 fieldRef:
@@ -55,7 +54,7 @@ spec:
             - name: STROOM_JDBC_DRIVER_URL
               value: {{ printf "jdbc:mysql://%s/%s?useUnicode=yes&characterEncoding=UTF-8" (include "mysql.connectionAddress" .) .Values.global.mysql.databases.stroom }}
             - name: STROOM_JDBC_DRIVER_CLASS_NAME
-              value: {{ .Values.jdbc.driver }}
+              value: {{ .Values.jdbcDriver }}
             - name: STROOM_JDBC_DRIVER_USERNAME
               value: {{ .Values.global.mysql.users.service.name }}
             - name: STROOM_JDBC_DRIVER_PASSWORD
@@ -87,12 +86,12 @@ spec:
             - name: STROOM_AUTH_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "stroom-node.fullname" . }}
                   key: auth-client-id
             - name: STROOM_AUTH_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "stroom-node.fullname" . }}
                   key: auth-client-secret
             - name: STROOM_UI_URL
               # TODO: This is supposed to be "STROOM_UI_HOST". Check whether this is equivalent to the advertised address
@@ -112,7 +111,7 @@ spec:
             - name: STROOM_LOGGING_LEVEL
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "stroom-node.fullname" . }}
                   key: stroom-logging-level
             - name: STROOM_PLUGINS_LIB_DIR
               value: /stroom/plugins
@@ -121,11 +120,11 @@ spec:
             - name: STROOM_CONNECTORS_KAFKA_DEFAULT_CONNECTOR_VERSION
               value: {{ .Values.global.kafka.connectorVersion }}
             - name: STROOM_CONTENT_PACK_IMPORT_ENABLED
-              value: {{ $stroomNode.contentPackImportEnabled }}
+              value: {{ .Values.contentPackImportEnabled }}
             - name: STROOM_SERVICE_DISCOVERY_ENABLED
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "stroom-node.fullname" . }}
                   key: stroom-service-discovery-enabled
             - name: STROOM_SERVICE_DISCOVERY_ZOOKEEPER_URL
               value: {{ include "zookeeper.connectionString" . | trimSuffix "," }}
@@ -134,65 +133,65 @@ spec:
             - name: STROOM_INTERNALSTATISTICS_BENCHMARK_CLUSTER_DOC_REFS
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "stroom-node.fullname" . }}
                   key: stat-docref-benchmark-cluster
             - name: STROOM_INTERNALSTATISTICS_CPU_DOC_REFS
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "stroom-node.fullname" . }}
                   key: stat-docref-cpu
             - name: STROOM_INTERNALSTATISTICS_EVENTS_PER_SECOND_DOC_REFS
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "stroom-node.fullname" . }}
                   key: stat-docref-events-per-second
             - name: STROOM_INTERNALSTATISTICS_HEAP_HISTOGRAM_BYTES_DOC_REFS
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "stroom-node.fullname" . }}
                   key: stat-docref-heap-histogram-bytes
             - name: STROOM_INTERNALSTATISTICS_HEAP_HISTOGRAM_INSTANCES_DOC_REFS
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "stroom-node.fullname" . }}
                   key: stat-docref-heap-histogram-instances
             - name: STROOM_INTERNALSTATISTICS_MEMORY_DOC_REFS
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "stroom-node.fullname" . }}
                   key: stat-docref-memory
             - name: STROOM_INTERNALSTATISTICS_META_DATA_STREAM_SIZE_DOC_REFS
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "stroom-node.fullname" . }}
                   key: stat-docref-metadata-stream-size
             - name: STROOM_INTERNALSTATISTICS_META_DATA_STREAMS_RECEIVED_DOC_REFS
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "stroom-node.fullname" . }}
                   key: stat-docref-metadata-streams-received
             - name: STROOM_INTERNALSTATISTICS_PIPELINE_STREAM_PROCESSOR_DOC_REFS
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "stroom-node.fullname" . }}
                   key: stat-docref-pipeline-stream-processor
             - name: STROOM_INTERNALSTATISTICS_STREAM_TASK_QUEUE_SIZE_DOC_REFS
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "stroom-node.fullname" . }}
                   key: stat-docref-stream-task-queue-size
             - name: STROOM_INTERNALSTATISTICS_VOLUMES_DOC_REFS
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "stroom-node.fullname" . }}
                   key: stat-docref-volumes
             - name: STROOM_PROXY_DIR
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "stroom-node.fullname" . }}
                   key: stroom-proxy-dir
             - name: STROOM_HELP_URL
-              value: {{ .Values.stroomNode.stroomHelpUrl }}
+              value: {{ .Values.stroomHelpUrl }}
           volumeMounts:
             - mountPath: /stroom/logs
               subPath: logs
@@ -209,7 +208,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           ports:
-            {{- range $name, $number := .Values.stroomNode.ports }}
+            {{- range $name, $number := .Values.ports }}
             - name: {{ $name }}
               containerPort: {{ $number }}
               protocol: TCP
@@ -232,11 +231,11 @@ spec:
               port: admin
           resources:
             requests:
-              cpu: {{ $stroomNode.resources.requests.cpu }}
-              memory: {{ $stroomNode.resources.requests.memory }}
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
             limits:
-              cpu: {{ $stroomNode.resources.limits.cpu }}
-              memory: {{ $stroomNode.resources.limits.memory }}
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
           # TODO: Configure logging
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -254,33 +253,33 @@ spec:
     - metadata:
         name: data
         labels:
-          {{- include "stroom.labels" . | nindent 10 }}
+          {{- include "stroom-node.labels" . | nindent 10 }}
       spec:
-        volumeName: {{ $stroomNode.volumeClaim.volumeName | quote }}
-        storageClassName: {{ $stroomNode.volumeClaim.storageClassName | quote }}
+        volumeName: {{ .Values.volumeClaim.volumeName | quote }}
+        storageClassName: {{ .Values.volumeClaim.storageClassName | quote }}
         selector:
-          {{- with $stroomNode.volumeClaim.selector.matchLabels }}
+          {{- with .Values.volumeClaim.selector.matchLabels }}
           matchLabels:
             {{- toYaml . | nindent 12 }}
             {{- end }}
-          {{- with $stroomNode.volumeClaim.selector.matchExpressions }}
+          {{- with .Values.volumeClaim.selector.matchExpressions }}
           matchExpressions:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-        {{- with $stroomNode.volumeClaim.dataSource }}
+        {{- with .Values.volumeClaim.dataSource }}
         dataSource:
           {{- toYaml . | nindent 10 }}
         {{- end }}
-        {{- with $stroomNode.volumeClaim.accessModes }}
+        {{- with .Values.volumeClaim.accessModes }}
         accessModes:
           {{- toYaml . | nindent 10 }}
         {{- end }}
-        {{- with $stroomNode.volumeClaim.volumeMode }}
+        {{- with .Values.volumeClaim.volumeMode }}
         volumeMode:
           {{- toYaml . | nindent 10 }}
         {{- end }}
         resources:
           requests:
-            storage: {{ $stroomNode.resources.requests.storage }}
+            storage: {{ .Values.resources.requests.storage }}
           limits:
-            storage: {{ $stroomNode.resources.limits.storage }}
+            storage: {{ .Values.resources.limits.storage }}

@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "stroom.name" -}}
+{{- define "stroom-node.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "stroom.fullname" -}}
+{{- define "stroom-node.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "stroom.chart" -}}
+{{- define "stroom-node.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "stroom.labels" -}}
-helm.sh/chart: {{ include "stroom.chart" . }}
-{{ include "stroom.selectorLabels" . }}
+{{- define "stroom-node.labels" -}}
+helm.sh/chart: {{ include "stroom-node.chart" . }}
+{{ include "stroom-node.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -44,45 +44,9 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
-Stroom-specific labels, used by subcharts
-*/}}
-{{- define "stroom.extraLabels" -}}
-stroom/stack: {{ .Values.global.stackName }}
-stroom/rack: {{ .Values.global.rackName }}
-{{- end }}
-
-{{/*
 Selector labels
 */}}
-{{- define "stroom.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "stroom.name" . }}
+{{- define "stroom-node.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "stroom-node.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "stroom.serviceAccountName" -}}
-{{- include "stroom.fullname" . }}
-{{- end }}
-
-{{/*
-Name of the cluster `Secret` resource
-*/}}
-{{- define "stroom.globalSecretName" -}}
-{{- default .Values.global.secretName .Release.Name $ }}
-{{- end }}
-
-{{/*
-Generates a random password
-*/}}
-{{- define "stroom.password" -}}
-{{- randAlphaNum (.Values.randomPasswordLength | int) | b64enc }}
-{{- end }}
-
-{{/*
-Root URL of the advertised web frontend
-*/}}
-{{- define "stroom.rootUrl" -}}
-https://{{ required "Advertised host is required" .Values.global.advertisedHost }}
 {{- end }}

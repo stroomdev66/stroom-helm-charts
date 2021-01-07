@@ -12,8 +12,8 @@ global:
   # Set the advertised host (could be a FQDN or hostname)
   advertisedHost: "stroom"
 
-  serviceAccount:
-    annotations: { }
+  # Override the name of the global `Secret` resource (defaults to `Release.Name`)
+  secretName: ""
 
   mysql:
     # MySQL service port
@@ -52,67 +52,8 @@ global:
     replicaCount: 3
     port: 2181
 
-# Node name prefix used to generate node IDs. For instance, the first node will be called 'node-1'
-nodeNamePrefix: node
-
-# Development mode
-developmentMode: true
-
 # Number of characters to generate for random passwords
 randomPasswordLength: 16
-
-loggingLevel: INFO
-jpaDialect: org.hibernate.dialect.MySQLInnoDBDialect
-jdbc:
-  driver: com.mysql.cj.jdbc.Driver
-
-stroomNode:
-  replicaCount: 1
-  image:
-    repository: gchq/stroom
-    tag: ""
-  javaOpts: -Xms50m -Xmx1024m -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=10765,suspend=n
-  resources:
-    requests:
-      cpu: 500m
-      memory: 512Mi
-      storage: 1Gi
-    limits:
-      cpu: 1000m
-      memory: 1Gi
-      storage: 2Gi
-  ports:
-    app: 8080
-    admin: 8081
-    debug: 10765
-  contentPackImportEnabled: false
-  serviceDiscovery:
-    enabled: true
-  stroomProxyDir: /tmp/proxy
-  stroomHelpUrl: https://gchq.github.io/stroom-docs
-  volumeClaim:
-    volumeName: ""
-    storageClassName: ""
-    selector:
-      matchLabels: { }
-      matchExpressions: { }
-    dataSource: { }
-    accessModes:
-      - ReadWriteOnce
-    volumeMode: { }
-
-statisticDocRefs:
-  benchmarkCluster: docRef(StatisticStore,946a88c6-a59a-11e6-bdc4-0242ac110002,Benchmark-Cluster Test),docRef(StroomStatsStore,2503f703-5ce0-4432-b9d4-e3272178f47e,Benchmark-Cluster Test)
-  cpu: docRef(StatisticStore,af08c4a7-ee7c-44e4-8f5e-e9c6be280434,CPU),docRef(StroomStatsStore,1edfd582-5e60-413a-b91c-151bd544da47,CPU)
-  eventsPerSecond: docRef(StatisticStore,a9936548-2572-448b-9d5b-8543052c4d92,EPS),docRef(StroomStatsStore,cde67df0-0f77-45d3-b2c0-ee8bb7b3c9c6,EPS)
-  heapHistogramBytes: docRef(StatisticStore,934a1600-b456-49bf-9aea-f1e84025febd,Heap Histogram Bytes),docRef(StroomStatsStore,b0110ab4-ac25-4b73-b4f6-96f2b50b456a,Heap Histogram Bytes)
-  heapHistogramInstances: docRef(StatisticStore,e4f243b8-2c70-4d6e-9d5a-16466bf8764f,Heap Histogram Instances),docRef(StroomStatsStore,bdd933a4-4309-47fd-98f6-1bc2eb555f20,Heap Histogram Instances)
-  memory: docRef(StatisticStore,77c09ccb-e251-4ca5-bca0-56a842654397,Memory),docRef(StroomStatsStore,d8a7da4f-ef6d-47e0-b16a-af26367a2798,Memory)
-  metaDataStreamSize: docRef(StatisticStore,946a8814-a59a-11e6-bdc4-0242ac110002,Meta Data-Stream Size),docRef(StroomStatsStore,3b25d63b-5472-44d0-80e8-8eea94f40f14,Meta Data-Stream Size)
-  metaDataStreamsReceived: docRef(StatisticStore,946a87bc-a59a-11e6-bdc4-0242ac110002,Meta Data-Streams Received),docRef(StroomStatsStore,5535f493-29ae-4ee6-bba6-735aa3104136,Meta Data-Streams Received)
-  pipelineStreamProcessor: docRef(StatisticStore,946a80fc-a59a-11e6-bdc4-0242ac110002,PipelineStreamProcessor),docRef(StroomStatsStore,efd9bad4-0bab-460f-ae98-79e9717deeaf,PipelineStreamProcessor)
-  streamTaskQueueSize: docRef(StatisticStore,946a7f0f-a59a-11e6-bdc4-0242ac110002,Stream Task Queue Size),docRef(StroomStatsStore,4ce8d6e7-94be-40e1-8294-bf29dd089962,Stream Task Queue Size)
-  volumes: docRef(StatisticStore,ac4d8d10-6f75-4946-9708-18b8cb42a5a3,Volumes),docRef(StroomStatsStore,60f4f5f0-4cc3-42d6-8fe7-21a7cec30f8e,Volumes)
 
 nameOverride: ""
 fullnameOverride: ""
