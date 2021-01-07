@@ -1,16 +1,14 @@
-{{- $component := "smtp" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "stroom.fullname" . }}-{{ $component }}
+  name: {{ include "smtp.fullname" . }}
   labels:
-    {{- include "stroom.labels" . | nindent 4 }}
+    {{- include "smtp.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.smtp.replicaCount }}
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "stroom.selectorLabels" . | nindent 6 }}
-      component: {{ $component }}
+      {{- include "smtp.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,24 +16,23 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "stroom.selectorLabels" . | nindent 8 }}
-        component: {{ $component }}
+        {{- include "smtp.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "stroom.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ $component }}
+        - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.smtp.image.repository }}:{{ .Values.smtp.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: IfNotPresent
           ports:
             - name: smtp
               containerPort: {{ .Values.global.smtp.port }}
               protocol: TCP
           resources:
-            {{- toYaml .Values.smtp.resources | nindent 12 }}
+            {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
