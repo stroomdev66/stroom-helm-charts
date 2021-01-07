@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "zookeeper.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.global.zookeeper.replicaCount }}
   serviceName: {{ include "zookeeper.fullname" . }}
   podManagementPolicy: Parallel
   selector:
@@ -49,7 +49,7 @@ spec:
               value: {{ include "zookeeper.servers" . | trimSuffix ";" }}
           ports:
             - name: zookeeper
-              containerPort: {{ .Values.port }}
+              containerPort: {{ .Values.global.zookeeper.port }}
               protocol: TCP
               # TODO: Implement probes
 {{/*          livenessProbe:*/}}

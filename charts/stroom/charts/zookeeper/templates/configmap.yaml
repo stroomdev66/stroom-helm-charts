@@ -7,4 +7,4 @@ metadata:
 data:
   zoo.cfg: |
     dataDir={{ .Values.dataDir }}
-    clientPort={{ .Values.port }}
+    clientPort={{ .Values.global.zookeeper.port }}
