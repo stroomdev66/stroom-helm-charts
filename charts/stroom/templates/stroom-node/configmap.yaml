@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Values.global.clusterConfig | default .Release.Name }}
+  name: {{ include "stroom.fullname" . }}
   labels:
     {{- include "mysql.labels" . | nindent 4 }}
   annotations:
@@ -24,12 +24,3 @@ data:
   stat-docref-stream-task-queue-size: {{ .streamTaskQueueSize }}
   stat-docref-volumes: {{ .volumes }}
   {{- end }}
-  auth-account-lockout-threshold: {{ .Values.authService.accountLockoutThreshold }}
-  {{- with .Values.authService.password }}
-  auth-password-allow-resets: {{ .allowResets }}
-  auth-password-force-change-on-first-login: {{ .forceChangeOnFirstLogin }}
-  auth-password-max-age: {{ .maxAge }}
-  auth-password-max-length: {{ .maxLength }}
-  auth-password-complexity-regex: {{ .complexityRegex }}
-  {{- end }}
-  

@@ -1,15 +1,14 @@
-{{- $component := "stroom-node" }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "stroom.fullname" . }}-{{ $component }}
+  name: {{ include "stroom.fullname" . }}
   labels:
     {{- include "stroom.labels" . | nindent 4 }}
 spec:
   type: ClusterIP
   clusterIP: None
   ports:
-    {{- range $name, $number := .Values.authService.ports }}
+    {{- range $name, $number := .Values.stroomNode.ports }}
     - port: {{ $number }}
       targetPort: $name
       protocol: TCP
@@ -17,4 +16,3 @@ spec:
     {{- end }}
   selector:
     {{- include "stroom.selectorLabels" . | nindent 4 }}
-    component: {{ $component }}

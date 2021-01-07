@@ -5,9 +5,10 @@ metadata:
   labels:
     {{- include "zookeeper.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: ClusterIP
+  clusterIP: None
   ports:
-    - port: {{ .Values.service.port }}
+    - port: {{ .Values.port }}
       targetPort: http
       protocol: TCP
       name: http

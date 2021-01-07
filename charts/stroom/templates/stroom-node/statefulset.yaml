@@ -1,18 +1,16 @@
-{{- $component := "stroom-node" }}
 {{- $stroomNode := .Values.stroomNode }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "stroom.fullname" . }}-{{ $component }}
+  name: {{ include "stroom.fullname" . }}
   labels:
     {{- include "stroom.labels" . | nindent 4 }}
 spec:
   replicas: {{ $stroomNode.replicaCount }}
-  serviceName: {{ include "stroom.fullname" . }}-{{ $component }}
+  serviceName: {{ include "stroom.fullname" . }}
   selector:
     matchLabels:
       {{- include "stroom.selectorLabels" . | nindent 6 }}
-      component: {{ $component }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -21,13 +19,12 @@ spec:
       {{- end }}
       labels:
         {{- include "stroom.selectorLabels" . | nindent 8 }}
-        component: {{ $component }}
     spec:
       serviceAccountName: {{ include "stroom.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ $component }}
+        - name: {{ .Chart.Name }}
           image: "{{ .Values.stroomNode.image.repository }}:{{ .Values.stroomNode.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: IfNotPresent
           env:
@@ -64,7 +61,7 @@ spec:
             - name: STROOM_JDBC_DRIVER_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.global.clusterSecret }}
+                  name: {{ include "stroom.globalSecretName" . }}
                   key: mysql-service-password
             - name: STROOM_STATISTICS_SQL_JDBC_DRIVER_CLASS_NAME
               value: com.mysql.cj.jdbc.Driver
@@ -75,7 +72,7 @@ spec:
             - name: STROOM_STATISTICS_SQL_JDBC_DRIVER_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.global.clusterSecret }}
+                  name: {{ include "stroom.globalSecretName" . }}
                   key: mysql-service-password
             - name: STROOM_AUTH_SERVICES_URL
               value: {{ include "stroom.rootUrl" . }}/api/auth

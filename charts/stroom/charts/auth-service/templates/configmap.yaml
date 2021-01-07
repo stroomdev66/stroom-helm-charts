@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "auth-service.fullname" . }}
+  labels:
+    {{- include "auth-service.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-delete-policy": hook-failed
+data:
+  account-lockout-threshold: {{ .Values.accountLockoutThreshold }}
+  {{- with .Values.password }}
+  password-allow-resets: {{ .allowResets }}
+  password-force-change-on-first-login: {{ .forceChangeOnFirstLogin }}
+  password-max-age: {{ .maxAge }}
+  password-max-length: {{ .maxLength }}
+  password-complexity-regex: {{ .complexityRegex }}
+  {{- end }}

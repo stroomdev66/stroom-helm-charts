@@ -43,7 +43,7 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "auth-service.fullname" . }}
-                  key: auth-password-allow-resets
+                  key: password-allow-resets
             - name: APPLICATION_CONTEXT_PATH
               value: /
             - name: AUTHORISATION_SERVICE_CAN_MANAGE_USERS_PATH
@@ -67,7 +67,7 @@ spec:
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "auth-service.fullname" . }}
+                  name: {{ include "stroom.fullname" . }}
                   key: mysql-service-password
             - name: DURATION_BETWEEN_CHECKS
               value: {{ .Values.durationBetweenChecks }}
@@ -97,13 +97,13 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "auth-service.fullname" . }}
-                  key: auth-account-lockout-threshold
+                  key: account-lockout-threshold
               value: {{ .Values.accountLockoutThreshold }}
             - name: FORCE_PASSWORD_CHANGE_ON_FIRST_LOGIN
               valueFrom:
                 - configMapKeyRef:
                     name: {{ include "auth-service.fullname" . }}
-                    key: auth-password-force-change-on-first-login
+                    key: password-force-change-on-first-login
             - name: JAVA_OPTS
               value: {{ .Values.javaOpts }}
             - name: JWS_ALGORITHM
@@ -122,12 +122,12 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "auth-service.fullname" . }}
-                  key: auth-password-max-age
+                  key: password-max-age
             - name: MINIMUM_PASSWORD_LENGTH
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "auth-service.fullname" . }}
-                  key: auth-password-max-length
+                  key: password-max-length
             - name: NEVER_USED_ACCOUNT_DEACTIVATION_THRESHOLD
               value: {{ .Values.deactivationThresholds.neverUsed }}
             - name: UNUSED_ACCOUNT_DEACTIVATION_THRESHOLD
@@ -138,7 +138,7 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "auth-service.fullname" . }}
-                  key: auth-password-complexity-regex
+                  key: password-complexity-regex
             - name: STROOM_AUTH_SERVICE_ADMIN_PORT
               value: {{ .Values.ports.admin }}
             - name: STROOM_AUTH_SERVICE_PORT

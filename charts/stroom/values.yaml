@@ -3,12 +3,6 @@
 # Declare variables to be passed into your templates.
 
 global:
-  # Specifies the name of the cluster `ConfigMap` resource. If omitted, defaults to the release name
-  clusterConfig: ""
-
-  # Name of the cluster `Secret` resource. Defaults to the release name
-  clusterSecret: ""
-
   # Set the initial advertised host (could be a FQDN or hostname). This can be updated later on
   # via the global `ConfigMap`. Defaults to
   advertisedHost: ""

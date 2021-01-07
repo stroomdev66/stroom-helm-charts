@@ -67,6 +67,13 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
+Name of the cluster `Secret` resource
+*/}}
+{{- define "stroom.globalSecretName" -}}
+{{- include "stroom.fullname" $ }}
+{{- end }}
+
+{{/*
 Generates a random password
 */}}
 {{- define "stroom.password" -}}

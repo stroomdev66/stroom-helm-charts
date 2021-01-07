@@ -1,20 +1,18 @@
-{{- $component := "auth-service" }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "stroom.fullname" . }}-{{ $component }}
+  name: {{ include "auth-service.fullname" . }}
   labels:
-    {{- include "stroom.labels" . | nindent 4 }}
+    {{- include "auth-service.labels" . | nindent 4 }}
 spec:
   type: ClusterIP
   clusterIP: None
   ports:
-    {{- range $name, $number := .Values.authService.ports }}
+    {{- range $name, $number := .Values.ports }}
     - port: {{ $number }}
       targetPort: $name
       protocol: TCP
       name: $name
     {{- end }}
   selector:
-    {{- include "stroom.selectorLabels" . | nindent 4 }}
-    component: {{ $component }}
+    {{- include "auth-service.selectorLabels" . | nindent 4 }}
