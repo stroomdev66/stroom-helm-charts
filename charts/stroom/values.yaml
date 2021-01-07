@@ -13,6 +13,11 @@ global:
   # via the global `ConfigMap`. Defaults to
   advertisedHost: ""
 
+  serviceAccount:
+    annotations: { }
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
   mysql:
     # Override the name of the service, which defaults to: (Release name)-mysql
     serviceName: ""
@@ -46,6 +51,7 @@ global:
     # Override the service name. Defaults to: (Release name)-kafka
     serviceName: ""
     port: 9092
+    # TODO: Review use of version - add to global scope?
     connectorVersion: 2.1.1
 
   zookeeper:
@@ -106,18 +112,6 @@ stroomNode:
       - ReadWriteOnce
     volumeMode: {}
 
-smtp:
-  replicaCount: 1
-  image:
-    repository: munkyboy/fakesmtp
-    tag: latest
-  resources: {}
-
-ui:
-  image:
-    repository: gchq/stroom-ui
-    tag: v1-LATEST
-
 statisticDocRefs:
   benchmarkCluster: docRef(StatisticStore,946a88c6-a59a-11e6-bdc4-0242ac110002,Benchmark-Cluster Test),docRef(StroomStatsStore,2503f703-5ce0-4432-b9d4-e3272178f47e,Benchmark-Cluster Test)
   cpu: docRef(StatisticStore,af08c4a7-ee7c-44e4-8f5e-e9c6be280434,CPU),docRef(StroomStatsStore,1edfd582-5e60-413a-b91c-151bd544da47,CPU)
@@ -133,15 +127,6 @@ statisticDocRefs:
 
 nameOverride: ""
 fullnameOverride: ""
-
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
 
 podAnnotations: {}
 
