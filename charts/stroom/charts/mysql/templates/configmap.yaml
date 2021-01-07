@@ -5,10 +5,10 @@ metadata:
 data:
   my.cnf: |
     [mysqld]
-    datadir={{ .Values.mysql.dataDir }}
-    port={{ $.Values.mysql.port }}
+    datadir={{ .Values.dataDir }}
+    port={{ $.Values.port }}
     user={{ .Values.securityContext.runAsUser | default "mysql" }}
 
-    {{- range .Values.mysql.additionalConfig }}
+    {{- range .Values.additionalConfig }}
     {{ . }}
     {{- end }}

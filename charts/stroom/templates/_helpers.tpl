@@ -40,6 +40,8 @@ helm.sh/chart: {{ include "stroom.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+stroom/stack: {{ .Values.stackName }}
+stroom/rack: {{ .Values.rackName }}
 {{- end }}
 
 {{/*
@@ -59,4 +61,18 @@ Create the name of the service account to use
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
+{{- end }}
+
+{{/*
+Generates a random password. Parameter is the number of characters to generate.
+*/}}
+{{- define "stroom.password" -}}
+{{- randAlphaNum ( . | default 16 ) | b64enc }}
+{{- end }}
+
+{{/*
+Root URL of the advertised web frontend
+*/}}
+{{- define "stroom.rootUrl" -}}
+https://{{ .Values.global.advertisedHost }}
 {{- end }}

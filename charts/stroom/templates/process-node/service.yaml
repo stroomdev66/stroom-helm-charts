@@ -1,0 +1,17 @@
+{{- $component := "processing-node" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "stroom.fullname" . }}-{{ $component }}
+  labels:
+    {{- include "stroom.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  clusterIP: None
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: app
+      protocol: TCP
+      name: app
+  selector:
+    {{- include "stroom.selectorLabels" . | nindent 4 }}

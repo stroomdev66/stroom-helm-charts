@@ -1,24 +1,25 @@
+{{- $component := "process-node" }}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: {{ include "stroom.fullname" . }}
+  name: {{ include "stroom.fullname" . }}-{{ $component }}
   labels:
     {{- include "stroom.labels" . | nindent 4 }}
 spec:
-{{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-{{- end }}
+  replicas: {{ .Values.processNode.replicaCount }}
   selector:
     matchLabels:
       {{- include "stroom.selectorLabels" . | nindent 6 }}
+      component: {{ $component }}
   template:
     metadata:
-    {{- with .Values.podAnnotations }}
+      {{- with .Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- end }}
       labels:
         {{- include "stroom.selectorLabels" . | nindent 8 }}
+        component: {{ $component }}
     spec:
       serviceAccountName: {{ include "stroom.serviceAccountName" . }}
       securityContext:
@@ -27,8 +28,8 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.processNode.image.repository }}:{{ .Values.processNode.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 80
@@ -42,7 +43,7 @@ spec:
               path: /
               port: http
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml .Values.processNode.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

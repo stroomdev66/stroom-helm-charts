@@ -4,8 +4,10 @@ metadata:
   name: {{ include "stroom.fullname" . }}
   labels:
     {{- include "stroom.labels" . | nindent 4 }}
+    component: ""
 spec:
   type: {{ .Values.service.type }}
+  clusterIP: None
   ports:
     - port: {{ .Values.service.port }}
       targetPort: http

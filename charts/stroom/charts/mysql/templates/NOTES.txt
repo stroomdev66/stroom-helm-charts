@@ -4,4 +4,4 @@ How to connect:
 
 Service: {{ include "mysql.fullname" . }}
 Namespace: {{ .Release.Namespace }}
-Port: {{ .Values.mysql.port }}
+Port: {{ .Values.port }}

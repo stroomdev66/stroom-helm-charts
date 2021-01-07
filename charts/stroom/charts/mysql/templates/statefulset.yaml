@@ -29,15 +29,13 @@ spec:
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: {{ $rootPasswordFile }}
-            {{- if .Values.mysql.serviceUser.userName }}
             - name: MYSQL_USER
-              value: {{ .Values.mysql.serviceUser.userName }}
+              value: {{ .Values.global.mysql.users.service.name }}
             - name: MYSQL_PASSWORD
               value: {{ $serviceUserPasswordFile }}
-            {{- end }}
           ports:
             - name: mysql
-              containerPort: {{ .Values.mysql.port }}
+              containerPort: {{ .Values.port }}
               protocol: TCP
 {{/*          livenessProbe:*/}}
 {{/*            initialDelaySeconds: 5*/}}
@@ -64,18 +62,16 @@ spec:
             - mountPath: /docker-entrypoint-initdb.d
               name: config-init
               readOnly: true
-            - mountPath: {{ .Values.mysql.dataDir }}
+            - mountPath: {{ .Values.dataDir }}
               name: data
             - mountPath: {{ $rootPasswordFile }}
               subPath: root
               name: root-password
               readOnly: true
-            {{- if .Values.mysql.serviceUser.userName }}
             - mountPath: {{ $serviceUserPasswordFile }}
               subPath: serviceuser
               name: serviceuser-password
               readOnly: true
-            {{- end }}
       serviceAccountName: {{ include "mysql.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
@@ -100,36 +96,18 @@ spec:
             name: {{ include "mysql.fullname" . }}-init
         - name: root-password
           secret:
-            {{- if .Values.mysql.rootUser.secret.name }}
-            secretName: {{ .Values.mysql.rootUser.secret.name }}
+            secretName: {{ .Values.global.clusterSecret }}
             items:
-              - key: {{ .Values.mysql.rootUser.secret.key }}
+              - key: mysql-root-password
                 path: root
                 mode: {{ $passwordFileMode }}
-            {{- else }}
-            secretName: {{ include "mysql.fullname" . }}-rootuser
-            items:
-              - key: password
-                path: root
-                mode: {{ $passwordFileMode }}
-            {{- end }}
-        {{- if .Values.mysql.serviceUser.userName }}
         - name: serviceuser-password
           secret:
-            {{- if .Values.mysql.serviceUser.secret.name }}
-            secretName: {{ .Values.mysql.serviceUser.secret.name }}
+            secretName: {{ .Values.global.clusterSecret }}
             items:
-              - key: {{ .Values.mysql.serviceUser.secret.key }}
+              - key: mysql-service-password
                 path: serviceuser
                 mode: {{ $passwordFileMode }}
-            {{- else }}
-            secretName: {{ include "mysql.fullname" . }}-serviceuser
-            items:
-              - key: password
-                path: serviceuser
-                mode: {{ $passwordFileMode }}
-            {{- end }}
-        {{- end }}
   volumeClaimTemplates:
     - metadata:
         name: data
@@ -139,8 +117,8 @@ spec:
         volumeName: {{ .Values.volumeClaim.volumeName | quote }}
         storageClassName: {{ .Values.volumeClaim.storageClassName | quote }}
         selector:
+          {{- with .Values.volumeClaim.selector.matchLabels }}
           matchLabels:
-            {{- with .Values.volumeClaim.selector.matchLabels }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           {{- with .Values.volumeClaim.selector.matchExpressions }}

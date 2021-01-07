@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "mysql.fullname" . }}-server
+  name: {{ .Values.global.mysql.serviceName | default (print .Release.Name "-mysql") }}
   labels:
     {{- include "mysql.labels" . | nindent 4 }}
 spec:
@@ -10,7 +10,7 @@ spec:
   selector:
     {{- include "mysql.selectorLabels" . | nindent 4 }}
   ports:
-    - port: {{ .Values.mysql.port }}
-      targetPort: server
+    - port: {{ .Values.global.mysql.port }}
+      targetPort: mysql
       protocol: TCP
-      name: server
+      name: mysql

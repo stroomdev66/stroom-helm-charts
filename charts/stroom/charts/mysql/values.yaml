@@ -1,0 +1,74 @@
+# Default values for mysql.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  repository: mysql/mysql-server
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+nameOverride: ""
+fullnameOverride: ""
+
+port: 3306
+dataDir: /var/lib/mysql
+
+# TODO:
+# - Encryption (https://dev.mysql.com/doc/refman/8.0/en/using-encrypted-connections.html)
+# - Additional custom config (config file?) https://dev.mysql.com/doc/refman/8.0/en/docker-mysql-more-topics.html#docker_var_mysql-log-console
+# - Logging
+
+# Plain-text configuration to append to the `my.cnf` file
+additionalConfig: []
+# - key=value
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 512Mi
+    storage: 1Gi
+
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+    storage: 2Gi
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+volumeClaim:
+  volumeName: ""
+  storageClassName: ""
+  selector:
+    matchLabels: {}
+    matchExpressions: {}
+  dataSource: {}
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: {}
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 1000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

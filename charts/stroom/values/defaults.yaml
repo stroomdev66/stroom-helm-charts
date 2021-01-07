@@ -1,0 +1,23 @@
+mysql:
+  users:
+    root:
+      password: "test"
+    service:
+      password: "test"
+
+processNode:
+  replicaCount: 3
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1g
+    limits:
+      cpu: 1000m
+      memory: 2g
+  java:
+    heap:
+      min: 512m
+      max: 1g
+ui:
+  image:
+    tag: v1.0-LATEST

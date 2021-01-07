@@ -2,34 +2,123 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
+global:
+  # Specifies the name of the cluster `ConfigMap` resource. If omitted, defaults to the release name
+  clusterConfig: ""
 
-stroom:
-  image:
-    repository: gchq/stroom
-    tag: ""
-  java:
-    heap:
-      min: 50m
-      max: 1024m
+  # Name of the cluster `Secret` resource. Defaults to the release name
+  clusterSecret: ""
 
-  # Friendly name of the cluster. Also known as the 'rack' in the UI
-  clusterName: stroom
-
-  # Node name prefix used to generate node IDs. For instance, the first node will be called 'node-1'
-  nodeNamePrefix: node
-
-
+  # Set the initial advertised host (could be a FQDN or hostname). This can be updated later on
+  # via the global `ConfigMap`. Defaults to
+  advertisedHost: ""
 
   ports:
     app: 8080
     admin: 8081
     debug: 10765
 
-stroomUi:
+  mysql:
+    # Override the name of the service, which defaults to: (Release name)-mysql
+    serviceName: ""
+
+    # MySQL service port
+    port: 3307
+
+    users:
+      root:
+        password: ""
+      service:
+        name: "stroomuser"
+        password: ""
+
+    # User databases to create on startup
+    databases:
+      annotations: annotations
+      auth: auth
+      config: config
+      datameta: datameta
+      explorer: explorer
+      process: process
+      stats: stats
+      stroom: stroom
+
+  kafka:
+    # Override the service name. Defaults to: (Release name)-kafka
+    serviceName: ""
+    port: 9092
+    connectorVersion: 2.1.1
+
+  zookeeper:
+    url: zookeeper:2181
+
+# Identifies this Stroom deployment
+stackName: stroom
+
+# Used to logically identify groups of nodes
+rackName: rack
+
+# Node name prefix used to generate node IDs. For instance, the first node will be called 'node-1'
+nodeNamePrefix: node
+
+# Development mode
+developmentMode: true
+
+loggingLevel: INFO
+jpaDialect: org.hibernate.dialect.MySQLInnoDBDialect
+jdbc:
+  driver: com.mysql.cj.jdbc.Driver
+
+processNode:
+  replicaCount: 1
+  image:
+    repository: gchq/stroom
+    tag: ""
+  contentPackImportEnabled: false
+  serviceDiscovery:
+    enabled: true
+  stroomProxyDir: /tmp/proxy
+  stroomHelpUrl: https://gchq.github.io/stroom-docs
+  javaOpts: -Xms50m -Xmx1024m -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=10765,suspend=n
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+      storage: 1Gi
+
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+      storage: 2Gi
+
+  volumeClaim:
+    volumeName: ""
+    storageClassName: ""
+    selector:
+      matchLabels: {}
+      matchExpressions: {}
+    dataSource: {}
+    accessModes:
+      - ReadWriteOnce
+    volumeMode: {}
+
+ui:
   image:
     repository: gchq/stroom-ui
-    tag: v1.0-LATEST
+    tag: v1-LATEST
+
+statisticDocRefs:
+  benchmarkCluster: docRef(StatisticStore,946a88c6-a59a-11e6-bdc4-0242ac110002,Benchmark-Cluster Test),docRef(StroomStatsStore,2503f703-5ce0-4432-b9d4-e3272178f47e,Benchmark-Cluster Test)
+  cpu: docRef(StatisticStore,af08c4a7-ee7c-44e4-8f5e-e9c6be280434,CPU),docRef(StroomStatsStore,1edfd582-5e60-413a-b91c-151bd544da47,CPU)
+  eventsPerSecond: docRef(StatisticStore,a9936548-2572-448b-9d5b-8543052c4d92,EPS),docRef(StroomStatsStore,cde67df0-0f77-45d3-b2c0-ee8bb7b3c9c6,EPS)
+  heapHistogramBytes: docRef(StatisticStore,934a1600-b456-49bf-9aea-f1e84025febd,Heap Histogram Bytes),docRef(StroomStatsStore,b0110ab4-ac25-4b73-b4f6-96f2b50b456a,Heap Histogram Bytes)
+  heapHistogramInstances: docRef(StatisticStore,e4f243b8-2c70-4d6e-9d5a-16466bf8764f,Heap Histogram Instances),docRef(StroomStatsStore,bdd933a4-4309-47fd-98f6-1bc2eb555f20,Heap Histogram Instances)
+  memory: docRef(StatisticStore,77c09ccb-e251-4ca5-bca0-56a842654397,Memory),docRef(StroomStatsStore,d8a7da4f-ef6d-47e0-b16a-af26367a2798,Memory)
+  metaDataStreamSize: docRef(StatisticStore,946a8814-a59a-11e6-bdc4-0242ac110002,Meta Data-Stream Size),docRef(StroomStatsStore,3b25d63b-5472-44d0-80e8-8eea94f40f14,Meta Data-Stream Size)
+  metaDataStreamsReceived: docRef(StatisticStore,946a87bc-a59a-11e6-bdc4-0242ac110002,Meta Data-Streams Received),docRef(StroomStatsStore,5535f493-29ae-4ee6-bba6-735aa3104136,Meta Data-Streams Received)
+  pipelineStreamProcessor: docRef(StatisticStore,946a80fc-a59a-11e6-bdc4-0242ac110002,PipelineStreamProcessor),docRef(StroomStatsStore,efd9bad4-0bab-460f-ae98-79e9717deeaf,PipelineStreamProcessor)
+  streamTaskQueueSize: docRef(StatisticStore,946a7f0f-a59a-11e6-bdc4-0242ac110002,Stream Task Queue Size),docRef(StroomStatsStore,4ce8d6e7-94be-40e1-8294-bf29dd089962,Stream Task Queue Size)
+  volumes: docRef(StatisticStore,ac4d8d10-6f75-4946-9708-18b8cb42a5a3,Volumes),docRef(StroomStatsStore,60f4f5f0-4cc3-42d6-8fe7-21a7cec30f8e,Volumes)
 
 nameOverride: ""
 fullnameOverride: ""
@@ -64,7 +153,6 @@ ingress:
   enabled: false
   annotations: {}
     # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
   hosts:
     - host: chart-example.local
       paths: []
@@ -72,25 +160,6 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
-
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
-
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
 
 nodeSelector: {}
 

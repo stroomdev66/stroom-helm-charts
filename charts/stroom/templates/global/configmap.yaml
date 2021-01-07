@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.clusterConfig | default .Release.Name }}
+  labels:
+    {{- include "mysql.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-delete-policy": hook-failed
+data:
+  stroom-advertised-host: {{ .Values.global.}}
+  stroom-logging-level: {{ .Values.loggingLevel }}
+  stroom-proxy-dir: {{ .Values.processNode.stroomProxyDir }}
+  stat-docref-benchmark-cluster: {{ .Values.statisticDocRefs.benchmarkCluster }}
+  stat-docref-cpu: {{ .Values.statisticDocRefs.cpu }}
+  stat-docref-events-per-second: {{ .Values.statisticDocRefs.eventsPerSecond }}
+  stat-docref-heap-histogram-bytes: {{ .Values.statisticDocRefs.heapHistogramBytes }}
+  stat-docref-heap-histogram-instances: {{ .Values.statisticDocRefs.heapHistogramInstances }}
+  stat-docref-memory: {{ .Values.statisticDocRefs.memory }}
+  stat-docref-metadata-stream-size: {{ .Values.statisticDocRefs.metaDataStreamSize }}
+  stat-docref-metadata-streams-received: {{ .Values.statisticDocRefs.metaDataStreamsReceived }}
+  stat-docref-pipeline-stream-processor: {{ .Values.statisticDocRefs.pipelineStreamProcessor }}
+  stat-docref-stream-task-queue-size: {{ .Values.statisticDocRefs.streamTaskQueueSize }}
+  stat-docref-volumes: {{ .Values.statisticDocRefs.volumes }}
