@@ -56,7 +56,7 @@ spec:
             - name: STROOM_JPA_DIALECT
               value: {{ .Values.jpaDialect }}
             - name: STROOM_JDBC_DRIVER_URL
-              value: {{ printf "jdbc:mysql://%s:%d/%s?useUnicode=yes&characterEncoding=UTF-8" .Values.global.mysql.serviceName .Values.global.mysql.port .Values.global.mysql.databases.stroom }}
+              value: {{ printf "jdbc:mysql://%s:%d/%s?useUnicode=yes&characterEncoding=UTF-8" (include "mysql.fullname" .) .Values.global.mysql.port .Values.global.mysql.databases.stroom }}
             - name: STROOM_JDBC_DRIVER_CLASS_NAME
               value: {{ .Values.jdbc.driver }}
             - name: STROOM_JDBC_DRIVER_USERNAME
@@ -69,7 +69,7 @@ spec:
             - name: STROOM_STATISTICS_SQL_JDBC_DRIVER_CLASS_NAME
               value: com.mysql.cj.jdbc.Driver
             - name: STROOM_STATISTICS_SQL_JDBC_DRIVER_URL
-              value: {{ printf "jdbc:mysql://%s:%d/%s?useUnicode=yes&characterEncoding=UTF-8" .Values.global.mysql.serviceName .Values.global.mysql.port .Values.global.mysql.databases.stats }}
+              value: {{ printf "jdbc:mysql://%s:%d/%s?useUnicode=yes&characterEncoding=UTF-8" (include "mysql.fullname" .) .Values.global.mysql.port .Values.global.mysql.databases.stats }}
             - name: STROOM_STATISTICS_SQL_JDBC_DRIVER_USERNAME
               value: {{ .Values.global.mysql.users.service.name }}
             - name: STROOM_STATISTICS_SQL_JDBC_DRIVER_PASSWORD
