@@ -47,7 +47,7 @@ spec:
               protocol: TCP
               # TODO: Implement probes
 {{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}t
+{{/*            httpGet:*/}}
 {{/*              path: /*/}}
 {{/*              port: http*/}}
 {{/*          readinessProbe:*/}}
