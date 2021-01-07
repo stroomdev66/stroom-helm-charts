@@ -71,6 +71,13 @@ Generates a random password. Parameter is the number of characters to generate.
 {{- end }}
 
 {{/*
+Generates a MySQL connection string for the specified database name
+*/}}
+{{- define "stroom.dbConnectionString" -}}
+{{- printf "jdbc:mysql://%s:%d/%s?useUnicode=yes&characterEncoding=UTF-8" $.Values.global.mysql.serviceName $.Values.global.mysql.port . }}
+{{- end }}
+
+{{/*
 Root URL of the advertised web frontend
 */}}
 {{- define "stroom.rootUrl" -}}

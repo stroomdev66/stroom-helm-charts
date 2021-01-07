@@ -1,4 +1,4 @@
-{{- $component := "auth-service" }}
+{{- $component := "stroom-node" }}
 apiVersion: v1
 kind: Service
 metadata:

@@ -1,5 +1,5 @@
-{{- $component := "processing-node" }}
-{{- $processNode := .Values.processNode }}
+{{- $component := "stroom-node" }}
+{{- $stroomNode := .Values.stroomNode }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -7,7 +7,8 @@ metadata:
   labels:
     {{- include "stroom.labels" . | nindent 4 }}
 spec:
-  replicas: {{ $processNode.replicaCount }}
+  replicas: {{ $stroomNode.replicaCount }}
+  serviceName: {{ include "stroom.fullname" . }}-{{ $component }}
   selector:
     matchLabels:
       {{- include "stroom.selectorLabels" . | nindent 6 }}
@@ -27,17 +28,25 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.processNode.image.repository }}:{{ .Values.processNode.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.stroomNode.image.repository }}:{{ .Values.stroomNode.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: IfNotPresent
           env:
+            - name: DOCKER_HOST_HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['statefulset.kubernetes.io/pod-name']
+            - name: DOCKER_HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
             - name: JAVA_OPTS
-              value: {{ $processNode.javaOpts }}
+              value: {{ $stroomNode.javaOpts }}
             - name: STROOM_APP_PORT
-              value: {{ .Values.global.ports.app }}
+              value: {{ $stroomNode.ports.app }}
             - name: STROOM_ADMIN_PORT
-              value: {{ .Values.global.ports.admin }}
+              value: {{ $stroomNode.ports.admin }}
             - name: STROOM_DEBUG_PORT
-              value: {{ .Values.global.ports.debug }}
+              value: {{ $stroomNode.ports.debug }}
             - name: STROOM_NODE
               valueFrom:
                 fieldRef:
@@ -47,7 +56,7 @@ spec:
             - name: STROOM_JPA_DIALECT
               value: {{ .Values.jpaDialect }}
             - name: STROOM_JDBC_DRIVER_URL
-              value: {{ printf "jdbc:mysql://%s:%d/%s?useUnicode=yes&characterEncoding=UTF-8" .Values.global.mysql.serviceName .Values.global.mysql.port .Values.global.mysql.databases.stroom }}
+              value: {{ include "stroom.dbConnectionString" .Values.global.mysql.databases.stroom }}
             - name: STROOM_JDBC_DRIVER_CLASS_NAME
               value: {{ .Values.jdbc.driver }}
             - name: STROOM_JDBC_DRIVER_USERNAME
@@ -60,7 +69,7 @@ spec:
             - name: STROOM_STATISTICS_SQL_JDBC_DRIVER_CLASS_NAME
               value: com.mysql.cj.jdbc.Driver
             - name: STROOM_STATISTICS_SQL_JDBC_DRIVER_URL
-              value: {{ printf "jdbc:mysql://%s:%d/%s?useUnicode=yes&characterEncoding=UTF-8" .Values.global.mysql.serviceName .Values.global.mysql.port .Values.global.mysql.databases.stats }}
+              value: {{ include "stroom.dbConnectionString" .Values.global.mysql.databases.stats }}
             - name: STROOM_STATISTICS_SQL_JDBC_DRIVER_USERNAME
               value: {{ .Values.global.mysql.users.service.name }}
             - name: STROOM_STATISTICS_SQL_JDBC_DRIVER_PASSWORD
@@ -115,9 +124,12 @@ spec:
             - name: STROOM_CONNECTORS_KAFKA_DEFAULT_CONNECTOR_VERSION
               value: {{ .Values.global.kafka.connectorVersion }}
             - name: STROOM_CONTENT_PACK_IMPORT_ENABLED
-              value: {{ $processNode.contentPackImportEnabled }}
+              value: {{ $stroomNode.contentPackImportEnabled }}
             - name: STROOM_SERVICE_DISCOVERY_ENABLED
-              value: {{ $processNode.serviceDiscovery.enabled }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "stroom.fullname" . }}
+                  key: stroom-service-discovery-enabled
             - name: STROOM_SERVICE_DISCOVERY_ZOOKEEPER_URL
               value: {{ .Values.global.zookeeper.url }}
             - name: STROOM_DEVELOPMENT_MODE
@@ -183,7 +195,7 @@ spec:
                   name: {{ include "stroom.fullname" . }}
                   key: stroom-proxy-dir
             - name: STROOM_HELP_URL
-              value: {{ .Values.processNode.stroomHelpUrl }}
+              value: {{ .Values.stroomNode.stroomHelpUrl }}
           volumeMounts:
             - mountPath: /stroom/logs
               subPath: logs
@@ -200,15 +212,11 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           ports:
-            - name: app
-              containerPort: {{ .Values.global.ports.app }}
+            {{- range $name, $number := .Values.stroomNode.ports }}
+            - name: {{ $name }}
+              containerPort: {{ $number }}
               protocol: TCP
-            - name: admin
-              containerPort: {{ .Values.global.ports.admin }}
-              protocol: TCP
-            - name: debug
-              containerPort: {{ .Values.global.ports.debug }}
-              protocol: TCP
+            {{- end }}
           livenessProbe:
             initialDelaySeconds: 90
             periodSeconds: 10
@@ -227,11 +235,11 @@ spec:
               port: admin
           resources:
             requests:
-              cpu: {{ $processNode.resources.requests.cpu }}
-              memory: {{ $processNode.resources.requests.memory }}
+              cpu: {{ $stroomNode.resources.requests.cpu }}
+              memory: {{ $stroomNode.resources.requests.memory }}
             limits:
-              cpu: {{ $processNode.resources.limits.cpu }}
-              memory: {{ $processNode.resources.limits.memory }}
+              cpu: {{ $stroomNode.resources.limits.cpu }}
+              memory: {{ $stroomNode.resources.limits.memory }}
           # TODO: Configure logging
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -251,31 +259,31 @@ spec:
         labels:
           {{- include "stroom.labels" . | nindent 10 }}
       spec:
-        volumeName: {{ $processNode.volumeClaim.volumeName | quote }}
-        storageClassName: {{ $processNode.volumeClaim.storageClassName | quote }}
+        volumeName: {{ $stroomNode.volumeClaim.volumeName | quote }}
+        storageClassName: {{ $stroomNode.volumeClaim.storageClassName | quote }}
         selector:
-          {{- with $processNode.volumeClaim.selector.matchLabels }}
+          {{- with $stroomNode.volumeClaim.selector.matchLabels }}
           matchLabels:
             {{- toYaml . | nindent 12 }}
             {{- end }}
-          {{- with $processNode.volumeClaim.selector.matchExpressions }}
+          {{- with $stroomNode.volumeClaim.selector.matchExpressions }}
           matchExpressions:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-        {{- with $processNode.volumeClaim.dataSource }}
+        {{- with $stroomNode.volumeClaim.dataSource }}
         dataSource:
           {{- toYaml . | nindent 10 }}
         {{- end }}
-        {{- with $processNode.volumeClaim.accessModes }}
+        {{- with $stroomNode.volumeClaim.accessModes }}
         accessModes:
           {{- toYaml . | nindent 10 }}
         {{- end }}
-        {{- with $processNode.volumeClaim.volumeMode }}
+        {{- with $stroomNode.volumeClaim.volumeMode }}
         volumeMode:
           {{- toYaml . | nindent 10 }}
         {{- end }}
         resources:
           requests:
-            storage: {{ $processNode.resources.requests.storage }}
+            storage: {{ $stroomNode.resources.requests.storage }}
           limits:
-            storage: {{ $processNode.resources.limits.storage }}
+            storage: {{ $stroomNode.resources.limits.storage }}

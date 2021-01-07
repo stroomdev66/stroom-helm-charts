@@ -13,11 +13,6 @@ global:
   # via the global `ConfigMap`. Defaults to
   advertisedHost: ""
 
-  ports:
-    app: 8080
-    admin: 8081
-    debug: 10765
-
   mysql:
     # Override the name of the service, which defaults to: (Release name)-mysql
     serviceName: ""
@@ -69,28 +64,30 @@ jpaDialect: org.hibernate.dialect.MySQLInnoDBDialect
 jdbc:
   driver: com.mysql.cj.jdbc.Driver
 
-processNode:
+stroomNode:
   replicaCount: 1
   image:
     repository: gchq/stroom
     tag: ""
-  contentPackImportEnabled: false
-  serviceDiscovery:
-    enabled: true
-  stroomProxyDir: /tmp/proxy
-  stroomHelpUrl: https://gchq.github.io/stroom-docs
   javaOpts: -Xms50m -Xmx1024m -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=10765,suspend=n
   resources:
     requests:
       cpu: 500m
       memory: 512Mi
       storage: 1Gi
-
     limits:
       cpu: 1000m
       memory: 1Gi
       storage: 2Gi
-
+  ports:
+    app: 8080
+    admin: 8081
+    debug: 10765
+  contentPackImportEnabled: false
+  serviceDiscovery:
+    enabled: true
+  stroomProxyDir: /tmp/proxy
+  stroomHelpUrl: https://gchq.github.io/stroom-docs
   volumeClaim:
     volumeName: ""
     storageClassName: ""
@@ -101,6 +98,63 @@ processNode:
     accessModes:
       - ReadWriteOnce
     volumeMode: {}
+
+authService:
+  image:
+    repository: gchq/stroom-auth-service
+    tag: v6.0-LATEST
+  javaOpts: -Xms50m -Xmx1024m -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=10769,suspend=n
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+      storage: 1Gi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+      storage: 2Gi
+  ports:
+    auth: 8099
+    admin: 8100
+    debug: 10769
+  durationBetweenChecks: PT2M
+  email:
+    fromAddress: ""
+    fromName: Stroom User Accounts
+    resetSubject: Password reset for Stroom
+    resetText: A password reset has been requested for this email address. Please visit the following URL to reset your password -- %s.
+    resetTokenValidityMinutes: 60
+  jws:
+    algorithm: RS256
+    resetTokenExpiryMinutes:
+      api: 525600 # 1 year
+      email: 5
+      user: 43200 # 30 days
+    requireExpirationTime: false
+  accountLockoutThreshold: 3
+  password:
+    allowResets: false
+    forceChangeOnFirstLogin: true
+    maxAge: P30D
+    maxLength: 8
+    complexityRegex: .*
+  deactivationThresholds:
+    neverUsed: P30D
+    inactive: P90D
+  volumeClaim:
+    volumeName: ""
+    storageClassName: ""
+    selector:
+      matchLabels: { }
+      matchExpressions: { }
+    dataSource: { }
+    accessModes:
+      - ReadWriteOnce
+    volumeMode: { }
+
+smtp:
+  port: 2525
+  transport: plain
 
 ui:
   image:
@@ -144,10 +198,6 @@ securityContext: {}
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
   # runAsUser: 1000
-
-service:
-  type: ClusterIP
-  port: 80
 
 ingress:
   enabled: false

@@ -1,4 +1,4 @@
-{{- $component := "processing-node" }}
+{{- $component := "auth-service" }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -6,12 +6,15 @@ metadata:
   labels:
     {{- include "stroom.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: ClusterIP
   clusterIP: None
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: app
+    {{- range $name, $number := .Values.authService.ports }}
+    - port: {{ $number }}
+      targetPort: $name
       protocol: TCP
-      name: app
+      name: $name
+    {{- end }}
   selector:
     {{- include "stroom.selectorLabels" . | nindent 4 }}
+    component: {{ $component }}

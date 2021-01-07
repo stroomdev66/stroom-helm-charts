@@ -8,17 +8,28 @@ metadata:
     "helm.sh/hook": pre-install
     "helm.sh/hook-delete-policy": hook-failed
 data:
-  stroom-advertised-host: {{ .Values.global.}}
   stroom-logging-level: {{ .Values.loggingLevel }}
-  stroom-proxy-dir: {{ .Values.processNode.stroomProxyDir }}
-  stat-docref-benchmark-cluster: {{ .Values.statisticDocRefs.benchmarkCluster }}
-  stat-docref-cpu: {{ .Values.statisticDocRefs.cpu }}
-  stat-docref-events-per-second: {{ .Values.statisticDocRefs.eventsPerSecond }}
-  stat-docref-heap-histogram-bytes: {{ .Values.statisticDocRefs.heapHistogramBytes }}
-  stat-docref-heap-histogram-instances: {{ .Values.statisticDocRefs.heapHistogramInstances }}
-  stat-docref-memory: {{ .Values.statisticDocRefs.memory }}
-  stat-docref-metadata-stream-size: {{ .Values.statisticDocRefs.metaDataStreamSize }}
-  stat-docref-metadata-streams-received: {{ .Values.statisticDocRefs.metaDataStreamsReceived }}
-  stat-docref-pipeline-stream-processor: {{ .Values.statisticDocRefs.pipelineStreamProcessor }}
-  stat-docref-stream-task-queue-size: {{ .Values.statisticDocRefs.streamTaskQueueSize }}
-  stat-docref-volumes: {{ .Values.statisticDocRefs.volumes }}
+  stroom-proxy-dir: {{ .Values.stroomNode.stroomProxyDir }}
+  stroom-service-discovery-enabled: {{ .Values.stroomNode.serviceDiscovery.enabled }}
+  {{- with .Values.statisticDocRefs }}
+  stat-docref-benchmark-cluster: {{ .benchmarkCluster }}
+  stat-docref-cpu: {{ .cpu }}
+  stat-docref-events-per-second: {{ .eventsPerSecond }}
+  stat-docref-heap-histogram-bytes: {{ .heapHistogramBytes }}
+  stat-docref-heap-histogram-instances: {{ .heapHistogramInstances }}
+  stat-docref-memory: {{ .memory }}
+  stat-docref-metadata-stream-size: {{ .metaDataStreamSize }}
+  stat-docref-metadata-streams-received: {{ .metaDataStreamsReceived }}
+  stat-docref-pipeline-stream-processor: {{ .pipelineStreamProcessor }}
+  stat-docref-stream-task-queue-size: {{ .streamTaskQueueSize }}
+  stat-docref-volumes: {{ .volumes }}
+  {{- end }}
+  auth-account-lockout-threshold: {{ .Values.authService.accountLockoutThreshold }}
+  {{- with .Values.authService.password }}
+  auth-password-allow-resets: {{ .allowResets }}
+  auth-password-force-change-on-first-login: {{ .forceChangeOnFirstLogin }}
+  auth-password-max-age: {{ .maxAge }}
+  auth-password-max-length: {{ .maxLength }}
+  auth-password-complexity-regex: {{ .complexityRegex }}
+  {{- end }}
+  

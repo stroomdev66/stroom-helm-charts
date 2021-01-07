@@ -1,4 +1,4 @@
-{{- $component := "process-node" }}
+{{- $component := "annotations-service" }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -6,7 +6,8 @@ metadata:
   labels:
     {{- include "stroom.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.processNode.replicaCount }}
+  replicas: {{ .Values.stroomNode.replicaCount }}
+  serviceName: {{ include "stroom.fullname" . }}-{{ $component }}
   selector:
     matchLabels:
       {{- include "stroom.selectorLabels" . | nindent 6 }}
@@ -28,7 +29,7 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.processNode.image.repository }}:{{ .Values.processNode.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.stroomNode.image.repository }}:{{ .Values.stroomNode.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -43,7 +44,7 @@ spec:
               path: /
               port: http
           resources:
-            {{- toYaml .Values.processNode.resources | nindent 12 }}
+            {{- toYaml .Values.stroomNode.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
