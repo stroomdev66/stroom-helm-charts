@@ -61,7 +61,7 @@ spec:
             - name: CHANGE_PASSWORD_URL
               value: {{ include "stroom.rootUrl" . }}/s/changePassword
             - name: DB_URL
-              value: {{ printf "jdbc:mysql://%s:%d/%s?useUnicode=yes&characterEncoding=UTF-8" (include "mysql.fullname" .) .Values.global.mysql.port .Values.global.mysql.databases.auth }}
+              value: {{ printf "jdbc:mysql://%s/%s?useUnicode=yes&characterEncoding=UTF-8" (include "mysql.connectionAddress" .) .Values.global.mysql.databases.auth }}
             - name: DB_USER
               value: {{ .Values.global.mysql.users.service.name }}
             - name: DB_PASSWORD

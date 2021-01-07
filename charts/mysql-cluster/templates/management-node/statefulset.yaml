@@ -34,7 +34,7 @@ spec:
             - sh
             - -c
             - |
-              node_id=$(((${HOSTNAME##*-})+1))
+              node_id="$(((${HOSTNAME##*-})+1))"
               /entrypoint.sh ndb_mgmd --ndb-nodeid=$node_id --connect-retries={{ .Values.mysql.node.connectionRetries }}
           ports:
             - name: {{ $nodeType }}

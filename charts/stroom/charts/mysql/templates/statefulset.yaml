@@ -37,6 +37,7 @@ spec:
             - name: mysql
               containerPort: {{ .Values.port }}
               protocol: TCP
+              # TODO: Implement probes
 {{/*          livenessProbe:*/}}
 {{/*            initialDelaySeconds: 5*/}}
 {{/*            tcpSocket:*/}}
@@ -96,14 +97,14 @@ spec:
             name: {{ include "mysql.fullname" . }}-init
         - name: root-password
           secret:
-            secretName: {{ .Values.global.clusterSecret }}
+            secretName: {{ include "stroom.globalSecretName" . }}
             items:
               - key: mysql-root-password
                 path: root
                 mode: {{ $passwordFileMode }}
         - name: serviceuser-password
           secret:
-            secretName: {{ .Values.global.clusterSecret }}
+            secretName: {{ include "stroom.globalSecretName" . }}
             items:
               - key: mysql-service-password
                 path: serviceuser

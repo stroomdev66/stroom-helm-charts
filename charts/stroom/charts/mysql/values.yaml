@@ -20,7 +20,7 @@ dataDir: /var/lib/mysql
 # - Logging
 
 # Plain-text configuration to append to the `my.cnf` file
-additionalConfig: []
+additionalConfig: [ ]
 # - key=value
 
 resources:
@@ -38,19 +38,19 @@ volumeClaim:
   volumeName: ""
   storageClassName: ""
   selector:
-    matchLabels: {}
-    matchExpressions: {}
-  dataSource: {}
+    matchLabels: { }
+    matchExpressions: { }
+  dataSource: { }
   accessModes:
     - ReadWriteOnce
-  volumeMode: {}
+  volumeMode: { }
 
-podAnnotations: {}
+podAnnotations: { }
 
-podSecurityContext: {}
+podSecurityContext: { }
   # fsGroup: 1000
 
-securityContext: {}
+securityContext: { }
   # capabilities:
   #   drop:
   #   - ALL
@@ -58,8 +58,8 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
-nodeSelector: {}
+nodeSelector: { }
 
-tolerations: []
+tolerations: [ ]
 
-affinity: {}
+affinity: { }

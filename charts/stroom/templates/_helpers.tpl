@@ -47,8 +47,8 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Stroom-specific labels, used by subcharts
 */}}
 {{- define "stroom.extraLabels" -}}
-stroom/stack: {{ .Values.stackName }}
-stroom/rack: {{ .Values.rackName }}
+stroom/stack: {{ .Values.global.stackName }}
+stroom/rack: {{ .Values.global.rackName }}
 {{- end }}
 
 {{/*
@@ -84,5 +84,5 @@ Generates a random password
 Root URL of the advertised web frontend
 */}}
 {{- define "stroom.rootUrl" -}}
-https://{{ .Values.global.advertisedHost }}
+https://{{ required "Advertised host is required" .Values.global.advertisedHost }}
 {{- end }}

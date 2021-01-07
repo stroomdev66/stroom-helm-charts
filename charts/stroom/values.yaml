@@ -3,9 +3,14 @@
 # Declare variables to be passed into your templates.
 
 global:
-  # Set the initial advertised host (could be a FQDN or hostname). This can be updated later on
-  # via the global `ConfigMap`. Defaults to
-  advertisedHost: ""
+  # Identifies this Stroom deployment
+  stackName: stroom
+
+  # Used to logically identify groups of nodes
+  rackName: rack
+
+  # Set the advertised host (could be a FQDN or hostname)
+  advertisedHost: "stroom"
 
   serviceAccount:
     annotations: { }
@@ -51,12 +56,6 @@ global:
   zookeeper:
     url: zookeeper:2181
 
-# Identifies this Stroom deployment
-stackName: stroom
-
-# Used to logically identify groups of nodes
-rackName: rack
-
 # Node name prefix used to generate node IDs. For instance, the first node will be called 'node-1'
 nodeNamePrefix: node
 
@@ -99,12 +98,12 @@ stroomNode:
     volumeName: ""
     storageClassName: ""
     selector:
-      matchLabels: {}
-      matchExpressions: {}
-    dataSource: {}
+      matchLabels: { }
+      matchExpressions: { }
+    dataSource: { }
     accessModes:
       - ReadWriteOnce
-    volumeMode: {}
+    volumeMode: { }
 
 statisticDocRefs:
   benchmarkCluster: docRef(StatisticStore,946a88c6-a59a-11e6-bdc4-0242ac110002,Benchmark-Cluster Test),docRef(StroomStatsStore,2503f703-5ce0-4432-b9d4-e3272178f47e,Benchmark-Cluster Test)
@@ -122,12 +121,21 @@ statisticDocRefs:
 nameOverride: ""
 fullnameOverride: ""
 
-podAnnotations: {}
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: { }
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
 
-podSecurityContext: {}
+podAnnotations: { }
+
+podSecurityContext: { }
   # fsGroup: 2000
 
-securityContext: {}
+securityContext: { }
   # capabilities:
   #   drop:
   #   - ALL
@@ -137,18 +145,18 @@ securityContext: {}
 
 ingress:
   enabled: false
-  annotations: {}
+  annotations: { }
     # kubernetes.io/ingress.class: nginx
   hosts:
     - host: chart-example.local
-      paths: []
-  tls: []
+      paths: [ ]
+  tls: [ ]
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
 
-nodeSelector: {}
+nodeSelector: { }
 
-tolerations: []
+tolerations: [ ]
 
-affinity: {}
+affinity: { }

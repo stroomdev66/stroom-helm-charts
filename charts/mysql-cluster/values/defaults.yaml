@@ -62,10 +62,10 @@ mysql:
 volumeClaim:
   storageClassName: ""
 
-podSecurityContext: {}
+podSecurityContext: { }
   # fsGroup: 27 # mysql
 
-securityContext: {}
+securityContext: { }
   # capabilities:
   #   drop:
   #   - ALL

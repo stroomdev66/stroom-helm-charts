@@ -50,3 +50,14 @@ Selector labels
 app.kubernetes.io/name: {{ include "zookeeper.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Generate a list of servers based on the number of replicas
+*/}}
+{{- define "zookeeper.servers" -}}
+{{- range $i, $e := until (.Values.replicaCount | int) }}
+{{- $fullName := (include "zookeeper.fullname" $) }}
+{{- $hostName := ( printf "%s-%d.%s" $fullName $i $fullName ) }}
+{{- printf "server.%d=%s:%d; " (add $i 1) $hostName ($.Values.port | int) }}
+{{- end }}
+{{- end }}
