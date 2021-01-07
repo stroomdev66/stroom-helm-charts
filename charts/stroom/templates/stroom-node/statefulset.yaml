@@ -49,7 +49,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.labels['statefulset.kubernetes.io/pod-name']
             - name: STROOM_RACK
-              value: {{ .Values.rackName }}
+              value: {{ .Values.global.rackName }}
             - name: STROOM_JPA_DIALECT
               value: {{ .Values.jpaDialect }}
             - name: STROOM_JDBC_DRIVER_URL
@@ -66,7 +66,7 @@ spec:
             - name: STROOM_STATISTICS_SQL_JDBC_DRIVER_CLASS_NAME
               value: com.mysql.cj.jdbc.Driver
             - name: STROOM_STATISTICS_SQL_JDBC_DRIVER_URL
-              value: {{ printf "jdbc:mysql://%s:%d/%s?useUnicode=yes&characterEncoding=UTF-8" (include "mysql.connectionAddress" .) .Values.global.mysql.databases.stats }}
+              value: {{ printf "jdbc:mysql://%s/%s?useUnicode=yes&characterEncoding=UTF-8" (include "mysql.connectionAddress" .) .Values.global.mysql.databases.stats }}
             - name: STROOM_STATISTICS_SQL_JDBC_DRIVER_USERNAME
               value: {{ .Values.global.mysql.users.service.name }}
             - name: STROOM_STATISTICS_SQL_JDBC_DRIVER_PASSWORD
@@ -128,7 +128,7 @@ spec:
                   name: {{ include "stroom.fullname" . }}
                   key: stroom-service-discovery-enabled
             - name: STROOM_SERVICE_DISCOVERY_ZOOKEEPER_URL
-              value: {{ .Values.global.zookeeper.url }}
+              value: {{ include "zookeeper.connectionString" . | trimSuffix "," }}
             - name: STROOM_DEVELOPMENT_MODE
               value: {{ .Values.developmentMode }}
             - name: STROOM_INTERNALSTATISTICS_BENCHMARK_CLUSTER_DOC_REFS

@@ -55,9 +55,20 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Generate a list of servers based on the number of replicas
 */}}
 {{- define "zookeeper.servers" -}}
-{{- range $i, $e := until (.Values.replicaCount | int) }}
+{{- range $i, $e := until (.Values.global.zookeeper.replicaCount | int) }}
 {{- $fullName := (include "zookeeper.fullname" $) }}
 {{- $hostName := ( printf "%s-%d.%s" $fullName $i $fullName ) }}
-{{- printf "server.%d=%s:%d; " (add $i 1) $hostName ($.Values.port | int) }}
+{{- printf "server.%d=%s:%d; " (add $i 1) $hostName ($.Values.global.zookeeper.port | int) }}
+{{- end }}
+{{- end }}
+
+{{/*
+Zookeeper connection string
+*/}}
+{{- define "zookeeper.connectionString" -}}
+{{- range $i, $e := until (.Values.global.zookeeper.replicaCount | int) }}
+{{- $fullName := (include "zookeeper.fullname" $) }}
+{{- $hostName := ( printf "%s-%d.%s" $fullName $i $fullName ) }}
+{{- printf "%s:%d," $hostName ($.Values.global.zookeeper.port | int) }}
 {{- end }}
 {{- end }}

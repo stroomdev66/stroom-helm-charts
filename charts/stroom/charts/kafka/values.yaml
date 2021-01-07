@@ -13,23 +13,60 @@ image:
 nameOverride: ""
 fullnameOverride: ""
 
-port: 9092
+createTopics:
+  - name: sourceTopic
+    partitions: 10
+    replicas: 1
+  - name: destTopic
+    partitions: 1
+    replicas: 1
+  - name: badStatisticEvents-Count
+    partitions: 10
+    replicas: 1
+  - name: statisticEvents-Count
+    partitions: 10
+    replicas: 1
+  - name: statisticEvents-Value
+    partitions: 10
+    replicas: 1
+  - name: statisticRollupPerms-Count-s
+    partitions: 10
+    replicas: 1
+  - name: statisticRollupPerms-Count-m
+    partitions: 10
+    replicas: 1
+  - name: statisticRollupPerms-Count-h
+    partitions: 10
+    replicas: 1
+  - name: statisticRollupPerms-Count-d
+    partitions: 10
+    replicas: 1
+  - name: statisticRollupPerms-Count-f
+    partitions: 10
+    replicas: 1
 
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
+zookeeper:
+  # In milliseconds
+  sessionTimeout: 10000
+  connectionTimeout: 20000
 
-podAnnotations: {}
+volumeClaim:
+  volumeName: ""
+  storageClassName: ""
+  selector:
+    matchLabels: { }
+    matchExpressions: { }
+  dataSource: { }
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: { }
 
-podSecurityContext: {}
+podAnnotations: { }
+
+podSecurityContext: { }
   # fsGroup: 2000
 
-securityContext: {}
+securityContext: { }
   # capabilities:
   #   drop:
   #   - ALL
@@ -48,8 +85,8 @@ resources:
     memory: 1Gi
     storage: 2Gi
 
-nodeSelector: {}
+nodeSelector: { }
 
-tolerations: []
+tolerations: [ ]
 
-affinity: {}
+affinity: { }

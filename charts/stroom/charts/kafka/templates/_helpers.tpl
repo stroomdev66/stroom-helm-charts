@@ -50,3 +50,19 @@ Selector labels
 app.kubernetes.io/name: {{ include "kafka.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Kafka advertised hostname, which is the service address
+*/}}
+{{- define "kafka.advertisedHostName" -}}
+{{- printf "%s.%s" (include "kafka.fullname" .) .Release.Namespace }}
+{{- end }}
+
+{{/*
+List of topics to create on initialisation
+*/}}
+{{- define "kafka.createTopics" -}}
+{{- range .Values.createTopics }}
+{{- printf "%s:%d:%d," .name (.partitions | int) (.replicas | int) }}
+{{- end }}
+{{- end }}

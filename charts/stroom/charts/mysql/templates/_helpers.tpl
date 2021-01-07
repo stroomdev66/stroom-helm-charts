@@ -55,5 +55,5 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 MySQL server connection address (service hostname and port)
 */}}
 {{- define "mysql.connectionAddress" -}}
-{{- printf "%s.%s:%d" (include "mysql.fullname" $) $.Release.Namespace $.Values.port }}
+{{- printf "%s.%s:%d" (include "mysql.fullname" $) $.Release.Namespace ($.Values.global.mysql.port | int) }}
 {{- end }}

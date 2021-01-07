@@ -14,13 +14,8 @@ global:
 
   serviceAccount:
     annotations: { }
-    # If not set and create is true, a name is generated using the fullname template
-    name: ""
 
   mysql:
-    # Override the name of the service, which defaults to: (Release name)-mysql
-    serviceName: ""
-
     # MySQL service port
     port: 3307
 
@@ -54,7 +49,8 @@ global:
     connectorVersion: 2.1.1
 
   zookeeper:
-    url: zookeeper:2181
+    replicaCount: 3
+    port: 2181
 
 # Node name prefix used to generate node IDs. For instance, the first node will be called 'node-1'
 nodeNamePrefix: node

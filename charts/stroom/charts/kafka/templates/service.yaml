@@ -5,11 +5,12 @@ metadata:
   labels:
     {{- include "kafka.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: ClusterIP
+  clusterIP: None
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
+    - port: {{ .Values.global.kafka.port }}
+      targetPort: kafka
       protocol: TCP
-      name: http
+      name: kafka
   selector:
     {{- include "kafka.selectorLabels" . | nindent 4 }}

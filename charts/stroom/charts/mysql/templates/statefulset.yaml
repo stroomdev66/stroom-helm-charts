@@ -35,7 +35,7 @@ spec:
               value: {{ $serviceUserPasswordFile }}
           ports:
             - name: mysql
-              containerPort: {{ .Values.port }}
+              containerPort: {{ .Values.global.mysql.port }}
               protocol: TCP
               # TODO: Implement probes
 {{/*          livenessProbe:*/}}

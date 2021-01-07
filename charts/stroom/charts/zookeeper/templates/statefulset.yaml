@@ -46,7 +46,7 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: ZOOKEEPER_SERVERS
-              value: {{ include "zookeeper.servers" . | trimSuffix "," }}
+              value: {{ include "zookeeper.servers" . | trimSuffix ";" }}
           ports:
             - name: zookeeper
               containerPort: {{ .Values.port }}
@@ -97,7 +97,7 @@ spec:
           {{- with .Values.volumeClaim.selector.matchLabels }}
           matchLabels:
             {{- toYaml . | nindent 12 }}
-            {{- end }}
+          {{- end }}
           {{- with .Values.volumeClaim.selector.matchExpressions }}
           matchExpressions:
             {{- toYaml . | nindent 12 }}
