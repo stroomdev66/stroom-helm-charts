@@ -157,8 +157,13 @@ authService:
     volumeMode: { }
 
 smtp:
+  replicaCount: 1
+  image:
+    repository: munkyboy/fakesmtp
+    tag: latest
   port: 2525
   transport: plain
+  resources: {}
 
 ui:
   image:
