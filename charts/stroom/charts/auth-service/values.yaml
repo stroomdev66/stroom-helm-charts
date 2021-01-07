@@ -1,0 +1,89 @@
+# Default values for auth-service.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: gchq/stroom-auth-service
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+nameOverride: ""
+fullnameOverride: ""
+
+javaOpts: -Xms50m -Xmx1024m -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=10769,suspend=n
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 512Mi
+    storage: 1Gi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+    storage: 2Gi
+
+ports:
+  auth: 8099
+  admin: 8100
+  debug: 10769
+
+durationBetweenChecks: PT2M
+
+email:
+  fromAddress: ""
+  fromName: Stroom User Accounts
+  resetSubject: Password reset for Stroom
+  resetText: A password reset has been requested for this email address. Please visit the following URL to reset your password -- %s.
+  resetTokenValidityMinutes: 60
+
+jws:
+  algorithm: RS256
+  resetTokenExpiryMinutes:
+    api: 525600 # 1 year
+    email: 5
+    user: 43200 # 30 days
+  requireExpirationTime: false
+
+accountLockoutThreshold: 3
+
+password:
+  allowResets: false
+  forceChangeOnFirstLogin: true
+  maxAge: P30D
+  maxLength: 8
+  complexityRegex: .*
+deactivationThresholds:
+  neverUsed: P30D
+  inactive: P90D
+volumeClaim:
+  volumeName: ""
+  storageClassName: ""
+  selector:
+    matchLabels: {}
+    matchExpressions: {}
+  dataSource: {}
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: {}
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

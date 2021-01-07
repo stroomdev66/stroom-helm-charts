@@ -1,17 +1,15 @@
-{{- $component := "annotations-service" }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "stroom.fullname" . }}-{{ $component }}
+  name: {{ include "auth-service.fullname" . }}
   labels:
-    {{- include "stroom.labels" . | nindent 4 }}
+    {{- include "auth-service.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.authService.replicaCount }}
-  serviceName: {{ include "stroom.fullname" . }}-{{ $component }}
+  replicas: {{ .Values.replicaCount }}
+  serviceName: {{ include "auth-service.fullname" . }}
   selector:
     matchLabels:
-      {{- include "stroom.selectorLabels" . | nindent 6 }}
-      component: {{ $component }}
+      {{- include "auth-service.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -19,15 +17,14 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "stroom.selectorLabels" . | nindent 8 }}
-        component: {{ $component }}
+        {{- include "auth-service.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "stroom.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ $component }}
-          image: "{{ .Values.authService.image.repository }}:{{ .Values.authService.image.tag }}"
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: IfNotPresent
           env:
             - name: DOCKER_HOST_HOSTNAME
@@ -45,7 +42,7 @@ spec:
             - name: ALLOW_PASSWORD_RESETS
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "auth-service.fullname" . }}
                   key: auth-password-allow-resets
             - name: APPLICATION_CONTEXT_PATH
               value: /
@@ -70,82 +67,82 @@ spec:
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "auth-service.fullname" . }}
                   key: mysql-service-password
             - name: DURATION_BETWEEN_CHECKS
-              value: {{ .Values.authService.durationBetweenChecks }}
+              value: {{ .Values.durationBetweenChecks }}
             - name: EMAIL_FROM_ADDRESS
-              value: {{ .Values.authService.email.fromAddress }}
+              value: {{ .Values.email.fromAddress }}
             - name: EMAIL_FROM_NAME
-              value: {{ .Values.authService.email.fromName }}
+              value: {{ .Values.email.fromName }}
             - name: EMAIL_RESET_SUBJECT
-              value: {{ .Values.authService.email.resetSubject }}
+              value: {{ .Values.email.resetSubject }}
             - name: EMAIL_RESET_TEXT
-              value: {{ .Values.authService.email.resetText }}
+              value: {{ .Values.email.resetText }}
             - name: EMAIL_RESET_TOKEN_VALIDITY_IN_MINUTES
-              value: {{ .Values.authService.email.resetTokenValidityMinutes }}
+              value: {{ .Values.email.resetTokenValidityMinutes }}
             - name: EMAIL_RESET_URL
               value: {{ include "stroom.rootUrl" . }}/s/resetPassword/?token=%s
             - name: EMAIL_SMTP_HOST
-              value: {{ include "stroom.fullname" . }}-smtp
+              value: {{ include "auth-service.fullname" . }}-smtp
             - name: EMAIL_SMTP_PASSWORD
               value: ""
             - name: EMAIL_SMTP_PORT
-              value: {{ .Values.smtp.port }}
+              value: {{ .Values.global.smtp.port }}
             - name: EMAIL_SMTP_TRANSPORT
-              value: {{ .Values.smtp.transport }}
+              value: {{ .Values.global.smtp.transport }}
             - name: EMAIL_SMTP_USERNAME
               value: ""
             - name: FAILED_LOGIN_LOCK_THRESHOLD
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "auth-service.fullname" . }}
                   key: auth-account-lockout-threshold
-              value: {{ .Values.authService.accountLockoutThreshold }}
+              value: {{ .Values.accountLockoutThreshold }}
             - name: FORCE_PASSWORD_CHANGE_ON_FIRST_LOGIN
               valueFrom:
                 - configMapKeyRef:
-                    name: {{ include "stroom.fullname" . }}
+                    name: {{ include "auth-service.fullname" . }}
                     key: auth-password-force-change-on-first-login
             - name: JAVA_OPTS
-              value: {{ .Values.authService.javaOpts }}
+              value: {{ .Values.javaOpts }}
             - name: JWS_ALGORITHM
-              value: {{ .Values.authService.jws.algorithm }}
+              value: {{ .Values.jws.algorithm }}
             - name: JWS_ISSUER
               value: stroom
             - name: JWS_MINUTES_UNTIL_EXPIRATION_FOR_API_TOKEN
-              value: {{ .Values.authService.jws.resetTokenExpiryMinutes.api }}
+              value: {{ .Values.jws.resetTokenExpiryMinutes.api }}
             - name: JWS_MINUTES_UNTIL_EXPIRATION_FOR_EMAIL_RESET_TOKEN
-              value: {{ .Values.authService.jws.resetTokenExpiryMinutes.email }}
+              value: {{ .Values.jws.resetTokenExpiryMinutes.email }}
             - name: JWS_MINUTES_UNTIL_EXPIRATION_FOR_USER_TOKEN
-              value: {{ .Values.authService.jws.resetTokenExpiryMinutes.user }}
+              value: {{ .Values.jws.resetTokenExpiryMinutes.user }}
             - name: JWS_REQUIRE_EXPIRATION_TIME
-              value: {{ .Values.authService.jws.requireExpirationTime }}
+              value: {{ .Values.jws.requireExpirationTime }}
             - name: MANDATORY_PASSWORD_CHANGE_DURATION
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "auth-service.fullname" . }}
                   key: auth-password-max-age
             - name: MINIMUM_PASSWORD_LENGTH
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "auth-service.fullname" . }}
                   key: auth-password-max-length
             - name: NEVER_USED_ACCOUNT_DEACTIVATION_THRESHOLD
-              value: {{ .Values.authService.deactivationThresholds.neverUsed }}
+              value: {{ .Values.deactivationThresholds.neverUsed }}
             - name: UNUSED_ACCOUNT_DEACTIVATION_THRESHOLD
-              value: {{ .Values.authService.deactivationThresholds.inactive }}
+              value: {{ .Values.deactivationThresholds.inactive }}
             - name: OWN_PATH
               value: api/auth/authentication
             - name: PASSWORD_COMPLEXITY_REGEX
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "auth-service.fullname" . }}
                   key: auth-password-complexity-regex
             - name: STROOM_AUTH_SERVICE_ADMIN_PORT
-              value: {{ .Values.authService.ports.admin }}
+              value: {{ .Values.ports.admin }}
             - name: STROOM_AUTH_SERVICE_PORT
-              value: {{ .Values.authService.ports.auth }}
+              value: {{ .Values.ports.auth }}
             - name: UNAUTHORISED_URL
               value: {{ include "stroom.rootUrl" . }}/s/unauthorised
           volumeMounts:
@@ -154,7 +151,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           ports:
-            {{- range $name, $number := .Values.authService.ports }}
+            {{- range $name, $number := .Values.ports }}
             - name: {{ $name }}
               containerPort: {{ $number }}
               protocol: TCP
@@ -176,11 +173,7 @@ spec:
               path: /authenticationServiceAdmin/healthcheck
               port: admin
           resources:
-            {{- toYaml .Values.authService.resources | nindent 12 }}
-      volumes:
-        - name: config
-          configMap:
-            name: {{ include "stroom.fullname" . }}-{{ $component }}
+            {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -197,9 +190,9 @@ spec:
     - metadata:
         name: data
         labels:
-          {{- include "stroom.labels" . | nindent 10 }}
+          {{- include "auth-service.labels" . | nindent 10 }}
       spec:
-        {{- with .Values.authService.volumeClaim }}
+        {{- with .Values.volumeClaim }}
         volumeName: {{ .volumeName | quote }}
         storageClassName: {{ .storageClassName | quote }}
         selector:
@@ -226,6 +219,6 @@ spec:
         {{- end }}
         resources:
           requests:
-            storage: {{ .Values.authService.resources.requests.storage }}
+            storage: {{ .Values.resources.requests.storage }}
           limits:
-            storage: {{ .Values.authService.resources.limits.storage }}
+            storage: {{ .Values.resources.limits.storage }}

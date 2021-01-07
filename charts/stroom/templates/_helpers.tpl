@@ -40,6 +40,13 @@ helm.sh/chart: {{ include "stroom.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{ include "stroom.extraLabels" . }}
+{{- end }}
+
+{{/*
+Stroom-specific labels, used by subcharts
+*/}}
+{{- define "stroom.extraLabels" -}}
 stroom/stack: {{ .Values.stackName }}
 stroom/rack: {{ .Values.rackName }}
 {{- end }}

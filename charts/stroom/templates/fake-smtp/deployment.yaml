@@ -32,7 +32,7 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - name: smtp
-              containerPort: {{ .Values.smtp.port }}
+              containerPort: {{ .Values.global.smtp.port }}
               protocol: TCP
           resources:
             {{- toYaml .Values.smtp.resources | nindent 12 }}

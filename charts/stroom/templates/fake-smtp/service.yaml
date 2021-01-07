@@ -9,7 +9,7 @@ spec:
   type: ClusterIP
   clusterIP: None
   ports:
-    - port: {{ .Values.smtp.port }}
+    - port: {{ .Values.global.smtp.port }}
       targetPort: smtp
       protocol: TCP
       name: smtp

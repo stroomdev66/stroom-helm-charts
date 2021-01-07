@@ -72,7 +72,7 @@ spec:
               subPath: serviceuser
               name: serviceuser-password
               readOnly: true
-      serviceAccountName: {{ include "mysql.serviceAccountName" . }}
+      serviceAccountName: {{ include "stroom.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       {{- with .Values.nodeSelector }}

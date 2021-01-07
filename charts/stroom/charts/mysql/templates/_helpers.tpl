@@ -40,6 +40,7 @@ helm.sh/chart: {{ include "mysql.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{ include "stroom.extraLabels" . }}
 {{- end }}
 
 {{/*
@@ -48,15 +49,4 @@ Selector labels
 {{- define "mysql.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "mysql.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "mysql.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "mysql.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
 {{- end }}
