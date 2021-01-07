@@ -27,7 +27,7 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ $component }}
           image: "{{ .Values.stroomNode.image.repository }}:{{ .Values.stroomNode.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: IfNotPresent
           env:
