@@ -103,6 +103,7 @@ stroomNode:
     volumeMode: {}
 
 authService:
+  replicaCount: 1
   image:
     repository: gchq/stroom-auth-service
     tag: v6.0-LATEST

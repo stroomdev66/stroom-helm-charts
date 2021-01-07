@@ -6,7 +6,7 @@ metadata:
   labels:
     {{- include "stroom.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.stroomNode.replicaCount }}
+  replicas: {{ .Values.authService.replicaCount }}
   serviceName: {{ include "stroom.fullname" . }}-{{ $component }}
   selector:
     matchLabels:
@@ -176,7 +176,7 @@ spec:
               path: /authenticationServiceAdmin/healthcheck
               port: admin
           resources:
-            {{- toYaml .Values.stroomNode.resources | nindent 12 }}
+            {{- toYaml .Values.authService.resources | nindent 12 }}
       volumes:
         - name: config
           configMap:
