@@ -32,7 +32,10 @@ spec:
             - name: MYSQL_USER
               value: {{ .Values.global.mysql.users.service.name }}
             - name: MYSQL_PASSWORD
-              value: {{ $serviceUserPasswordFile }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "stroom.globalSecretName" . }}
+                  key: mysql-service-password
           ports:
             - name: mysql
               containerPort: {{ .Values.global.mysql.port }}
@@ -69,10 +72,6 @@ spec:
               subPath: root
               name: root-password
               readOnly: true
-            - mountPath: {{ $serviceUserPasswordFile }}
-              subPath: serviceuser
-              name: serviceuser-password
-              readOnly: true
       serviceAccountName: {{ include "stroom.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
@@ -101,13 +100,6 @@ spec:
             items:
               - key: mysql-root-password
                 path: root
-                mode: {{ $passwordFileMode }}
-        - name: serviceuser-password
-          secret:
-            secretName: {{ include "stroom.globalSecretName" . }}
-            items:
-              - key: mysql-service-password
-                path: serviceuser
                 mode: {{ $passwordFileMode }}
   volumeClaimTemplates:
     - metadata:
