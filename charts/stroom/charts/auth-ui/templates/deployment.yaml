@@ -58,7 +58,8 @@ spec:
               containerPort: {{ .Values.global.authUi.ports.http }}
               protocol: TCP
           volumeMounts:
-            - mountPath: /etc/nginx/template
+            - mountPath: /etc/nginx/template/nginx.conf.template
+              subPath: nginx.conf.template
               name: config
               readOnly: true
           resources:

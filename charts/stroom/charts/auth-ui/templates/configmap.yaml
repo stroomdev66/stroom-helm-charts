@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "auth-ui.labels" . | nindent 4 }}
 data:
-  nginx.conf: |
+  nginx.conf.template: |
     user  nginx;
 
     worker_processes  1;
