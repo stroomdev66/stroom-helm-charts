@@ -65,10 +65,10 @@ Name of the cluster `Secret` resource
 {{- end }}
 
 {{/*
-Generates a random password
+Generates a random password. Result is NOT base-64 encoded - this is left to the caller.
 */}}
 {{- define "stroom.password" -}}
-{{- randAlphaNum (.Values.randomPasswordLength | int) | b64enc }}
+{{- randAlphaNum (.Values.randomPasswordLength | int) }}
 {{- end }}
 
 {{/*
