@@ -4,10 +4,10 @@
 
 global:
   # Identifies this Stroom deployment
-  stackName: stroom
+  stackName: stroom-dev
 
   # Used to logically identify groups of nodes
-  rackName: rack
+  rackName: rack-1
 
   # Set the advertised host (could be a FQDN or hostname)
   advertisedHost: "stroom"
@@ -21,8 +21,6 @@ global:
 
   authService:
     chartId: auth-service
-
-    allowPasswordResets: false
 
   authUi:
     chartId: auth-ui
