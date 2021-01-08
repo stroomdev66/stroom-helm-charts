@@ -44,12 +44,26 @@ spec:
               value: stroom-accounts
             - name: AUTH_UI_ALLOW_PASSWORD_RESETS
               value: {{ .Values.global.authService.allowPasswordResets }}
+            - name: NGINX_HOST
+              value: {{ .Values.global.advertisedHost }}
+            - name: NGINX_HTTP_PORT
+              value: {{ .Values.global.authUi.ports.http }}
+            - name: NGINX_HTTPS_PORT
+              value: {{ .Values.global.authUi.ports.https }}
           ports:
             - name: http
               containerPort: {{ .Values.global.authUi.ports.http }}
               protocol: TCP
+          volumeMounts:
+            - mountPath: /etc/nginx/template
+              name: config
+              readOnly: true
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "auth-ui.fullname" }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
