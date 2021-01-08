@@ -101,7 +101,7 @@ spec:
               value: {{ .Values.accountLockoutThreshold }}
             - name: FORCE_PASSWORD_CHANGE_ON_FIRST_LOGIN
               valueFrom:
-                - configMapKeyRef:
+                configMapKeyRef:
                     name: {{ include "auth-service.fullname" . }}
                     key: password-force-change-on-first-login
             - name: JAVA_OPTS
