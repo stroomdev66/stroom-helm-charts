@@ -13,9 +13,9 @@ global:
   advertisedHost: "stroom"
 
   ingress:
-    enabled: false
+    enabled: true
     tls:
-      secretName: ""
+      secretName: "stroom-tls"
     annotations:
       kubernetes.io/ingress.class: nginx
 
