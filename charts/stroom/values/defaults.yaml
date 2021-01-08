@@ -18,7 +18,5 @@ processNode:
     heap:
       min: 512m
       max: 1g
+
   # TODO: Add selectors to volume claim templates to classify storage by component (e.g. proc node)
-ui:
-  image:
-    tag: v1.0-LATEST
