@@ -10,9 +10,9 @@ spec:
   ports:
     {{- range $name, $number := .Values.ports }}
     - port: {{ $number }}
-      targetPort: $name
+      targetPort: {{ $name }}
       protocol: TCP
-      name: $name
+      name: {{ $name }}
     {{- end }}
   selector:
     {{- include "auth-service.selectorLabels" . | nindent 4 }}

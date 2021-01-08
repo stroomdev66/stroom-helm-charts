@@ -25,12 +25,9 @@ resources:
   requests:
     cpu: 500m
     memory: 512Mi
-    storage: 1Gi
-
   limits:
     cpu: 1000m
     memory: 1Gi
-    storage: 2Gi
 
 nodeSelector: { }
 

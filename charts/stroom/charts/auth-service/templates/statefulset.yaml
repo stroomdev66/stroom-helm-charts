@@ -80,7 +80,7 @@ spec:
             - name: EMAIL_RESET_TEXT
               value: {{ .Values.email.resetText }}
             - name: EMAIL_RESET_TOKEN_VALIDITY_IN_MINUTES
-              value: {{ .Values.email.resetTokenValidityMinutes }}
+              value: {{ .Values.email.resetTokenValidityMinutes | quote }}
             - name: EMAIL_RESET_URL
               value: {{ include "stroom.rootUrl" . }}/s/resetPassword/?token=%s
             - name: EMAIL_SMTP_HOST
@@ -88,7 +88,7 @@ spec:
             - name: EMAIL_SMTP_PASSWORD
               value: ""
             - name: EMAIL_SMTP_PORT
-              value: {{ .Values.global.smtp.port }}
+              value: {{ .Values.global.smtp.port | quote }}
             - name: EMAIL_SMTP_TRANSPORT
               value: {{ .Values.global.smtp.transport }}
             - name: EMAIL_SMTP_USERNAME
@@ -98,7 +98,6 @@ spec:
                 configMapKeyRef:
                   name: {{ include "auth-service.fullname" . }}
                   key: account-lockout-threshold
-              value: {{ .Values.accountLockoutThreshold }}
             - name: FORCE_PASSWORD_CHANGE_ON_FIRST_LOGIN
               valueFrom:
                 configMapKeyRef:
@@ -111,13 +110,13 @@ spec:
             - name: JWS_ISSUER
               value: stroom
             - name: JWS_MINUTES_UNTIL_EXPIRATION_FOR_API_TOKEN
-              value: {{ .Values.jws.resetTokenExpiryMinutes.api }}
+              value: {{ .Values.jws.resetTokenExpiryMinutes.api | quote }}
             - name: JWS_MINUTES_UNTIL_EXPIRATION_FOR_EMAIL_RESET_TOKEN
-              value: {{ .Values.jws.resetTokenExpiryMinutes.email }}
+              value: {{ .Values.jws.resetTokenExpiryMinutes.email | quote }}
             - name: JWS_MINUTES_UNTIL_EXPIRATION_FOR_USER_TOKEN
-              value: {{ .Values.jws.resetTokenExpiryMinutes.user }}
+              value: {{ .Values.jws.resetTokenExpiryMinutes.user | quote }}
             - name: JWS_REQUIRE_EXPIRATION_TIME
-              value: {{ .Values.jws.requireExpirationTime }}
+              value: {{ .Values.jws.requireExpirationTime | quote }}
             - name: MANDATORY_PASSWORD_CHANGE_DURATION
               valueFrom:
                 configMapKeyRef:
@@ -140,9 +139,9 @@ spec:
                   name: {{ include "auth-service.fullname" . }}
                   key: password-complexity-regex
             - name: STROOM_AUTH_SERVICE_ADMIN_PORT
-              value: {{ .Values.ports.admin }}
+              value: {{ .Values.ports.admin | quote }}
             - name: STROOM_AUTH_SERVICE_PORT
-              value: {{ .Values.ports.auth }}
+              value: {{ .Values.ports.auth | quote }}
             - name: UNAUTHORISED_URL
               value: {{ include "stroom.rootUrl" . }}/s/unauthorised
           volumeMounts:
@@ -173,7 +172,12 @@ spec:
               path: /authenticationServiceAdmin/healthcheck
               port: admin
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

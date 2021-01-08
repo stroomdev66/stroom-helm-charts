@@ -38,9 +38,9 @@ spec:
             - name: KAFKA_ZOOKEEPER_CONNECT
               value: {{ include "zookeeper.connectionString" . | trimSuffix "," }}
             - name: KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS
-              value: {{ .Values.zookeeper.sessionTimeout }}
+              value: {{ .Values.zookeeper.sessionTimeout | quote }}
             - name: KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS
-              value: {{ .Values.zookeeper.connectionTimeout }}
+              value: {{ .Values.zookeeper.connectionTimeout | quote }}
           ports:
             - name: kafka
               containerPort: {{ .Values.global.kafka.port }}
@@ -62,7 +62,12 @@ spec:
               subPath: log
               name: data
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

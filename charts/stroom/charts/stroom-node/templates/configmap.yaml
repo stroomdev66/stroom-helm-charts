@@ -1,3 +1,4 @@
+{{- if not (lookup "v1" "ConfigMap" .Release.Namespace (include "stroom-node.fullname" .)) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -10,7 +11,7 @@ metadata:
 data:
   stroom-logging-level: {{ .Values.loggingLevel }}
   stroom-proxy-dir: {{ .Values.stroomProxyDir }}
-  stroom-service-discovery-enabled: {{ .Values.serviceDiscovery.enabled }}
+  stroom-service-discovery-enabled: {{ .Values.serviceDiscovery.enabled | quote }}
   {{- with .Values.statisticDocRefs }}
   stat-docref-benchmark-cluster: {{ .benchmarkCluster }}
   stat-docref-cpu: {{ .cpu }}
@@ -24,3 +25,4 @@ data:
   stat-docref-stream-task-queue-size: {{ .streamTaskQueueSize }}
   stat-docref-volumes: {{ .volumes }}
   {{- end }}
+{{- end }}

@@ -1,3 +1,4 @@
+{{- if not (lookup "v1" "ConfigMap" .Release.Namespace (include "auth-service.fullname" .)) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -8,11 +9,12 @@ metadata:
     "helm.sh/hook": pre-install
     "helm.sh/hook-delete-policy": hook-failed
 data:
-  account-lockout-threshold: {{ .Values.accountLockoutThreshold }}
-  password-allow-resets: {{ .Values.global.authService.allowPasswordResets }}
+  account-lockout-threshold: {{ .Values.accountLockoutThreshold | quote }}
+  password-allow-resets: {{ .Values.password.allowPasswordResets | quote }}
   {{- with .Values.password }}
-  password-force-change-on-first-login: {{ .forceChangeOnFirstLogin }}
-  password-max-age: {{ .maxAge }}
-  password-max-length: {{ .maxLength }}
-  password-complexity-regex: {{ .complexityRegex }}
+  password-force-change-on-first-login: {{ .forceChangeOnFirstLogin | quote }}
+  password-max-age: {{ .maxAge | quote }}
+  password-max-length: {{ .maxLength | quote }}
+  password-complexity-regex: {{ .complexityRegex | quote }}
   {{- end }}
+{{- end }}

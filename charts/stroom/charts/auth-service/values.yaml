@@ -47,6 +47,7 @@ jws:
 accountLockoutThreshold: 3
 
 password:
+  allowPasswordResets: false
   forceChangeOnFirstLogin: true
   maxAge: P30D
   maxLength: 8

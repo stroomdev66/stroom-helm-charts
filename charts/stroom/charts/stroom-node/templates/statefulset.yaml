@@ -38,11 +38,11 @@ spec:
             - name: JAVA_OPTS
               value: {{ .Values.javaOpts }}
             - name: STROOM_APP_PORT
-              value: {{ .Values.ports.app }}t
+              value: {{ .Values.ports.app | quote }}
             - name: STROOM_ADMIN_PORT
-              value: {{ .Values.ports.admin }}
+              value: {{ .Values.ports.admin | quote }}
             - name: STROOM_DEBUG_PORT
-              value: {{ .Values.ports.debug }}
+              value: {{ .Values.ports.debug | quote }}
             - name: STROOM_NODE
               valueFrom:
                 fieldRef:
@@ -120,7 +120,7 @@ spec:
             - name: STROOM_CONNECTORS_KAFKA_DEFAULT_CONNECTOR_VERSION
               value: {{ .Values.global.kafka.connectorVersion }}
             - name: STROOM_CONTENT_PACK_IMPORT_ENABLED
-              value: {{ .Values.contentPackImportEnabled }}
+              value: {{ .Values.contentPackImportEnabled | quote }}
             - name: STROOM_SERVICE_DISCOVERY_ENABLED
               valueFrom:
                 configMapKeyRef:
@@ -129,7 +129,7 @@ spec:
             - name: STROOM_SERVICE_DISCOVERY_ZOOKEEPER_URL
               value: {{ include "zookeeper.connectionString" . | trimSuffix "," }}
             - name: STROOM_DEVELOPMENT_MODE
-              value: {{ .Values.developmentMode }}
+              value: {{ .Values.developmentMode | quote }}
             - name: STROOM_INTERNALSTATISTICS_BENCHMARK_CLUSTER_DOC_REFS
               valueFrom:
                 configMapKeyRef:
