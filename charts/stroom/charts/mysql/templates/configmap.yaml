@@ -6,7 +6,7 @@ data:
   my.cnf: |
     [mysqld]
     datadir={{ .Values.dataDir }}
-    port={{ $.Values.port }}
+    port={{ .Values.global.mysql.port }}
     user={{ .Values.securityContext.runAsUser | default "mysql" }}
 
     {{- range .Values.additionalConfig }}
