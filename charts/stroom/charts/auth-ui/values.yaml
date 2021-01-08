@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: gchq/auth-ui
+  repository: gchq/stroom-auth-ui
   tag: ""
 
 podAnnotations: { }
