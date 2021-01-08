@@ -38,7 +38,7 @@ spec:
             - name: JAVA_OPTS
               value: {{ .Values.javaOpts }}
             - name: STROOM_APP_PORT
-              value: {{ .Values.ports.app }}
+              value: {{ .Values.ports.app }}t
             - name: STROOM_ADMIN_PORT
               value: {{ .Values.ports.admin }}
             - name: STROOM_DEBUG_PORT

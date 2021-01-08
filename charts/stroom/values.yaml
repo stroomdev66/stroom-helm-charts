@@ -12,6 +12,13 @@ global:
   # Set the advertised host (could be a FQDN or hostname)
   advertisedHost: "stroom"
 
+  ingress:
+    enabled: false
+    tls:
+      secretName: ""
+    annotations:
+      kubernetes.io/ingress.class: nginx
+
   authService:
     chartId: auth-service
 
@@ -96,18 +103,6 @@ securityContext: { }
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
   # runAsUser: 1000
-
-ingress:
-  enabled: false
-  annotations: { }
-    # kubernetes.io/ingress.class: nginx
-  hosts:
-    - host: chart-example.local
-      paths: [ ]
-  tls: [ ]
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
 
 nodeSelector: { }
 

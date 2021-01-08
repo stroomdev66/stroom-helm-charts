@@ -63,7 +63,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ include "auth-ui.fullname" }}
+            name: {{ include "auth-ui.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
