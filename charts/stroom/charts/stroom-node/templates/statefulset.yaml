@@ -86,12 +86,12 @@ spec:
             - name: STROOM_AUTH_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "stroom-node.fullname" . }}
+                  name: {{ include "stroom.globalSecretName" . }}
                   key: auth-client-id
             - name: STROOM_AUTH_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "stroom-node.fullname" . }}
+                  name: {{ include "stroom.globalSecretName" . }}
                   key: auth-client-secret
             - name: STROOM_UI_URL
               # TODO: This is supposed to be "STROOM_UI_HOST". Check whether this is equivalent to the advertised address
