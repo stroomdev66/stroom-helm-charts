@@ -9,8 +9,8 @@ spec:
   clusterIP: None
   ports:
     - port: {{ .Values.global.zookeeper.port }}
-      targetPort: http
+      targetPort: zookeeper
       protocol: TCP
-      name: http
+      name: zookeeper
   selector:
     {{- include "zookeeper.selectorLabels" . | nindent 4 }}
