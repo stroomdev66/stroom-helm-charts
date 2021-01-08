@@ -116,7 +116,7 @@ spec:
             - name: STROOM_PLUGINS_LIB_DIR
               value: /stroom/plugins
             - name: STROOM_CONNECTORS_KAFKA_DEFAULT_BOOTSTRAP_SERVERS
-              value: {{ .Values.global.kafka.serviceName | default (print .Release.Name "-kafka") }}:{{ .Values.global.kafka.port }}
+              value: {{ include "kafka.fullname" . }}:{{ .Values.global.kafka.port }}
             - name: STROOM_CONNECTORS_KAFKA_DEFAULT_CONNECTOR_VERSION
               value: {{ .Values.global.kafka.connectorVersion }}
             - name: STROOM_CONTENT_PACK_IMPORT_ENABLED

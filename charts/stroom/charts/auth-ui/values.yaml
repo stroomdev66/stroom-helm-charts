@@ -1,27 +1,12 @@
-# Default values for zookeeper.
+# Default values for auth-ui.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# Defined in global scope
-# replicaCount: 1
+replicaCount: 1
 
 image:
-  repository: zookeeper
+  repository: gchq/auth-ui
   tag: ""
-
-dataDir: /var/zookeeper
-jvmOpts: -Xms50m -Xmx512m
-
-volumeClaim:
-  volumeName: ""
-  storageClassName: ""
-  selector:
-    matchLabels: { }
-    matchExpressions: { }
-  dataSource: { }
-  accessModes:
-    - ReadWriteOnce
-  volumeMode: { }
 
 podAnnotations: { }
 

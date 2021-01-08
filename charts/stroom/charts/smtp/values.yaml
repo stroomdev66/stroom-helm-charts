@@ -8,9 +8,6 @@ image:
   repository: munkyboy/fakesmtp
   tag: ""
 
-nameOverride: ""
-fullnameOverride: ""
-
 podAnnotations: { }
 
 podSecurityContext: { }

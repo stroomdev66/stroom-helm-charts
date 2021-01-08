@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "auth-ui.fullname" . }}
+  labels:
+    {{- include "auth-ui.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "auth-ui.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "auth-ui.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "stroom.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: AUTH_UI_AUTHENTICATION_SERVICE_URL
+              value: {{ include "stroom.rootUrl" . }}/api/auth/authentication/v1
+            - name: AUTH_UI_USER_SERVICE_URL
+              value: {{ include "stroom.rootUrl" . }}/api/auth/user/v1
+            - name: AUTH_UI_TOKEN_SERVICE_URL
+              value: {{ include "stroom.rootUrl" . }}/api/auth/token/v1
+            - name: AUTH_UI_AUTHORISATION_SERVICE_URL
+              value: {{ include "stroom.rootUrl" . }}/api/authorisation/v1
+            - name: AUTH_UI_STROOM_UI_URL
+              value: {{ include "stroom.rootUrl" . }}/stroom
+            - name: AUTH_UI_ADVERTISED_URL
+              value: {{ include "stroom.rootUrl" . }}
+            - name: AUTH_UI_APP_CLIENT_ID
+              value: stroom-accounts
+            - name: AUTH_UI_ALLOW_PASSWORD_RESETS
+              value: {{ .Values.global.authService.allowPasswordResets }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.global.authUi.ports.http }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

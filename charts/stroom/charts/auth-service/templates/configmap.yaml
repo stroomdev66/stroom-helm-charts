@@ -9,8 +9,8 @@ metadata:
     "helm.sh/hook-delete-policy": hook-failed
 data:
   account-lockout-threshold: {{ .Values.accountLockoutThreshold }}
+  password-allow-resets: {{ .Values.global.authService.allowPasswordResets }}
   {{- with .Values.password }}
-  password-allow-resets: {{ .allowResets }}
   password-force-change-on-first-login: {{ .forceChangeOnFirstLogin }}
   password-max-age: {{ .maxAge }}
   password-max-length: {{ .maxLength }}

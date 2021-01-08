@@ -8,9 +8,6 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
-nameOverride: ""
-fullnameOverride: ""
-
 dataDir: /var/lib/mysql
 
 # TODO:

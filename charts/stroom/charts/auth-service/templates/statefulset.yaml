@@ -67,7 +67,7 @@ spec:
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "stroom.fullname" . }}
+                  name: {{ include "stroom.globalSecretName" . }}
                   key: mysql-service-password
             - name: DURATION_BETWEEN_CHECKS
               value: {{ .Values.durationBetweenChecks }}

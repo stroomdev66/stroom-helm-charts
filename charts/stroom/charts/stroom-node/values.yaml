@@ -8,9 +8,6 @@ image:
   repository: gchq/stroom
   tag: ""
 
-nameOverride: ""
-fullnameOverride: ""
-
 javaOpts: -Xms50m -Xmx1024m -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=10765,suspend=n
 jpaDialect: org.hibernate.dialect.MySQLInnoDBDialect
 jdbcDriver: com.mysql.cj.jdbc.Driver
