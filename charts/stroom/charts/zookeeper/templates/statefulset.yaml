@@ -47,6 +47,8 @@ spec:
           env:
             - name: ZOOKEEPER_SERVERS
               value: {{ include "zookeeper.servers" . | trimSuffix ";" }}
+            - name: JVMFLAGS
+              value: {{ .Values.jvmOpts | quote }}
           ports:
             - name: zookeeper
               containerPort: {{ .Values.global.zookeeper.port }}
