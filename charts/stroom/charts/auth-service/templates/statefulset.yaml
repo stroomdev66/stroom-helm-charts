@@ -38,7 +38,7 @@ spec:
             - name: ADMIN_CONTEXT_PATH
               value: /authenticationServiceAdmin
             - name: ADVERTISED_HTTP_HOST
-              value: {{ .Values.global.advertisedHost }}
+              value: https://{{ .Values.global.advertisedHost }}
             - name: ALLOW_PASSWORD_RESETS
               valueFrom:
                 configMapKeyRef:
