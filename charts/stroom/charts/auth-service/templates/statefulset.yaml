@@ -55,7 +55,7 @@ spec:
             - name: AUTH_UI
               value: {{ include "stroom.rootUrl" . }}/s/login
             - name: CERTIFICATE_DN_CAPTURE_GROUP_INDEX
-              value: "-1"
+              value: "1"
             - name: CERTIFICATE_DN_PATTERN
               value: .*\((.*)\)
             - name: CHANGE_PASSWORD_URL
