@@ -74,7 +74,7 @@ metadata:
   {{- with .Values.global.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
-    nginx.ingress.kubernetes.io/app-root: /stroom/ui
+    nginx.ingress.kubernetes.io/app-root: /stroom
   {{- end }}
 spec:
   tls:
@@ -86,13 +86,6 @@ spec:
       http:
         paths:
           - path: /
-            pathType: Exact
-            backend:
-              service:
-                name: {{ include "stroom-node.fullname" . }}
-                port:
-                  name: app
-          - path: /stroom
             pathType: Exact
             backend:
               service:
