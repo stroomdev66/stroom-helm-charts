@@ -36,7 +36,7 @@ spec:
                 echo $server_id > myid
               fi
           volumeMounts:
-            - mountPath: {{ .Values.dataDir }}
+            - mountPath: /data
               name: data
       containers:
         - name: {{ .Chart.Name }}
@@ -63,12 +63,15 @@ spec:
 {{/*              path: /*/}}
 {{/*              port: http*/}}
           volumeMounts:
-            - mountPath: {{ .Values.dataDir }}
+            - mountPath: /data
+              subPath: data
               name: data
-            - mountPath: /conf/zoo.cfg
-              subPath: zoo.cfg
-              name: config
-              readOnly: true
+            - mountPath: /datalog
+              subPath: datalog
+              name: data
+            - mountPath: /logs
+              subPath: logs
+              name: data
           resources:
             requests:
               cpu: {{ .Values.resources.requests.cpu }}
