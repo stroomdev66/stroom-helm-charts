@@ -213,22 +213,22 @@ spec:
               containerPort: {{ $number }}
               protocol: TCP
             {{- end }}
-          livenessProbe:
-            initialDelaySeconds: 90
-            periodSeconds: 10
-            timeoutSeconds: 1
-            failureThreshold: 3
-            httpGet:
-              path: /stroomAdmin/healthcheck
-              port: admin
-          readinessProbe:
-            initialDelaySeconds: 90
-            periodSeconds: 60
-            timeoutSeconds: 5
-            failureThreshold: 3
-            httpGet:
-              path: /stroomAdmin/healthcheck
-              port: admin
+{{/*          livenessProbe:*/}}
+{{/*            initialDelaySeconds: 90*/}}
+{{/*            periodSeconds: 10*/}}
+{{/*            timeoutSeconds: 1*/}}
+{{/*            failureThreshold: 3*/}}
+{{/*            httpGet:*/}}
+{{/*              path: /stroomAdmin/healthcheck*/}}
+{{/*              port: admin*/}}
+{{/*          readinessProbe:*/}}
+{{/*            initialDelaySeconds: 90*/}}
+{{/*            periodSeconds: 60*/}}
+{{/*            timeoutSeconds: 5*/}}
+{{/*            failureThreshold: 3*/}}
+{{/*            httpGet:*/}}
+{{/*              path: /stroomAdmin/healthcheck*/}}
+{{/*              port: admin*/}}
           resources:
             requests:
               cpu: {{ .Values.resources.requests.cpu }}
