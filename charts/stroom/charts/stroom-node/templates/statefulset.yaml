@@ -74,7 +74,7 @@ spec:
                   name: {{ include "stroom.globalSecretName" . }}
                   key: mysql-service-password
             - name: STROOM_AUTH_SERVICES_URL
-              value: {{ include "stroom.rootUrl" . }}/api/auth
+              value: http://{{ printf "%s.%s:%d" (include "auth-service.fullname" .) .Release.Namespace (.Values.global.authService.ports.auth | int) }}
             - name: STROOM_AUTHENTICATION_SERVICE_URL
               value: {{ include "stroom.rootUrl" . }}/api/auth/authentication/v1
             - name: STROOM_AUTH_AUTHENTICATION_SERVICE_URL

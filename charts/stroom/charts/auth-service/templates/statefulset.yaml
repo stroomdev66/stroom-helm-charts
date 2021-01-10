@@ -51,7 +51,7 @@ spec:
             - name: AUTHORISATION_SERVICE_CAN_MANAGE_USERS_PERMISSION
               value: Manage Users
             - name: AUTHORISATION_SERVICE_URL
-              value: {{ include "stroom.rootUrl" . }}/api/authorisation/v1
+              value: http://{{ printf "%s.%s:%d" (include "stroom-node.fullname" .) .Release.Namespace (.Values.global.stroomNode.ports.app | int) }}/api/authorisation/v1
             - name: AUTH_UI
               value: {{ include "stroom.rootUrl" . }}/s/login
             - name: CERTIFICATE_DN_CAPTURE_GROUP_INDEX
