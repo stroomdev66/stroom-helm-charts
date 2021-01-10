@@ -1,0 +1,23 @@
+global:
+  stackName: stroom-dev
+  rackName: rack-1
+
+  # Must be changed
+  advertisedHost: stroom.example.com
+
+  ingress:
+    tls:
+      # A secret must be pre-created in the SAME namespace using this name
+      secretName: "stroom-tls"
+
+  mysql:
+    users:
+      root:
+        password: "test"
+      service:
+        password: "test"
+
+stroomNode:
+  replicaCount: 3
+
+  # TODO: Add selectors to volume claim templates to classify storage by component (e.g. proc node)

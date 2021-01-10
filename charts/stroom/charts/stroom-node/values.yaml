@@ -13,6 +13,7 @@ jpaDialect: org.hibernate.dialect.MySQLInnoDBDialect
 jdbcDriver: com.mysql.cj.jdbc.Driver
 
 # Node name prefix used to generate node IDs. For instance, the first node will be called 'node-1'
+# TODO: Label nodes using this prefix
 nodeNamePrefix: node
 
 # Development mode
