@@ -35,7 +35,7 @@ global:
 
     ports:
       http: 5000
-      https: 9443
+#      https: 9443
 
   kafka:
     chartId: kafka
