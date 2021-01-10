@@ -7,9 +7,11 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: {{ .Values.global.authUi.ports.http }}
-      targetPort: http
+    {{- range $name, $number := .Values.global.authUi.ports }}
+    - port: {{ $number }}
+      targetPort: {{ $name }}
       protocol: TCP
-      name: http
+      name: {{ $name }}
+    {{- end }}
   selector:
     {{- include "auth-ui.selectorLabels" . | nindent 4 }}
