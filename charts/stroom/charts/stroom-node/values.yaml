@@ -12,11 +12,6 @@ javaOpts: -Xms50m -Xmx1024m -Xdebug -Xrunjdwp:server=y,transport=dt_socket,addre
 jpaDialect: org.hibernate.dialect.MySQLInnoDBDialect
 jdbcDriver: com.mysql.cj.jdbc.Driver
 
-ports:
-  app: 8080
-  admin: 8081
-  debug: 10765
-
 # Node name prefix used to generate node IDs. For instance, the first node will be called 'node-1'
 nodeNamePrefix: node
 

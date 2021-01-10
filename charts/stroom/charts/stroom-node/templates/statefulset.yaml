@@ -38,11 +38,11 @@ spec:
             - name: JAVA_OPTS
               value: {{ .Values.javaOpts }}
             - name: STROOM_APP_PORT
-              value: {{ .Values.ports.app | quote }}
+              value: {{ .Values.global.stroomNode.ports.app | quote }}
             - name: STROOM_ADMIN_PORT
-              value: {{ .Values.ports.admin | quote }}
+              value: {{ .Values.global.stroomNode.ports.admin | quote }}
             - name: STROOM_DEBUG_PORT
-              value: {{ .Values.ports.debug | quote }}
+              value: {{ .Values.global.stroomNode.ports.debug | quote }}
             - name: STROOM_NODE
               valueFrom:
                 fieldRef:
@@ -208,7 +208,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           ports:
-            {{- range $name, $number := .Values.ports }}
+            {{- range $name, $number := .Values.global.stroomNode.ports }}
             - name: {{ $name }}
               containerPort: {{ $number }}
               protocol: TCP
