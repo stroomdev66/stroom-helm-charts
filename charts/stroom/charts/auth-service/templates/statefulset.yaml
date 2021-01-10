@@ -139,9 +139,9 @@ spec:
                   name: {{ include "auth-service.fullname" . }}
                   key: password-complexity-regex
             - name: STROOM_AUTH_SERVICE_ADMIN_PORT
-              value: {{ .Values.ports.admin | quote }}
+              value: {{ .Values.global.authService.ports.admin | quote }}
             - name: STROOM_AUTH_SERVICE_PORT
-              value: {{ .Values.ports.auth | quote }}
+              value: {{ .Values.global.authService.ports.auth | quote }}
             - name: UNAUTHORISED_URL
               value: {{ include "stroom.rootUrl" . }}/s/unauthorised
           volumeMounts:
@@ -150,7 +150,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           ports:
-            {{- range $name, $number := .Values.ports }}
+            {{- range $name, $number := .Values.global.authService.ports }}
             - name: {{ $name }}
               containerPort: {{ $number }}
               protocol: TCP

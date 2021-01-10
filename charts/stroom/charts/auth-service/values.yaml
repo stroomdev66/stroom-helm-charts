@@ -22,11 +22,6 @@ resources:
     memory: 1Gi
     storage: 2Gi
 
-ports:
-  auth: 8099
-  admin: 8100
-  debug: 10769
-
 durationBetweenChecks: PT2M
 
 email:
