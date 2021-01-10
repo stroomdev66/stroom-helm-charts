@@ -144,6 +144,8 @@ spec:
               value: {{ .Values.global.authService.ports.auth | quote }}
             - name: UNAUTHORISED_URL
               value: {{ include "stroom.rootUrl" . }}/s/unauthorised
+            - name: LOGGING_LEVEL
+              value: ERROR
           volumeMounts:
             - mountPath: /stroom-auth-service/logs
               name: data
