@@ -8,6 +8,7 @@ metadata:
   {{- with .Values.global.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
   {{- end }}
 spec:
   tls:
@@ -18,7 +19,7 @@ spec:
     - host: {{ .Values.global.advertisedHost }}
       http:
         paths:
-          - path: /api/auth
+          - path: /api/auth/(.*)
             pathType: Prefix
             backend:
               service:
