@@ -19,7 +19,7 @@ resources:
     storage: 1Gi
   limits:
     cpu: 1000m
-    memory: 1Gi
+    memory: 2Gi
     storage: 2Gi
 
 durationBetweenChecks: PT2M

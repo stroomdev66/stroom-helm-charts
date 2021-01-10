@@ -9,8 +9,7 @@ image:
   repository: zookeeper
   tag: ""
 
-dataDir: /var/zookeeper
-jvmOpts: -Xms50m -Xmx512m
+jvmOpts: -Xms50m -Xmx1024m
 
 volumeClaim:
   volumeName: ""
@@ -44,7 +43,7 @@ resources:
 
   limits:
     cpu: 1000m
-    memory: 1Gi
+    memory: 2Gi
     storage: 2Gi
 
 nodeSelector: { }
