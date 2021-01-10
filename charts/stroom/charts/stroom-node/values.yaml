@@ -16,7 +16,7 @@ jdbcDriver: com.mysql.cj.jdbc.Driver
 nodeNamePrefix: node
 
 # Development mode
-developmentMode: true
+developmentMode: false
 
 contentPackImportEnabled: false
 
