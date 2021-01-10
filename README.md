@@ -8,8 +8,8 @@ This project uses [gchq/stroom-resources](https://github.com/gchq/stroom-resourc
 ## 1. Design goals
 
 - Integrate Stroom into production Kubernetes environments using current and supported tooling (such as Helm)
-- Replace the existing bespoke customisation and bootstrap scripts, through a collection of Helm charts - in order to improve maintainability and simplify on-boarding
-- Simplify deployment, such as by removing the need to track and allocate port assignments to the various components of the Stroom stack
+- Replace the existing bespoke bootstrap scripts and resources, with a collection of Helm charts. This improves maintainability and simplifies on-boarding
+- Simplify deployment, such as by removing the need to track and allocate port assignments for Stroom stack components
 - Remove Nginx reverse proxies, replacing them with [Kubernetes Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress) resources
 - Simplify operations management, by allowing admins to use cluster management tools like [Rancher](https://rancher.com) to deploy and configure Stroom resources
 - Support both production-ready deployments and development environments (e.g. using [Minikube](https://minikube.sigs.k8s.io)), while using the same architecture and code base
