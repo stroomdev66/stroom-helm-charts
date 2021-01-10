@@ -1,0 +1,22 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ include "mysql.fullname" . }}-init
+data:
+  init-stroom-db.sql: |
+    -- Script to initialise Stroom databases
+
+    {{/* For each database, create it if it doesn't exist and grant access to the service user account */}}
+    {{- range $key, $value := .Values.global.mysql.databases }}
+    CREATE DATABASE IF NOT EXISTS {{ $value }};
+    GRANT ALL PRIVILEGES ON {{ $value }}.* TO '{{ $.Values.global.mysql.users.service.name }}'@'%';
+    {{ "" }}
+    {{- end }}
+
+    SELECT 'Dumping list of databases' AS '';
+    SELECT '---------------------------------------' AS '';
+    SHOW DATABASES;
+
+    SELECT 'Dumping list of users' AS '';
+    SELECT '---------------------------------------' AS '';
+    SELECT User AS 'USER', Host AS 'HOST' FROM mysql.user;

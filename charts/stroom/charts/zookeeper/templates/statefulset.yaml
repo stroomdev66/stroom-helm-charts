@@ -1,0 +1,132 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "zookeeper.fullname" . }}
+  labels:
+    {{- include "zookeeper.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.global.zookeeper.replicaCount }}
+  serviceName: {{ include "zookeeper.fullname" . }}
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      {{- include "zookeeper.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "zookeeper.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "stroom.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        {{- /* If a Zookeeper server ID doesn't exist, generate a unique ID and store on the file system */}}
+        - name: generate-server-id
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              if [ -f "myid" ] && [ ! -z "$(cat myid)" ]; then
+                server_id="$(((${HOSTNAME##*-})+1))"
+                echo $server_id > myid
+              fi
+          volumeMounts:
+            - mountPath: /data
+              name: data
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ZOOKEEPER_SERVERS
+              value: {{ include "zookeeper.servers" . | trimSuffix ";" }}
+            - name: JVMFLAGS
+              value: {{ .Values.jvmOpts | quote }}
+          ports:
+            - name: zookeeper
+              containerPort: {{ .Values.global.zookeeper.port }}
+              protocol: TCP
+              # TODO: Implement probes
+{{/*          livenessProbe:*/}}
+{{/*            httpGet:*/}}
+{{/*              path: /*/}}
+{{/*              port: http*/}}
+{{/*          readinessProbe:*/}}
+{{/*            httpGet:*/}}
+{{/*              path: /*/}}
+{{/*              port: http*/}}
+          volumeMounts:
+            - mountPath: /data
+              subPath: data
+              name: data
+            - mountPath: /datalog
+              subPath: datalog
+              name: data
+            - mountPath: /logs
+              subPath: logs
+              name: data
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "zookeeper.fullname" . }}
+            defaultMode: 0777
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "zookeeper.labels" . | nindent 10 }}
+      spec:
+        volumeName: {{ .Values.volumeClaim.volumeName | quote }}
+        storageClassName: {{ .Values.volumeClaim.storageClassName | quote }}
+        selector:
+          {{- with .Values.volumeClaim.selector.matchLabels }}
+          matchLabels:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.volumeClaim.selector.matchExpressions }}
+          matchExpressions:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- with .Values.volumeClaim.dataSource }}
+        dataSource:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.volumeClaim.accessModes }}
+        accessModes:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.volumeClaim.volumeMode }}
+        volumeMode:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.resources.requests.storage }}
+          limits:
+            storage: {{ .Values.resources.limits.storage }}

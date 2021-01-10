@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "stroom-node.fullname" . }}
+  labels:
+    {{- include "stroom-node.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    {{- range $name, $number := .Values.global.stroomNode.ports }}
+    - port: {{ $number }}
+      targetPort: {{ $name }}
+      protocol: TCP
+      name: {{ $name }}
+    {{- end }}
+  selector:
+    {{- include "stroom-node.selectorLabels" . | nindent 4 }}

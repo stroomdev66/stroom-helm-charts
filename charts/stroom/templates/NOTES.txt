@@ -1,0 +1,9 @@
+Deployed stack services:
+- fake-smtp
+- kafka
+- nginx
+- stroom
+- stroom-auth-service
+- stroom-auth-ui
+- mysql
+- zookeeper

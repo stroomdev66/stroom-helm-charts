@@ -1,0 +1,127 @@
+{{- if .Values.global.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "stroom-node.fullname" . }}
+  labels:
+    {{- include "stroom-node.labels" . | nindent 4 }}
+  {{- with .Values.global.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+    # Enable sticky sessions, to ensure auth token requests succeed
+    nginx.ingress.kubernetes.io/affinity: cookie
+  {{- end }}
+spec:
+  tls:
+    - hosts:
+      - {{ $.Values.global.advertisedHost }}
+      secretName: {{ required "Ingress TLS secret name is required" .Values.global.ingress.tls.secretName }}
+  rules:
+    - host: {{ .Values.global.advertisedHost }}
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "stroom-node.fullname" . }}
+                port:
+                  name: app
+          - path: /stroom
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "stroom-node.fullname" . }}
+                port:
+                  name: app
+---
+# Rewrite requests to `/stroom/datafeeddirect` to `/stroom/datafeed`
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "stroom-node.fullname" . }}-datafeeddirect
+  labels:
+    {{- include "stroom-node.labels" . | nindent 4 }}
+  {{- with .Values.global.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+    nginx.ingress.kubernetes.io/rewrite-target: /stroom/datafeed$1$2
+  {{- end }}
+spec:
+  tls:
+    - hosts:
+        - {{ .Values.global.advertisedHost }}
+      secretName: {{ required "Ingress TLS secret name is required" .Values.global.ingress.tls.secretName }}
+  rules:
+    - host: {{ .Values.global.advertisedHost }}
+      http:
+        paths:
+          - path: /stroom/datafeeddirect(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "stroom-node.fullname" . }}
+                port:
+                  name: app
+---
+# Redirect requests to either `/` or `/stroom` to `/stroom/ui`
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "stroom-node.fullname" . }}-stroom-ui
+  labels:
+    {{- include "stroom-node.labels" . | nindent 4 }}
+  {{- with .Values.global.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+    nginx.ingress.kubernetes.io/app-root: /stroom
+  {{- end }}
+spec:
+  tls:
+    - hosts:
+        - {{ .Values.global.advertisedHost }}
+      secretName: {{ required "Ingress TLS secret name is required" .Values.global.ingress.tls.secretName }}
+  rules:
+    - host: {{ .Values.global.advertisedHost }}
+      http:
+        paths:
+          - path: /
+            pathType: Exact
+            backend:
+              service:
+                name: {{ include "stroom-node.fullname" . }}
+                port:
+                  name: app
+---
+# Denies access to the `/stroom/clustercall.rpc` endpoint
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "stroom-node.fullname" . }}-clustercall
+  labels:
+    {{- include "stroom-node.labels" . | nindent 4 }}
+  {{- with .Values.global.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+    nginx.ingress.kubernetes.io/server-snippet: |
+      location ~ .*/clustercall.rpc$ {
+        deny all;
+      }
+  {{- end }}
+spec:
+  tls:
+    - hosts:
+        - {{ $.Values.global.advertisedHost }}
+      secretName: {{ required "Ingress TLS secret name is required" .Values.global.ingress.tls.secretName }}
+  rules:
+    - host: {{ .Values.global.advertisedHost }}
+      http:
+        paths:
+          - path: /stroom/clustercall.rpc
+            pathType: Exact
+            backend:
+              service:
+                name: {{ include "stroom-node.fullname" . }}
+                port:
+                  name: app
+{{- end }}

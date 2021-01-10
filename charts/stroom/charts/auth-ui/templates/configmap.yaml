@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "auth-ui.fullname" . }}
+  labels:
+    {{- include "auth-ui.labels" . | nindent 4 }}
+data:
+  nginx.conf.template: |
+    user  nginx;
+
+    worker_processes  1;
+
+    events {
+        worker_connections  1024;
+    }
+
+    http {
+        include  /etc/nginx/mime.types;
+
+        index index.html index.htm;
+
+        server {
+            root /usr/share/nginx/html;
+
+            listen                  ${NGINX_HTTP_PORT};
+            server_name             ${NGINX_HOST};
+
+            # Prevent clickjacking attacks. More details here:
+            # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
+            add_header X-Frame-Options sameorigin always;
+
+            # Make sure the browser's XSS filter is enabled, and make it block rendering
+            # entirely if XSS is detected.
+            add_header X-XSS-Protection "1; mode=block";
+
+            # Enable Content Security Policy (CSP) so the browser only downloads content
+            # from our domain.
+            add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'; frame-ancestors 'self'";
+
+            # Prevent mime based attacks
+            add_header X-Content-Type-Options "nosniff";
+
+            location / {
+                try_files $uri /index.html;
+            }
+        }
+    }

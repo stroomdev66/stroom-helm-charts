@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "zookeeper.fullname" . }}
+  labels:
+    {{- include "zookeeper.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: {{ .Values.global.zookeeper.port }}
+      targetPort: zookeeper
+      protocol: TCP
+      name: zookeeper
+  selector:
+    {{- include "zookeeper.selectorLabels" . | nindent 4 }}

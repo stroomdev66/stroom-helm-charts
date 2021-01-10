@@ -1,0 +1,89 @@
+# Default values for kafka.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: wurstmeister/kafka
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+createTopics:
+  - name: sourceTopic
+    partitions: 10
+    replicas: 1
+  - name: destTopic
+    partitions: 1
+    replicas: 1
+  - name: badStatisticEvents-Count
+    partitions: 10
+    replicas: 1
+  - name: statisticEvents-Count
+    partitions: 10
+    replicas: 1
+  - name: statisticEvents-Value
+    partitions: 10
+    replicas: 1
+  - name: statisticRollupPerms-Count-s
+    partitions: 10
+    replicas: 1
+  - name: statisticRollupPerms-Count-m
+    partitions: 10
+    replicas: 1
+  - name: statisticRollupPerms-Count-h
+    partitions: 10
+    replicas: 1
+  - name: statisticRollupPerms-Count-d
+    partitions: 10
+    replicas: 1
+  - name: statisticRollupPerms-Count-f
+    partitions: 10
+    replicas: 1
+
+zookeeper:
+  # In milliseconds
+  sessionTimeout: 10000
+  connectionTimeout: 20000
+
+volumeClaim:
+  volumeName: ""
+  storageClassName: ""
+  selector:
+    matchLabels: { }
+    matchExpressions: { }
+  dataSource: { }
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: { }
+
+podAnnotations: { }
+
+podSecurityContext: { }
+  # fsGroup: 2000
+
+securityContext: { }
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 512Mi
+    storage: 1Gi
+
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+    storage: 2Gi
+
+nodeSelector: { }
+
+tolerations: [ ]
+
+affinity: { }

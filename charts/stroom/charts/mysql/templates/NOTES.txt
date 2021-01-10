@@ -1,0 +1,7 @@
+MySQL instance deployed.
+
+How to connect:
+
+Service: {{ include "mysql.fullname" . }}
+Namespace: {{ .Release.Namespace }}
+Port: {{ .Values.port }}

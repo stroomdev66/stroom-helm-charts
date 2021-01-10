@@ -1,0 +1,36 @@
+# Default values for smtp.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: munkyboy/fakesmtp
+  tag: ""
+
+podAnnotations: { }
+
+podSecurityContext: { }
+  # fsGroup: 2000
+
+securityContext: { }
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+nodeSelector: { }
+
+tolerations: [ ]
+
+affinity: { }

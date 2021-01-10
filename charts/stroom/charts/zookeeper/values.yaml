@@ -1,0 +1,53 @@
+# Default values for zookeeper.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Defined in global scope
+# replicaCount: 1
+
+image:
+  repository: zookeeper
+  tag: ""
+
+jvmOpts: -Xms50m -Xmx1024m
+
+volumeClaim:
+  volumeName: ""
+  storageClassName: ""
+  selector:
+    matchLabels: { }
+    matchExpressions: { }
+  dataSource: { }
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: { }
+
+podAnnotations: { }
+
+podSecurityContext: { }
+  # fsGroup: 2000
+
+securityContext: { }
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 512Mi
+    storage: 1Gi
+
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+    storage: 2Gi
+
+nodeSelector: { }
+
+tolerations: [ ]
+
+affinity: { }
