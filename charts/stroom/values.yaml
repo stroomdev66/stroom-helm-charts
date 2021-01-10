@@ -10,7 +10,7 @@ global:
   rackName: rack-1
 
   # Set the advertised host (could be a FQDN or hostname)
-  advertisedHost: "stroom"
+  advertisedHost: "stroom.internal"
 
   ingress:
     enabled: true
@@ -21,6 +21,14 @@ global:
 
   authService:
     chartId: auth-service
+
+    ports:
+      auth: 8099
+      admin: 8100
+      debug: 10769
+
+    clientId: PZnJr8kHRKqnlJRQThSI
+    clientSecret: OtzHiAWLj8QWcwO2IxXmqxpzE2pyg0pMKCghR2aU
 
   authUi:
     chartId: auth-ui
@@ -46,10 +54,10 @@ global:
 
     users:
       root:
-        password: ""
+        password: "test"
       service:
         name: "stroomuser"
-        password: ""
+        password: "test"
 
     # User databases to create on startup
     databases:
@@ -69,7 +77,12 @@ global:
     transport: plain
 
   stroomNode:
-    chartId: stroom-node
+    chartId: node
+
+    ports:
+      app: 8080
+      admin: 8081
+      debug: 10765
 
   zookeeper:
     chartId: zookeeper
