@@ -95,6 +95,7 @@ spec:
         - name: config
           configMap:
             name: {{ include "zookeeper.fullname" . }}
+            defaultMode: 0777
   volumeClaimTemplates:
     - metadata:
         name: data
