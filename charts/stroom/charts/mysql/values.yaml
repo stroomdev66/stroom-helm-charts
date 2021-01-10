@@ -4,8 +4,6 @@
 
 image:
   repository: mysql/mysql-server
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
 dataDir: /var/lib/mysql

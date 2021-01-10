@@ -50,6 +50,7 @@ The following Helm charts have been completed to the point of being functional:
 ### Prerequisites
 
 * A Kubernetes cluster, such as Minikube or [K3s](https://rancher.com/docs/k3s)
+* [Nginx Kubernetes ingress controller](https://kubernetes.github.io/ingress-nginx) deployed. Other ingress controllers may be supported in future (via custom annotations)
 * [Helm](https://helm.sh) installed
 * A DNS entry pointing to the Kubernetes Ingress. Recommendation is for this DNS record to point to a high-availability load balancer, such as what's described in the [Rancher docs](https://rancher.com/docs/k3s/latest/en/architecture/#high-availability-with-an-external-db)
 * A [Kubernetes TLS secret](https://kubernetes.io/docs/concepts/configuration/secret/#tls-secrets) for that DNS entry, created in the same namespace that Stroom will be deployed into
