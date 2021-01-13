@@ -62,6 +62,6 @@ Zookeeper connection string
 {{- range $i, $e := until (.Values.global.zookeeper.replicaCount | int) }}
 {{- $fullName := (include "zookeeper.fullname" $) }}
 {{- $hostName := ( printf "%s-%d.%s" $fullName $i $fullName ) }}
-{{- printf "%s:%d," $hostName ($.Values.global.zookeeper.port | int) }}
+{{- printf "%s:%d," $hostName ($.Values.global.zookeeper.ports.client | int) }}
 {{- end }}
 {{- end }}

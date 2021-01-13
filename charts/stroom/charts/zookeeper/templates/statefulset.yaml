@@ -50,9 +50,11 @@ spec:
             - name: JVMFLAGS
               value: {{ .Values.jvmOpts | quote }}
           ports:
-            - name: zookeeper
-              containerPort: {{ .Values.global.zookeeper.port }}
+            {{- range $name, $value := .Values.global.zookeeper.ports }}
+            - name: {{ $name }}
+              containerPort: {{ $value }}
               protocol: TCP
+            {{- end }}
               # TODO: Implement probes
 {{/*          livenessProbe:*/}}
 {{/*            httpGet:*/}}

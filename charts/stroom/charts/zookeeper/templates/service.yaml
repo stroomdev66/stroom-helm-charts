@@ -8,9 +8,11 @@ spec:
   type: ClusterIP
   clusterIP: None
   ports:
-    - port: {{ .Values.global.zookeeper.port }}
-      targetPort: zookeeper
+    {{- range $name, $value := .Values.global.zookeeper.ports }}
+    - port: {{ $value }}
+      targetPort: {{ $name }}
       protocol: TCP
-      name: zookeeper
+      name: {{ $name }}
+    {{- end }}
   selector:
     {{- include "zookeeper.selectorLabels" . | nindent 4 }}

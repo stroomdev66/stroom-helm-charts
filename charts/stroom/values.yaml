@@ -89,7 +89,11 @@ global:
     chartId: zookeeper
 
     replicaCount: 3
-    port: 2181
+    ports:
+      client: 2181
+      follower: 2888
+      election: 3888
+      admin: 8080
 
 # Number of characters to generate for random passwords
 randomPasswordLength: 16
