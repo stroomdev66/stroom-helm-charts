@@ -31,12 +31,14 @@ spec:
             - sh
             - -c
             - |
-              if [ -f "myid" ] && [ ! -z "$(cat myid)" ]; then
+              if [ ! -f "/data/myid" ] && [ -z "$(cat /data/myid)" ]; then
                 server_id="$(((${HOSTNAME##*-})+1))"
-                echo $server_id > myid
+                echo $server_id > /data/myid
+                echo "Set node ID to: $server_id"
               fi
           volumeMounts:
             - mountPath: /data
+              subPath: data
               name: data
       containers:
         - name: {{ .Chart.Name }}
@@ -45,8 +47,12 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: IfNotPresent
           env:
-            - name: ZOOKEEPER_SERVERS
-              value: {{ include "zookeeper.servers" . | trimSuffix ";" }}
+            - name: ZOO_SERVERS
+              value: {{ include "zookeeper.servers" . | trimSuffix " " }}
+            - name: ZOO_TICK_TIME
+              value: {{ .Values.tickTime | quote }}
+            - name: ZOO_INIT_LIMIT
+              value: {{ .Values.initLimit | quote }}
             - name: JVMFLAGS
               value: {{ .Values.jvmOpts | quote }}
           ports:

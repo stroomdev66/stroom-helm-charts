@@ -8,6 +8,12 @@ image:
 
 jvmOpts: -Xms50m -Xmx1024m
 
+# Number of milliseconds comprising one tick (unit of time)
+tickTime: 2000
+
+# Number of ticks to allow for followers to connect and sync to a leader
+initLimit: 30
+
 volumeClaim:
   volumeName: ""
   storageClassName: ""
