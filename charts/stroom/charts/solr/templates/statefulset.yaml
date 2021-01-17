@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "solr.fullname" . }}
+  labels:
+    {{- include "solr.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  serviceName: {{ include "solr.fullname" . }}
+  selector:
+    matchLabels:
+      {{- include "solr.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "solr.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "stroom.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ZK_HOST
+              value: {{ include "zookeeper.connectionString" . | trimSuffix "," }}
+          ports:
+            - name: solr
+              containerPort: {{ .Values.global.solr.port }}
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/solr
+              name: data
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "solr.labels" . | nindent 10 }}
+      spec:
+        volumeName: {{ .Values.volumeClaim.volumeName | quote }}
+        storageClassName: {{ .Values.volumeClaim.storageClassName | quote }}
+        selector:
+          {{- with .Values.volumeClaim.selector.matchLabels }}
+          matchLabels:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.volumeClaim.selector.matchExpressions }}
+          matchExpressions:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- with .Values.volumeClaim.dataSource }}
+        dataSource:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.volumeClaim.accessModes }}
+        accessModes:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.volumeClaim.volumeMode }}
+        volumeMode:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.resources.requests.storage }}
+          limits:
+            storage: {{ .Values.resources.limits.storage }}

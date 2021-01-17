@@ -77,6 +77,11 @@ global:
     port: 2525
     transport: plain
 
+  solr:
+    chartId: solr
+
+    port: 8983
+
   stroomNode:
     chartId: node
 
