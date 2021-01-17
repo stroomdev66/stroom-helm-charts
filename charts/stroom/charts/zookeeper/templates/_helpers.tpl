@@ -65,3 +65,10 @@ Zookeeper connection string
 {{- printf "%s:%d," $hostName ($.Values.global.zookeeper.ports.client | int) }}
 {{- end }}
 {{- end }}
+
+{{/*
+Zookeeper command whitelist for external clients
+*/}}
+{{- define "zookeeper.commandWhitelist" -}}
+{{- join "," .Values.commandWhitelist }}
+{{- end }}

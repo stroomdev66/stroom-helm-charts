@@ -53,6 +53,8 @@ spec:
               value: {{ .Values.tickTime | quote }}
             - name: ZOO_INIT_LIMIT
               value: {{ .Values.initLimit | quote }}
+            - name: ZOO_4LW_COMMANDS_WHITELIST
+              value: {{ include "zookeeper.commandWhitelist" . }}
             - name: JVMFLAGS
               value: {{ .Values.jvmOpts | quote }}
           ports:
