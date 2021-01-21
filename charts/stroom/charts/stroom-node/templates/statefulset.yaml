@@ -97,7 +97,7 @@ spec:
               # TODO: This is supposed to be "STROOM_UI_HOST". Check whether this is equivalent to the advertised address
               value: {{ include "stroom.rootUrl" . }}
             - name: STROOM_UI_PATH
-              value: {{ include "stroom.rootUrl" . }}/stroom/ui?prompt=login
+              value: /stroom/ui?prompt=login
             - name: STROOM_USERS_UI_URL
               value: {{ include "stroom.rootUrl" . }}/s/users
             - name: STROOM_APIKEYS_UI_URL
@@ -107,7 +107,7 @@ spec:
             - name: STROOM_ADVERTISED_URL
               value: {{ include "stroom.rootUrl" . }}
             - name: ADMIN_CONTEXT_PATH
-              value: {{ include "stroom.rootUrl" . }}/stroomAdmin
+              value: /stroomAdmin
             - name: STROOM_LOGGING_LEVEL
               valueFrom:
                 configMapKeyRef:

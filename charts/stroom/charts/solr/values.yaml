@@ -1,26 +1,12 @@
-# Default values for zookeeper.
+# Default values for solr.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+replicaCount: 1
+
 image:
-  repository: zookeeper
+  repository: solr
   tag: ""
-
-jvmOpts: -Xms50m -Xmx1024m
-
-# Number of milliseconds comprising one tick (unit of time)
-tickTime: 2000
-
-# Number of ticks to allow for followers to connect and sync to a leader
-initLimit: 30
-
-# List of four-letter-word commands that are enabled for external clients.
-# By default, only `srvr` is enabled. The others are required by Solr for monitoring status.
-commandWhitelist:
-  - srvr
-  - mntr
-  - conf
-  - ruok
 
 volumeClaim:
   volumeName: ""

@@ -1,16 +1,15 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "zookeeper.fullname" . }}
+  name: {{ include "solr.fullname" . }}
   labels:
-    {{- include "zookeeper.labels" . | nindent 4 }}
+    {{- include "solr.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.global.zookeeper.replicaCount }}
-  serviceName: {{ include "zookeeper.fullname" . }}
-  podManagementPolicy: Parallel
+  replicas: {{ .Values.replicaCount }}
+  serviceName: {{ include "solr.fullname" . }}
   selector:
     matchLabels:
-      {{- include "zookeeper.selectorLabels" . | nindent 6 }}
+      {{- include "solr.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,28 +17,11 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "zookeeper.selectorLabels" . | nindent 8 }}
+        {{- include "solr.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "stroom.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      initContainers:
-        {{- /* If a Zookeeper server ID doesn't exist, generate a unique ID and store on the file system */}}
-        - name: generate-server-id
-          image: busybox
-          command:
-            - sh
-            - -c
-            - |
-              if [ ! -f "/data/myid" ] && [ -z "$(cat /data/myid)" ]; then
-                server_id="$(((${HOSTNAME##*-})+1))"
-                echo $server_id > /data/myid
-                echo "Set node ID to: $server_id"
-              fi
-          volumeMounts:
-            - mountPath: /data
-              subPath: data
-              name: data
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -47,40 +29,14 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: IfNotPresent
           env:
-            - name: ZOO_SERVERS
-              value: {{ include "zookeeper.servers" . | trimSuffix " " }}
-            - name: ZOO_TICK_TIME
-              value: {{ .Values.tickTime | quote }}
-            - name: ZOO_INIT_LIMIT
-              value: {{ .Values.initLimit | quote }}
-            - name: ZOO_4LW_COMMANDS_WHITELIST
-              value: {{ include "zookeeper.commandWhitelist" . }}
-            - name: JVMFLAGS
-              value: {{ .Values.jvmOpts | quote }}
+            - name: ZK_HOST
+              value: {{ include "zookeeper.connectionString" . | trimSuffix "," }}
           ports:
-            {{- range $name, $value := .Values.global.zookeeper.ports }}
-            - name: {{ $name }}
-              containerPort: {{ $value }}
+            - name: solr
+              containerPort: {{ .Values.global.solr.port }}
               protocol: TCP
-            {{- end }}
-              # TODO: Implement probes
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              path: /*/}}
-{{/*              port: http*/}}
-{{/*          readinessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              path: /*/}}
-{{/*              port: http*/}}
           volumeMounts:
-            - mountPath: /data
-              subPath: data
-              name: data
-            - mountPath: /datalog
-              subPath: datalog
-              name: data
-            - mountPath: /logs
-              subPath: logs
+            - mountPath: /var/solr
               name: data
           resources:
             requests:
@@ -101,16 +57,11 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      volumes:
-        - name: config
-          configMap:
-            name: {{ include "zookeeper.fullname" . }}
-            defaultMode: 0777
   volumeClaimTemplates:
     - metadata:
         name: data
         labels:
-          {{- include "zookeeper.labels" . | nindent 10 }}
+          {{- include "solr.labels" . | nindent 10 }}
       spec:
         volumeName: {{ .Values.volumeClaim.volumeName | quote }}
         storageClassName: {{ .Values.volumeClaim.storageClassName | quote }}

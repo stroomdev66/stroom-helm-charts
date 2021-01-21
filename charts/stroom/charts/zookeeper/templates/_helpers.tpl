@@ -50,7 +50,8 @@ Generate a list of servers based on the number of replicas
 {{- range $i, $e := until (.Values.global.zookeeper.replicaCount | int) }}
 {{- $fullName := (include "zookeeper.fullname" $) }}
 {{- $hostName := ( printf "%s-%d.%s" $fullName $i $fullName ) }}
-{{- printf "server.%d=%s:%d; " (add $i 1) $hostName ($.Values.global.zookeeper.port | int) }}
+{{- $ports := $.Values.global.zookeeper.ports }}
+{{- printf "server.%d=%s:%d:%d;%d " (add $i 1) $hostName ($ports.follower | int) ($ports.election | int) ($ports.client | int) }}
 {{- end }}
 {{- end }}
 
@@ -61,6 +62,13 @@ Zookeeper connection string
 {{- range $i, $e := until (.Values.global.zookeeper.replicaCount | int) }}
 {{- $fullName := (include "zookeeper.fullname" $) }}
 {{- $hostName := ( printf "%s-%d.%s" $fullName $i $fullName ) }}
-{{- printf "%s:%d," $hostName ($.Values.global.zookeeper.port | int) }}
+{{- printf "%s:%d," $hostName ($.Values.global.zookeeper.ports.client | int) }}
 {{- end }}
+{{- end }}
+
+{{/*
+Zookeeper command whitelist for external clients
+*/}}
+{{- define "zookeeper.commandWhitelist" -}}
+{{- join "," .Values.commandWhitelist }}
 {{- end }}
