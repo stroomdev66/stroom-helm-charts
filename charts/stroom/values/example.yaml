@@ -20,4 +20,10 @@ global:
 stroom-node:
   replicaCount: 3
 
+kafka:
+  externalListener:
+    host: kafka.example.com
+    targetPort: 9093
+    externalPort: 30093
+
   # TODO: Add selectors to volume claim templates to classify storage by component (e.g. proc node)
