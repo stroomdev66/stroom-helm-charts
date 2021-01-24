@@ -17,7 +17,7 @@ global:
       service:
         password: "test"
 
-stroomNode:
+stroom-node:
   replicaCount: 3
 
   # TODO: Add selectors to volume claim templates to classify storage by component (e.g. proc node)
