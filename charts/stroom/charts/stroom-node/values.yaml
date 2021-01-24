@@ -24,7 +24,7 @@ contentPackImportEnabled: false
 loggingLevel: INFO
 
 serviceDiscovery:
-  enabled: true
+  enabled: false
 
 stroomProxyDir: /tmp/proxy
 
