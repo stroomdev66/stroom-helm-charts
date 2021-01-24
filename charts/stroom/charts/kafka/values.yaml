@@ -8,6 +8,18 @@ image:
   repository: wurstmeister/kafka
   tag: ""
 
+# Optional: Provide access to Kafka consumers outside the cluster network.
+# Requires a `NodePort` or `LoadBalancer` service to be defined.
+externalListener: {}
+  # External hostname or IP. This must be resolvable outside the cluster network
+  # host: kafka.example.com
+
+  # Target container port (internal to the cluster)
+  # targetPort: # 9093
+
+  # Port exposed by the service (i.e. port external to the cluster)
+  # externalPort: # 30093
+
 createTopics:
   - name: sourceTopic
     partitions: 10
