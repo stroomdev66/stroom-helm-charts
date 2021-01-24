@@ -51,6 +51,41 @@ Kafka advertised hostname, which is the service address
 {{- end }}
 
 {{/*
+Advertised listener addresses, each consisting of a listener ID, hostname and port. If an external hostname is provided,
+a second advertised listener is created.
+*/}}
+{{- define "kafka.advertisedListeners" -}}
+{{- if .Values.externalListener }}
+{{- printf "INTERNAL://%s:%d,EXTERNAL://%s:%d" (include "kafka.advertisedHostName" .) (.Values.global.kafka.port | int) .Values.externalListener.host (.Values.externalListener.externalPort | int) }}
+{{- else }}
+{{- printf "INTERNAL://%s:%d" (include "kafka.advertisedHostName" .) (.Values.global.kafka.port | int) }}
+{{- end }}
+{{- end }}
+
+{{/*
+Listener addresses, each consisting of a listener ID, hostname and port. If an external hostname is provided,
+a second advertised listener is created.
+*/}}
+{{- define "kafka.listeners" -}}
+{{- if .Values.externalListener }}
+{{- printf "INTERNAL://:%d,EXTERNAL://:%d" (.Values.global.kafka.port | int) (.Values.externalListener.targetPort | int) }}
+{{- else }}
+{{- printf "INTERNAL://:%d" (.Values.global.kafka.port | int) }}
+{{- end }}
+{{- end }}
+
+{{/*
+Maps listener IDs to protocols
+*/}}
+{{- define "kafka.listenerSecurityProtocolMap" -}}
+{{- if .Values.externalListener -}}
+INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+{{- else -}}
+INTERNAL:PLAINTEXT
+{{- end }}
+{{- end }}
+
+{{/*
 List of topics to create on initialisation
 */}}
 {{- define "kafka.createTopics" -}}
