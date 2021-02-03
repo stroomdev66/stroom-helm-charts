@@ -203,8 +203,7 @@ spec:
               subPath: proxy-repo
               name: data
             - mountPath: /stroom/volumes
-              subPath: volumes
-              name: data
+              name: stroom-shared
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           ports:
@@ -237,6 +236,10 @@ spec:
               cpu: {{ .Values.resources.limits.cpu }}
               memory: {{ .Values.resources.limits.memory }}
           # TODO: Configure logging
+      volumes:
+        - name: stroom-shared
+          persistentVolumeClaim:
+            claimName: {{ include "stroom-node.fullname" . }}-stroom-shared
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -250,36 +253,76 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
   volumeClaimTemplates:
+    {{- with .Values.volumeClaims.nodeData }}
     - metadata:
         name: data
         labels:
-          {{- include "stroom-node.labels" . | nindent 10 }}
+          {{- include "stroom-node.labels" $ | nindent 10 }}
       spec:
-        volumeName: {{ .Values.volumeClaim.volumeName | quote }}
-        storageClassName: {{ .Values.volumeClaim.storageClassName | quote }}
+        volumeName: {{ .volumeName | quote }}
+        storageClassName: {{ .storageClassName | quote }}
         selector:
-          {{- with .Values.volumeClaim.selector.matchLabels }}
+          {{- with .selector.matchLabels }}
           matchLabels:
             {{- toYaml . | nindent 12 }}
             {{- end }}
-          {{- with .Values.volumeClaim.selector.matchExpressions }}
+          {{- with .selector.matchExpressions }}
           matchExpressions:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-        {{- with .Values.volumeClaim.dataSource }}
+        {{- with .dataSource }}
         dataSource:
           {{- toYaml . | nindent 10 }}
         {{- end }}
-        {{- with .Values.volumeClaim.accessModes }}
+        {{- with .accessModes }}
         accessModes:
           {{- toYaml . | nindent 10 }}
         {{- end }}
-        {{- with .Values.volumeClaim.volumeMode }}
+        {{- with .volumeMode }}
         volumeMode:
           {{- toYaml . | nindent 10 }}
         {{- end }}
         resources:
           requests:
-            storage: {{ .Values.resources.requests.storage }}
+            storage: {{ $.Values.resources.requests.storage }}
           limits:
-            storage: {{ .Values.resources.limits.storage }}
+            storage: {{ $.Values.resources.limits.storage }}
+  {{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "stroom-node.fullname" . }}-stroom-shared
+  labels:
+    {{ include "stroom-node.labels" . | nindent 4 }}
+spec:
+  {{- with .Values.volumeClaims.sharedData }}
+  volumeName: {{ .volumeName | quote }}
+  storageClassName: {{ .storageClassName | quote }}
+  selector:
+    {{- with .selector.matchLabels }}
+    matchLabels:
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+    {{- with .selector.matchExpressions }}
+    matchExpressions:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- with .dataSource }}
+  dataSource:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .accessModes }}
+  accessModes:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .volumeMode }}
+  volumeMode:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ $.Values.resources.requests.storage }}
+    limits:
+      storage: {{ $.Values.resources.limits.storage }}
+  {{- end }}

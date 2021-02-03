@@ -44,16 +44,27 @@ statisticDocRefs:
   streamTaskQueueSize: docRef(StatisticStore,946a7f0f-a59a-11e6-bdc4-0242ac110002,Stream Task Queue Size),docRef(StroomStatsStore,4ce8d6e7-94be-40e1-8294-bf29dd089962,Stream Task Queue Size)
   volumes: docRef(StatisticStore,ac4d8d10-6f75-4946-9708-18b8cb42a5a3,Volumes),docRef(StroomStatsStore,60f4f5f0-4cc3-42d6-8fe7-21a7cec30f8e,Volumes)
 
-volumeClaim:
-  volumeName: ""
-  storageClassName: ""
-  selector:
-    matchLabels: { }
-    matchExpressions: { }
-  dataSource: { }
-  accessModes:
-    - ReadWriteOnce
-  volumeMode: { }
+volumeClaims:
+  nodeData:
+    volumeName: ""
+    storageClassName: ""
+    selector:
+      matchLabels: { }
+      matchExpressions: { }
+    dataSource: { }
+    accessModes:
+      - ReadWriteOnce
+    volumeMode: { }
+  sharedData:
+    volumeName: ""
+    storageClassName: ""
+    selector:
+      matchLabels: { }
+      matchExpressions: { }
+    dataSource: { }
+    accessModes:
+      - ReadWriteMany
+    volumeMode: { }
 
 podAnnotations: { }
 
