@@ -3,6 +3,10 @@ apiVersion: v1
 metadata:
   name: {{ include "mysql.fullname" . }}-init
 data:
+  create-service-user.sql: |
+    -- Create a service user for determining MySQL health
+
+    CREATE USER 'healthcheck'@'localhost';
   init-stroom-db.sql: |
     -- Script to initialise Stroom databases
 

@@ -64,14 +64,30 @@ spec:
               protocol: TCP
             {{- end }}
               # TODO: Implement probes
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              path: /*/}}
-{{/*              port: http*/}}
-{{/*          readinessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              path: /*/}}
-{{/*              port: http*/}}
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 1
+            timeoutSeconds: 5
+            failureThreshold: 10
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  status=$(echo srvr | nc localhost {{ .Values.global.zookeeper.ports.client }} | grep Mode);
+                  if [[ $status ]]; then echo 1; else echo 0; fi
+          livenessProbe:
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  status=$(echo srvr | nc localhost {{ .Values.global.zookeeper.ports.client }} | grep Mode);
+                  if [[ $status ]]; then echo 1; else echo 0; fi
           volumeMounts:
             - mountPath: /data
               subPath: data

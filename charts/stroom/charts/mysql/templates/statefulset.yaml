@@ -40,15 +40,26 @@ spec:
             - name: mysql
               containerPort: {{ .Values.global.mysql.port }}
               protocol: TCP
-              # TODO: Implement probes
-{{/*          livenessProbe:*/}}
-{{/*            initialDelaySeconds: 5*/}}
-{{/*            tcpSocket:*/}}
-{{/*              port: data*/}}
-{{/*          readinessProbe:*/}}
-{{/*            initialDelaySeconds: 15*/}}
-{{/*            tcpSocket:*/}}
-{{/*              port: data*/}}
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 1
+            timeoutSeconds: 5
+            failureThreshold: 10
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  status=$(mysql -u healthcheck -e "SELECT 'OK'" | grep 'OK');
+                  if [[ $status ]]; then echo 1; else echo 0; fi
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
+            exec:
+              command:
+                - "mysqladmin -u healthcheck ping"
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           resources:
