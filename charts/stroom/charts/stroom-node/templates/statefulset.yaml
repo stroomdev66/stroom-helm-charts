@@ -25,7 +25,7 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: DOCKER_HOST_HOSTNAME
               valueFrom:
@@ -203,8 +203,7 @@ spec:
               subPath: proxy-repo
               name: data
             - mountPath: /stroom/volumes
-              subPath: volumes
-              name: data
+              name: stroom-shared
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           ports:
@@ -213,22 +212,26 @@ spec:
               containerPort: {{ $number }}
               protocol: TCP
             {{- end }}
-{{/*          livenessProbe:*/}}
-{{/*            initialDelaySeconds: 90*/}}
-{{/*            periodSeconds: 10*/}}
-{{/*            timeoutSeconds: 1*/}}
-{{/*            failureThreshold: 3*/}}
-{{/*            httpGet:*/}}
-{{/*              path: /stroomAdmin/healthcheck*/}}
-{{/*              port: admin*/}}
-{{/*          readinessProbe:*/}}
-{{/*            initialDelaySeconds: 90*/}}
-{{/*            periodSeconds: 60*/}}
-{{/*            timeoutSeconds: 5*/}}
-{{/*            failureThreshold: 3*/}}
-{{/*            httpGet:*/}}
-{{/*              path: /stroomAdmin/healthcheck*/}}
-{{/*              port: admin*/}}
+          readinessProbe:
+            {{- with .Values.readinessProbe }}
+            initialDelaySeconds: {{ .initialDelaySeconds }}
+            periodSeconds: {{ .periodSeconds }}
+            timeoutSeconds: {{ .timeoutSeconds }}
+            failureThreshold: {{ .failureThreshold }}
+            httpGet:
+              path: /stroomAdmin/healthcheck
+              port: admin
+            {{- end }}
+          livenessProbe:
+            {{- with .Values.livenessProbe }}
+            initialDelaySeconds: {{ .initialDelaySeconds }}
+            periodSeconds: {{ .periodSeconds }}
+            timeoutSeconds: {{ .timeoutSeconds }}
+            failureThreshold: {{ .failureThreshold }}
+            httpGet:
+              path: /stroomAdmin/healthcheck
+              port: admin
+            {{- end }}
           resources:
             requests:
               cpu: {{ .Values.resources.requests.cpu }}
@@ -237,6 +240,11 @@ spec:
               cpu: {{ .Values.resources.limits.cpu }}
               memory: {{ .Values.resources.limits.memory }}
           # TODO: Configure logging
+      volumes:
+        - name: stroom-shared
+          {{- with .Values.sharedDataVolume }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -250,36 +258,38 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
   volumeClaimTemplates:
+    {{- with .Values.volumeClaims.nodeData }}
     - metadata:
         name: data
         labels:
-          {{- include "stroom-node.labels" . | nindent 10 }}
+          {{- include "stroom-node.labels" $ | nindent 10 }}
       spec:
-        volumeName: {{ .Values.volumeClaim.volumeName | quote }}
-        storageClassName: {{ .Values.volumeClaim.storageClassName | quote }}
+        volumeName: {{ .volumeName | quote }}
+        storageClassName: {{ .storageClassName | quote }}
         selector:
-          {{- with .Values.volumeClaim.selector.matchLabels }}
+          {{- with .selector.matchLabels }}
           matchLabels:
             {{- toYaml . | nindent 12 }}
             {{- end }}
-          {{- with .Values.volumeClaim.selector.matchExpressions }}
+          {{- with .selector.matchExpressions }}
           matchExpressions:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-        {{- with .Values.volumeClaim.dataSource }}
+        {{- with .dataSource }}
         dataSource:
           {{- toYaml . | nindent 10 }}
         {{- end }}
-        {{- with .Values.volumeClaim.accessModes }}
+        {{- with .accessModes }}
         accessModes:
           {{- toYaml . | nindent 10 }}
         {{- end }}
-        {{- with .Values.volumeClaim.volumeMode }}
+        {{- with .volumeMode }}
         volumeMode:
           {{- toYaml . | nindent 10 }}
         {{- end }}
         resources:
           requests:
-            storage: {{ .Values.resources.requests.storage }}
+            storage: {{ $.Values.resources.requests.storage }}
           limits:
-            storage: {{ .Values.resources.limits.storage }}
+            storage: {{ $.Values.resources.limits.storage }}
+  {{- end }}

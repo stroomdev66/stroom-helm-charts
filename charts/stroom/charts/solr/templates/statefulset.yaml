@@ -38,6 +38,22 @@ spec:
           volumeMounts:
             - mountPath: /var/solr
               name: data
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 1
+            failureThreshold: 10
+            httpGet:
+              path: /solr
+              port: solr
+          livenessProbe:
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
+            httpGet:
+              path: /solr
+              port: solr
           resources:
             requests:
               cpu: {{ .Values.resources.requests.cpu }}

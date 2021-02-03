@@ -56,15 +56,20 @@ spec:
               containerPort: {{ .Values.externalListener.targetPort }}
               protocol: TCP
             {{- end }}
-              # TODO: Implement probes
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              path: /*/}}
-{{/*              port: http*/}}
-{{/*          readinessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              path: /*/}}
-{{/*              port: http*/}}
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 1
+            timeoutSeconds: 5
+            failureThreshold: 10
+            tcpSocket:
+              port: kafka
+          livenessProbe:
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+            tcpSocket:
+              port: kafka
           volumeMounts:
             - mountPath: /kafka
               subPath: data

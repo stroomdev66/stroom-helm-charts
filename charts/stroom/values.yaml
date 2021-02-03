@@ -36,7 +36,7 @@ global:
 
     ports:
       http: 5000
-#      https: 9443
+      https: 9443
 
   kafka:
     chartId: kafka
@@ -44,7 +44,6 @@ global:
     # Override the service name. Defaults to: (Release name)-kafka
     serviceName: ""
     port: 9092
-    # TODO: Review use of version - add to global scope?
     connectorVersion: 2.1.1
 
   mysql:

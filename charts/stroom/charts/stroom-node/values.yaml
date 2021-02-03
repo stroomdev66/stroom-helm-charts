@@ -7,6 +7,7 @@ replicaCount: 2
 image:
   repository: gchq/stroom
   tag: ""
+  pullPolicy: IfNotPresent
 
 javaOpts: -Xms50m -Xmx1024m -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=10765,suspend=n
 jpaDialect: org.hibernate.dialect.MySQLInnoDBDialect
@@ -43,16 +44,35 @@ statisticDocRefs:
   streamTaskQueueSize: docRef(StatisticStore,946a7f0f-a59a-11e6-bdc4-0242ac110002,Stream Task Queue Size),docRef(StroomStatsStore,4ce8d6e7-94be-40e1-8294-bf29dd089962,Stream Task Queue Size)
   volumes: docRef(StatisticStore,ac4d8d10-6f75-4946-9708-18b8cb42a5a3,Volumes),docRef(StroomStatsStore,60f4f5f0-4cc3-42d6-8fe7-21a7cec30f8e,Volumes)
 
-volumeClaim:
-  volumeName: ""
-  storageClassName: ""
-  selector:
-    matchLabels: { }
-    matchExpressions: { }
-  dataSource: { }
-  accessModes:
-    - ReadWriteOnce
-  volumeMode: { }
+volumeClaims:
+  # Persists data for each node replica
+  nodeData:
+    volumeName: ""
+    storageClassName: ""
+    selector:
+      matchLabels: { }
+      matchExpressions: { }
+    dataSource: { }
+    accessModes:
+      - ReadWriteOnce
+    volumeMode: { }
+
+# Common mount point, must be accessible to all nodes
+sharedDataVolume: { }
+  # nfs:
+  #   server: file-server.example.com
+  #   path: /data
+
+readinessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 5
+  failureThreshold: 10
+livenessProbe:
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
 
 podAnnotations: { }
 
