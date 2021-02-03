@@ -25,15 +25,15 @@ The following Helm charts have been completed to the point of being functional:
 
 * [x] Core Stroom stack
     * [x] Processing / UI node
-      * [ ] Dedicated processing / UI nodes
+    * [ ] Dedicated processing / UI nodes
     * [x] MySQL (single instance, no replication)
     * [x] Zookeeper
     * [x] Kafka
     * [x] Authentication service and UI
 * [ ] Stroom services
-    * [ ] Stroom stats
+    * [x] Stroom stats
     * [ ] Stroom proxy
-    * [ ] Solr
+    * [x] Solr
     * [ ] Log sender
     * [ ] HBase
     * [ ] HDFS
@@ -63,12 +63,12 @@ Clone this repository to a directory on a machine that has `kubectl` and Kuberne
 ### Deploy
 
 1. `cd` into `./charts/stroom`
-1. Make any customisations to `./values/example.yaml`, such as setting the cluster name, or the number of processing node replicas
-1. Ensure the following are set in `./values/example.yaml`:
+1. Make a custom configuration file, using `./values/example.yaml` as a guide
+1. Ensure the following are set in your custom config file:
   1. `global.advertisedHost`. FQDN of the Kubernetes ingress (e.g. `stroom.example.com`)
   1. `global.ingress.tls.secretName`. Name of the TLS secret
 1. Create a namespace for the Stroom deployment: `kubectl create namespace stroom-dev`
-1. Deploy the Helm chart, applying your customisations: `helm install -n stroom-dev -f ./values/defaults.yaml stroom .`
+1. Deploy the Helm chart, applying your customisations: `helm install -n stroom-dev -f <path to custom config YAML> stroom .`
 
 Stroom will now deploy to the namespace you created (in this case: `stroom-dev`). Cluster resources will be named using the release name `stroom` as a base.
 
@@ -77,13 +77,12 @@ To check on the status of the deployment, execute a command like: `watch kubectl
 ### Upgrade
 
 1. Clone the updated repository 
-1. Re-apply any customisations to `./values/example.yaml`
 1. Follow steps 1 - 3 as described above
-1. Upgrade the chart: `helm upgrade -n stroom-dev -f ./values/defaults.yaml stroom .`
+1. Upgrade the chart: `helm upgrade -n stroom-dev -f <path to custom config YAML> stroom .`
 
 ### Open Stroom
 
-Open the following in your web browser: `https://<FQDN>`
+Open the following in your web browser: `https://<advertised URL>`
 
 ## 4. Contributing
 
