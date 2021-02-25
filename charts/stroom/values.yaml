@@ -3,6 +3,9 @@
 # Declare variables to be passed into your templates.
 
 global:
+  repositories:
+    busybox: busybox
+
   # Identifies this Stroom deployment
   stackName: stroom-dev
 
