@@ -26,7 +26,7 @@ spec:
       initContainers:
         {{- /* If a Zookeeper server ID doesn't exist, generate a unique ID and store on the file system */}}
         - name: generate-server-id
-          image: busybox
+          image: {{ .Values.global.repositories.busybox }}
           command:
             - sh
             - -c
