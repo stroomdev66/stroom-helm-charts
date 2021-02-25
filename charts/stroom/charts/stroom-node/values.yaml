@@ -31,6 +31,9 @@ stroomProxyDir: /tmp/proxy
 
 stroomHelpUrl: https://gchq.github.io/stroom-docs
 
+# Maximum size of a HTTP POST to the ingress. Ensure this is large enough to cater for posted event files
+maxClientBodySize: 1g
+
 statisticDocRefs:
   benchmarkCluster: docRef(StatisticStore,946a88c6-a59a-11e6-bdc4-0242ac110002,Benchmark-Cluster Test),docRef(StroomStatsStore,2503f703-5ce0-4432-b9d4-e3272178f47e,Benchmark-Cluster Test)
   cpu: docRef(StatisticStore,af08c4a7-ee7c-44e4-8f5e-e9c6be280434,CPU),docRef(StroomStatsStore,1edfd582-5e60-413a-b91c-151bd544da47,CPU)

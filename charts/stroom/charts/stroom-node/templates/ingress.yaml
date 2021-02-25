@@ -5,11 +5,13 @@ metadata:
   name: {{ include "stroom-node.fullname" . }}
   labels:
     {{- include "stroom-node.labels" . | nindent 4 }}
+  {{- $maxClientBodySize := .Values.maxClientBodySize }}
   {{- with .Values.global.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
     # Enable sticky sessions, to ensure auth token requests succeed
     nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/proxy-body-size: {{ $maxClientBodySize }}
   {{- end }}
 spec:
   tls:
