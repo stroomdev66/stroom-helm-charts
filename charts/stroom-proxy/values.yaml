@@ -1,0 +1,126 @@
+# Default values for stroom-proxy.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: gchq/stroom-proxy
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+nameOverride: ""
+fullnameOverride: ""
+
+advertisedHost: stroom-proxy.example.com
+
+stroom:
+  host: stroom.example.com
+  apiKey:
+    # Requires:
+    # - stroom_api_key - API key issued by Stroom, to enable feed status lookups
+    secretRef:
+      secretName: "" # stroom-proxy-api-key
+
+storing:
+  enabled: true
+
+forwarding:
+  enabled: true
+
+# Used for client connections to Stroom or a downstream proxy
+clientKeyStore:
+  type: pkcs12 # pkcs12, jks, ...
+  path: /stroom-proxy/certs/client.p12
+
+  # Requires two items:
+  # - `client.p12` - Encoded keystore (must match filename of `path`)
+  # - `password` - Keystore password
+  secretKeyRef:
+    secretName: "" # stroom-proxy-keystore
+
+trustStore:
+  type: pkcs12
+  path: /stroom-proxy/certs/ca.p12
+  secretKeyRef:
+    secretName: "" # stroom-proxy-truststore
+
+webServer:
+  timeout: 10s
+  connectionTimeout: 10s
+  timeToLive: 1h
+  maxConnections: 1024
+  maxConnectionsPerRoute: 1024
+  keepAlive: 0ms
+  retries: 0
+  verifyHostname: true
+  trustSelfSignedCertificates: false
+
+ports:
+  app: 8090
+  admin: 8091
+  debug: 10766
+
+volumeClaims:
+  # Local proxy storage. Recommend using fast storage tier especially when aggregation is enabled
+  localData:
+    volumeName: ""
+    storageClassName: ""
+    selector:
+      matchLabels: { }
+      matchExpressions: { }
+    dataSource: { }
+    accessModes:
+      - ReadWriteOnce
+    volumeMode: { }
+
+ingress:
+  enabled: false
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  tls:
+    secretName: ""
+
+javaOpts: -Xms512m -Xmx1g -Xrunjdwp:server=y,transport=dt_socket,address=10765,suspend=n
+
+resources:
+  requests:
+    cpu: 1000m
+    memory: 1Gi
+    storage: 1Gi
+
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+    storage: 2Gi
+
+readinessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 5
+  failureThreshold: 10
+livenessProbe:
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+podAnnotations: {}
+
+podSecurityContext: {}
+# fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+# runAsUser: 1000
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

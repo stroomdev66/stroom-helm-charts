@@ -1,0 +1,31 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "stroom-proxy.fullname" . }}
+  labels:
+    {{- include "stroom-proxy.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.ingress.tls }}
+  tls:
+    - hosts:
+        - {{ .Values.advertisedHost | quote }}
+      secretName: {{ .Values.ingress.tls.secretName }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.advertisedHost | quote }}
+      http:
+        paths:
+          - path: /datafeed
+            pathType: Exact
+            backend:
+              service:
+                name: {{ include "stroom-proxy.fullname" . }}
+                port:
+                  name: http
+                  number: {{ .Values.ports.app }}
+{{- end }}

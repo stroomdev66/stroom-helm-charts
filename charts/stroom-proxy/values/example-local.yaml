@@ -1,0 +1,17 @@
+# Example values file for a local Stroom proxy
+
+replicaCount: 1
+
+advertisedHost: "stroom-proxy.internal"
+stroomBaseUri: "stroom.internal"
+
+forwarding:
+  enabled: true
+
+clientKeyStore:
+  secretKeyRef:
+    secretName: stroom-proxy-keystore
+
+trustStore:
+  secretKeyRef:
+    secretName: stroom-proxy-truststore
