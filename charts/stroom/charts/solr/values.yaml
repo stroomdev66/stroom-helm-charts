@@ -8,6 +8,9 @@ image:
   repository: solr
   tag: ""
 
+# Whether to deploy this chart
+enabled: false
+
 volumeClaim:
   volumeName: ""
   storageClassName: ""
