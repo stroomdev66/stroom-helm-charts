@@ -31,18 +31,18 @@ forwarding:
 
 # Used for client connections to Stroom or a downstream proxy
 clientKeyStore:
-  type: pkcs12 # pkcs12, jks, ...
-  path: /stroom-proxy/certs/client.p12
+  type: PKCS12 # PKCS12, JKS, ...
+  path: /stroom-proxy/certs/client.pfx
 
   # Requires two items:
-  # - `client.p12` - Encoded keystore (must match filename of `path`)
+  # - `client.pfx` - Encoded keystore (must match filename of `path`)
   # - `password` - Keystore password
   secretKeyRef:
     secretName: "" # stroom-proxy-keystore
 
 trustStore:
-  type: pkcs12
-  path: /stroom-proxy/certs/ca.p12
+  type: JKS
+  path: /stroom-proxy/certs/ca.jks
   secretKeyRef:
     secretName: "" # stroom-proxy-truststore
 
