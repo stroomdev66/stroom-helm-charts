@@ -6,6 +6,7 @@ metadata:
     {{- include "stroom-proxy.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  serviceName: {{ include "stroom-proxy.fullname" . }}
   selector:
     matchLabels:
       {{- include "stroom-proxy.selectorLabels" . | nindent 6 }}
