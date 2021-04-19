@@ -27,5 +27,4 @@ spec:
                 name: {{ include "stroom-proxy.fullname" . }}
                 port:
                   name: http
-                  number: {{ .Values.ports.app }}
 {{- end }}
