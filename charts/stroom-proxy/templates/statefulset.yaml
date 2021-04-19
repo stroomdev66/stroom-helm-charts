@@ -56,7 +56,7 @@ spec:
             - name: STROOM_PROXY_DEBUG_PORT
               value: {{ .Values.ports.debug | quote }}
             - name: FEED_STATUS_URL
-              value: https://{{ .Values.stroomHost }}/api/proxy/feedStatus/v1
+              value: https://{{ .Values.stroom.host }}/api/proxy/feedStatus/v1
             - name: FEED_STATUS_API_KEY
               valueFrom:
                 secretKeyRef:
