@@ -43,6 +43,8 @@ spec:
                 secretKeyRef:
                   key: password
                   name: {{ .Values.trustStore.secretKeyRef.secretName }}
+            - name: FORWARD_URL
+              value: https://{{ .Values.stroom.host }}/stroom/datafeed
             - name: JAVA_OPTS
               value: {{ .Values.javaOpts }}
             - name: STORING_ENABLED
