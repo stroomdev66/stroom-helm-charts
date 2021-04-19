@@ -46,6 +46,9 @@ trustStore:
   secretKeyRef:
     secretName: "" # stroom-proxy-truststore
 
+# Maximum size of a HTTP POST to the ingress. Ensure this is large enough to cater for posted event files
+maxClientBodySize: 1g
+
 webServer:
   timeout: 10s
   connectionTimeout: 10s

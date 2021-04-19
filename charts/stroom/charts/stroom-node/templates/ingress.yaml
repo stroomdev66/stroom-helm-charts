@@ -5,18 +5,17 @@ metadata:
   name: {{ include "stroom-node.fullname" . }}
   labels:
     {{- include "stroom-node.labels" . | nindent 4 }}
-  {{- $maxClientBodySize := .Values.maxClientBodySize }}
   {{- with .Values.global.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
     # Enable sticky sessions, to ensure auth token requests succeed
     nginx.ingress.kubernetes.io/affinity: cookie
-    nginx.ingress.kubernetes.io/proxy-body-size: {{ $maxClientBodySize }}
+    nginx.ingress.kubernetes.io/proxy-body-size: {{ $.Values.maxClientBodySize }}
   {{- end }}
 spec:
   tls:
     - hosts:
-      - {{ $.Values.global.advertisedHost }}
+        - {{ $.Values.global.advertisedHost }}
       secretName: {{ required "Ingress TLS secret name is required" .Values.global.ingress.tls.secretName }}
   rules:
     - host: {{ .Values.global.advertisedHost }}
@@ -59,35 +58,6 @@ spec:
       http:
         paths:
           - path: /stroom/datafeeddirect(/|$)(.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ include "stroom-node.fullname" . }}
-                port:
-                  name: app
----
-# Rewrite requests to `/api/proxy` to `/api` (so we can avoid deploying a local Stroom proxy)
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: {{ include "stroom-node.fullname" . }}-proxy-api
-  labels:
-  {{- include "stroom-node.labels" . | nindent 4 }}
-  {{- with .Values.global.ingress.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-    nginx.ingress.kubernetes.io/rewrite-target: /api$1$2
-  {{- end }}
-spec:
-  tls:
-    - hosts:
-        - {{ .Values.global.advertisedHost }}
-      secretName: {{ required "Ingress TLS secret name is required" .Values.global.ingress.tls.secretName }}
-  rules:
-    - host: {{ .Values.global.advertisedHost }}
-      http:
-        paths:
-          - path: /api/proxy(/|$)(.*)
             pathType: Prefix
             backend:
               service:

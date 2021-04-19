@@ -8,6 +8,8 @@ metadata:
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
+    nginx.ingress.kubernetes.io/proxy-body-size: {{ $.Values.maxClientBodySize }}
+    nginx.ingress.kubernetes.io/rewrite-target: /stroom/datafeed
   {{- end }}
 spec:
   {{- if .Values.ingress.tls }}
@@ -26,5 +28,5 @@ spec:
               service:
                 name: {{ include "stroom-proxy.fullname" . }}
                 port:
-                  name: http
+                  name: app
 {{- end }}

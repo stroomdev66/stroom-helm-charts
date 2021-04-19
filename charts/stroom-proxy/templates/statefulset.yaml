@@ -57,7 +57,7 @@ spec:
             - name: STROOM_PROXY_DEBUG_PORT
               value: {{ .Values.ports.debug | quote }}
             - name: FEED_STATUS_URL
-              value: https://{{ .Values.stroom.host }}/api/proxy/feedStatus/v1
+              value: https://{{ .Values.stroom.host }}/api/feedStatus/v1
             - name: FEED_STATUS_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -125,15 +125,11 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: {{ .Values.ports.app }}
+            {{- range $name, $number := .Values.ports }}
+            - name: {{ $name }}
+              containerPort: {{ $number }}
               protocol: TCP
-            - name: admin
-              containerPort: {{ .Values.ports.admin }}
-              protocol: TCP
-            - name: debug
-              containerPort: {{ .Values.ports.debug }}
-              protocol: TCP
+            {{- end }}
           startupProbe:
             {{- with .Values.startupProbe }}
             initialDelaySeconds: {{ .initialDelaySeconds }}
