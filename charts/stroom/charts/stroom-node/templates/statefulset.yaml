@@ -218,8 +218,8 @@ spec:
               containerPort: {{ $number }}
               protocol: TCP
             {{- end }}
-          readinessProbe:
-            {{- with .Values.readinessProbe }}
+          startupProbe:
+            {{- with .Values.startupProbe }}
             initialDelaySeconds: {{ .initialDelaySeconds }}
             periodSeconds: {{ .periodSeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}

@@ -67,8 +67,8 @@ sharedDataVolume: { }
   #   server: file-server.example.com
   #   path: /data
 
-readinessProbe:
-  initialDelaySeconds: 5
+startupProbe:
+  initialDelaySeconds: 10
   periodSeconds: 5
   timeoutSeconds: 5
   failureThreshold: 10

@@ -95,7 +95,7 @@ resources:
     memory: 2Gi
     storage: 2Gi
 
-readinessProbe:
+startupProbe:
   initialDelaySeconds: 5
   periodSeconds: 5
   timeoutSeconds: 5

@@ -100,9 +100,11 @@ spec:
               value: {{ .Values.webServer.trustSelfSignedCertificates | quote }}
           volumeMounts:
             - mountPath: /stroom-proxy/certs/{{ base .Values.clientKeyStore.path }}
+              subPath: {{ base .Values.clientKeyStore.path }}
               name: client-keystore
               readOnly: true
             - mountPath: /stroom-proxy/certs/{{ base .Values.trustStore.path }}
+              subPath: {{ base .Values.trustStore.path }}
               name: trust-store
               readOnly: true
             - mountPath: /stroom-proxy/config
@@ -131,8 +133,8 @@ spec:
             - name: debug
               containerPort: {{ .Values.ports.debug }}
               protocol: TCP
-          livenessProbe:
-            {{- with .Values.livenessProbe }}
+          startupProbe:
+            {{- with .Values.startupProbe }}
             initialDelaySeconds: {{ .initialDelaySeconds }}
             periodSeconds: {{ .periodSeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
@@ -141,8 +143,8 @@ spec:
             httpGet:
               path: /proxyAdmin/healthcheck
               port: admin
-          readinessProbe:
-            {{- with .Values.readinessProbe }}
+          livenessProbe:
+            {{- with .Values.livenessProbe }}
             initialDelaySeconds: {{ .initialDelaySeconds }}
             periodSeconds: {{ .periodSeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
