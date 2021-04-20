@@ -45,7 +45,7 @@ spec:
                   key: password
                   name: {{ .Values.trustStore.secretKeyRef.secretName }}
             - name: FORWARD_URL
-              value: https://{{ .Values.stroom.host }}/stroom/datafeed
+              value: http://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/stroom/datafeed
             - name: JAVA_OPTS
               value: {{ .Values.javaOpts }}
             - name: STORING_ENABLED
@@ -57,7 +57,7 @@ spec:
             - name: STROOM_PROXY_DEBUG_PORT
               value: {{ .Values.ports.debug | quote }}
             - name: FEED_STATUS_URL
-              value: https://{{ .Values.stroom.host }}/api/feedStatus/v1
+              value: http://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/api/feedStatus/v1
             - name: FEED_STATUS_API_KEY
               valueFrom:
                 secretKeyRef:

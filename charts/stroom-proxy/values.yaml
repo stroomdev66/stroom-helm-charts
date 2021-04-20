@@ -16,7 +16,8 @@ fullnameOverride: ""
 advertisedHost: stroom-proxy.example.com
 
 stroom:
-  host: stroom.example.com
+  host: stroom-node.stroom.svc
+  port: 8080
   apiKey:
     # Requires:
     # - stroom_api_key - API key issued by Stroom, to enable feed status lookups
@@ -47,7 +48,7 @@ trustStore:
     secretName: "" # stroom-proxy-truststore
 
 # Maximum size of a HTTP POST to the ingress. Ensure this is large enough to cater for posted event files
-maxClientBodySize: 1g
+maxClientBodySize: 10g
 
 webServer:
   timeout: 10s
