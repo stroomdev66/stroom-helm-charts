@@ -9,15 +9,10 @@ image:
   tag: ""
   pullPolicy: IfNotPresent
 
-javaOpts: -Xms50m -Xmx1024m -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=10765,suspend=n
+javaOpts: -Xms512m -Xmx1g -Xrunjdwp:server=y,transport=dt_socket,address=10765,suspend=n
 jpaDialect: org.hibernate.dialect.MySQLInnoDBDialect
 jdbcDriver: com.mysql.cj.jdbc.Driver
 
-# Node name prefix used to generate node IDs. For instance, the first node will be called 'node-1'
-# TODO: Label nodes using this prefix
-nodeNamePrefix: node
-
-# Development mode
 developmentMode: false
 
 contentPackImportEnabled: false
@@ -30,6 +25,12 @@ serviceDiscovery:
 stroomProxyDir: /tmp/proxy
 
 stroomHelpUrl: https://gchq.github.io/stroom-docs
+
+# CA certificate to verify TLS connections. If omitted, connections to services requiring X.509 verification may not work.
+caCert:
+  secretName: ""
+  mountPath: /stroom/pki
+  subPath: ca.crt
 
 # Maximum size of a HTTP POST to the ingress. Ensure this is large enough to cater for posted event files
 maxClientBodySize: 1g
@@ -66,8 +67,8 @@ sharedDataVolume: { }
   #   server: file-server.example.com
   #   path: /data
 
-readinessProbe:
-  initialDelaySeconds: 5
+startupProbe:
+  initialDelaySeconds: 10
   periodSeconds: 5
   timeoutSeconds: 5
   failureThreshold: 10

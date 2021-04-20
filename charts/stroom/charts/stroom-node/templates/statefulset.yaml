@@ -204,6 +204,12 @@ spec:
               name: data
             - mountPath: /stroom/volumes
               name: stroom-shared
+            {{- if .Values.caCert.secretName }}
+            - mountPath: {{ .Values.caCert.mountPath }}
+              subPath: {{ .Values.caCert.subPath }}
+              name: ca-cert
+              readOnly: true
+            {{- end }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           ports:
@@ -212,8 +218,8 @@ spec:
               containerPort: {{ $number }}
               protocol: TCP
             {{- end }}
-          readinessProbe:
-            {{- with .Values.readinessProbe }}
+          startupProbe:
+            {{- with .Values.startupProbe }}
             initialDelaySeconds: {{ .initialDelaySeconds }}
             periodSeconds: {{ .periodSeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
@@ -239,12 +245,16 @@ spec:
             limits:
               cpu: {{ .Values.resources.limits.cpu }}
               memory: {{ .Values.resources.limits.memory }}
-          # TODO: Configure logging
       volumes:
         - name: stroom-shared
           {{- with .Values.sharedDataVolume }}
           {{- toYaml . | nindent 10 }}
           {{- end }}
+        {{- with .Values.caCert.secretName }}
+        - name: ca-cert
+          secret:
+            secretName: {{ . }}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
