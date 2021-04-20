@@ -165,7 +165,8 @@ spec:
           secret:
             secretName: {{ .Values.trustStore.secretKeyRef.secretName }}
         - name: config
-          emptyDir: { }
+          configMap:
+            name: {{ include "stroom-proxy.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
