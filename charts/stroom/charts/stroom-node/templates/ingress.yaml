@@ -5,9 +5,10 @@ metadata:
   name: {{ include "stroom-node.fullname" . }}
   labels:
     {{- include "stroom-node.labels" . | nindent 4 }}
-  {{- with .Values.global.ingress.annotations }}
   annotations:
+    {{- with .Values.global.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
+    {{- end }}
     # Enable sticky sessions, to ensure auth token requests succeed
     nginx.ingress.kubernetes.io/affinity: cookie
     nginx.ingress.kubernetes.io/proxy-body-size: {{ $.Values.maxClientBodySize }}
