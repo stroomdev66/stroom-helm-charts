@@ -30,6 +30,22 @@ storing:
 forwarding:
   enabled: true
 
+  # Number of threads to forward with
+  threadCount: 4
+
+repository:
+  # How often to scan the repository
+  readCron: "* * *"
+
+  # Max number of files to scan over during forwarding. Once this limit is reached it will wait until next read interval
+  maxFileScan: 100000
+
+  # The maximum number of concurrent mapped files we can hold before we send the largest set for aggregation
+  maxConcurrentMappedFiles: 100000
+
+  # Stream size (uncompressed) to break at when building an aggregate
+  maxStreamSize: 1G
+
 # Used for client connections to Stroom or a downstream proxy
 clientKeyStore:
   type: PKCS12 # PKCS12, JKS, ...

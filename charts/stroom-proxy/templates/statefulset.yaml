@@ -46,10 +46,20 @@ spec:
                   name: {{ .Values.trustStore.secretKeyRef.secretName }}
             - name: FORWARD_URL
               value: http://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/stroom/datafeed
+            - name: FORWARDING_THREAD_COUNT
+              value: {{ .Values.forwarding.threadCount | quote }}
             - name: JAVA_OPTS
               value: {{ .Values.javaOpts }}
             - name: STORING_ENABLED
               value: {{ .Values.storing.enabled | quote }}
+            - name: REPO_READ_CRON
+              value: {{ .Values.repository.readCron | quote }}
+            - name: REPO_MAX_FILE_SCAN
+              value: {{ .Values.repository.maxFileScan | quote }}
+            - name: REPO_MAX_CONCURRENT_MAPPED_FILES
+              value: {{ .Values.repository.maxConcurrentMappedFiles | quote }}
+            - name: REPO_MAX_STREAM_SIZE
+              value: {{ .Values.repository.maxStreamSize }}
             - name: STROOM_PROXY_ADMIN_PORT
               value: {{ .Values.ports.admin | quote }}
             - name: STROOM_PROXY_APP_PORT

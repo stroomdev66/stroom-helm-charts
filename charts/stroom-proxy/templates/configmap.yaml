@@ -128,14 +128,13 @@ data:
         repoDir: "${REPO_DIR:-/stroom-proxy/repo}"
         repositoryFormat: "${executionUuid}/${year}-${month}-${day}/${feed}/${pathId}/${id}"
         # Uncomment this for rolled repositories
-        rollCron: "25 * *"
+        # rollCron: "* * *"
       proxyRepositoryReaderConfig:
-        readCron: "* * *"
-        forwardThreadCount: 4
-        maxFileScan: 100000
-        maxConcurrentMappedFiles: 100000
-        maxAggregation: 1000
-        maxStreamSize: 10G
+        readCron: "${REPO_READ_CRON:-* * *}"
+        forwardThreadCount: ${FORWARDING_THREAD_COUNT:-4}
+        maxFileScan: ${REPO_MAX_FILE_SCAN:-100000}
+        maxConcurrentMappedFiles: ${REPO_MAX_CONCURRENT_MAPPED_FILES:-100000}
+        maxStreamSize: "${REPO_MAX_STREAM_SIZE:-1G}"
       logStreamConfig:
         metaKeys: "guid,feed,system,environment,remotehost,remoteaddress,remotedn,remotecertexpiry"
       #  contentSyncConfig:
