@@ -70,10 +70,3 @@ Generates a random password. Result is NOT base-64 encoded - this is left to the
 {{- define "stroom.password" -}}
 {{- randAlphaNum (.Values.randomPasswordLength | int) }}
 {{- end }}
-
-{{/*
-Root URL of the advertised web frontend
-*/}}
-{{- define "stroom.rootUrl" -}}
-https://{{ required "Advertised host is required" .Values.global.advertisedHost }}
-{{- end }}

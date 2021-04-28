@@ -10,7 +10,6 @@ image:
   pullPolicy: IfNotPresent
 
 javaOpts: -Xms512m -Xmx1g -Xrunjdwp:server=y,transport=dt_socket,address=10765,suspend=n
-jpaDialect: org.hibernate.dialect.MySQLInnoDBDialect
 jdbcDriver: com.mysql.cj.jdbc.Driver
 
 developmentMode: false

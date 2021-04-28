@@ -27,6 +27,12 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+            - name: ADMIN_CONTEXT_PATH
+              value: /stroomAdmin
+            - name: API_GATEWAY_HOST
+              value: {{ .Values.global.advertisedHost }}
+            - name: API_GATEWAY_PORT
+              value: {{ .Values.global.advertisedPort | quote }}
             - name: DOCKER_HOST_HOSTNAME
               valueFrom:
                 fieldRef:
@@ -47,10 +53,6 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.labels['statefulset.kubernetes.io/pod-name']
-            - name: STROOM_RACK
-              value: {{ .Values.global.rackName }}
-            - name: STROOM_JPA_DIALECT
-              value: {{ .Values.jpaDialect }}
             - name: STROOM_JDBC_DRIVER_URL
               value: {{ printf "jdbc:mysql://%s/%s?useUnicode=yes&characterEncoding=UTF-8" (include "mysql.connectionAddress" .) .Values.global.mysql.databases.stroom }}
             - name: STROOM_JDBC_DRIVER_CLASS_NAME
@@ -73,16 +75,6 @@ spec:
                 secretKeyRef:
                   name: {{ include "stroom.globalSecretName" . }}
                   key: mysql-service-password
-            - name: STROOM_AUTH_SERVICES_URL
-              value: http://{{ printf "%s.%s:%d" (include "auth-service.fullname" .) .Release.Namespace (.Values.global.authService.ports.auth | int) }}
-            - name: STROOM_AUTHENTICATION_SERVICE_URL
-              value: {{ include "stroom.rootUrl" . }}/api/auth/authentication/v1
-            - name: STROOM_AUTH_AUTHENTICATION_SERVICE_URL
-              value: {{ include "stroom.rootUrl" . }}/api/auth/authentication/v1
-            - name: STROOM_AUTH_JWT_ISSUER
-              value: stroom
-            - name: STROOM_AUTH_JWT_ENABLETOKENREVOCATIONCHECK
-              value: "false"
             - name: STROOM_AUTH_CLIENT_ID
               valueFrom:
                 secretKeyRef:
@@ -93,21 +85,6 @@ spec:
                 secretKeyRef:
                   name: {{ include "stroom.globalSecretName" . }}
                   key: auth-client-secret
-            - name: STROOM_UI_URL
-              # TODO: This is supposed to be "STROOM_UI_HOST". Check whether this is equivalent to the advertised address
-              value: {{ include "stroom.rootUrl" . }}
-            - name: STROOM_UI_PATH
-              value: /stroom/ui?prompt=login
-            - name: STROOM_USERS_UI_URL
-              value: {{ include "stroom.rootUrl" . }}/s/users
-            - name: STROOM_APIKEYS_UI_URL
-              value: {{ include "stroom.rootUrl" . }}/s/tokens
-            - name: STROOM_CHANGEPASSWORD_URL
-              value: {{ include "stroom.rootUrl" . }}/s/changepassword
-            - name: STROOM_ADVERTISED_URL
-              value: {{ include "stroom.rootUrl" . }}
-            - name: ADMIN_CONTEXT_PATH
-              value: /stroomAdmin
             - name: STROOM_LOGGING_LEVEL
               valueFrom:
                 configMapKeyRef:
