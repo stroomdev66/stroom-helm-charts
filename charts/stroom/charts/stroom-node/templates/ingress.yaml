@@ -12,7 +12,6 @@ metadata:
     # Enable sticky sessions, to ensure auth token requests succeed
     nginx.ingress.kubernetes.io/affinity: cookie
     nginx.ingress.kubernetes.io/proxy-body-size: {{ $.Values.maxClientBodySize }}
-  {{- end }}
 spec:
   tls:
     - hosts:

@@ -22,7 +22,8 @@ loggingLevel: INFO
 serviceDiscovery:
   enabled: false
 
-stroomProxyDir: /tmp/proxy
+stroomTempDir: /stroom/tmp
+stroomProxyDir: /stroom/volumes/proxy-repo
 
 stroomHelpUrl: https://gchq.github.io/stroom-docs
 

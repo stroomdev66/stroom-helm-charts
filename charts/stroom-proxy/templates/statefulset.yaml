@@ -76,7 +76,11 @@ spec:
             - name: STROOM_PROXY_CLIENT_KEYSTORE_TYPE
               value: {{ .Values.clientKeyStore.type }}
             - name: STROOM_PROXY_CLIENT_KEYSTORE_PATH
+              {{- if .Values.forwarding.enabled }}
               value: {{ .Values.clientKeyStore.path }}
+              {{- else }}
+              value: ""
+              {{- end }}
             - name: STROOM_PROXY_CLIENT_KEYSTORE_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -85,7 +89,11 @@ spec:
             - name: STROOM_PROXY_CLIENT_TRUSTSTORE_TYPE
               value: {{ .Values.trustStore.type }}
             - name: STROOM_PROXY_CLIENT_TRUSTSTORE_PATH
+              {{- if .Values.forwarding.enabled }}
               value: {{ .Values.trustStore.path }}
+              {{- else }}
+              value: ""
+              {{- end }}
             - name: STROOM_PROXY_CLIENT_TRUSTSTORE_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -110,14 +118,18 @@ spec:
             - name: JERSEY_TRUST_SELF_SIGNED
               value: {{ .Values.webServer.trustSelfSignedCertificates | quote }}
           volumeMounts:
+            {{- if .Values.forwarding.enabled }}
             - mountPath: /stroom-proxy/certs/{{ base .Values.clientKeyStore.path }}
               subPath: {{ base .Values.clientKeyStore.path }}
               name: client-keystore
               readOnly: true
+            {{- end }}
+            {{- if .Values.forwarding.enabled }}
             - mountPath: /stroom-proxy/certs/{{ base .Values.trustStore.path }}
               subPath: {{ base .Values.trustStore.path }}
               name: trust-store
               readOnly: true
+            {{- end }}
             - mountPath: /stroom-proxy/config
               name: config
               readOnly: true
@@ -128,8 +140,12 @@ spec:
               subPath: logs
               name: local-data
             - mountPath: /stroom-proxy/repo
+              {{- if .Values.sharedProxyRepoVolume }}
+              name: shared-repo
+              {{- else }}
               subPath: repo
               name: local-data
+              {{- end }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -168,15 +184,23 @@ spec:
               cpu: {{ .Values.resources.limits.cpu }}
               memory: {{ .Values.resources.limits.memory }}
       volumes:
+        {{- with .Values.clientKeyStore.secretKeyRef.secretName }}
         - name: client-keystore
           secret:
-            secretName: {{ .Values.clientKeyStore.secretKeyRef.secretName }}
+            secretName: {{ . }}
+        {{- end }}
+        {{- with .Values.trustStore.secretKeyRef.secretName }}
         - name: trust-store
           secret:
-            secretName: {{ .Values.trustStore.secretKeyRef.secretName }}
+            secretName: {{ . }}
+        {{- end }}
         - name: config
           configMap:
             name: {{ include "stroom-proxy.fullname" . }}
+        {{- with .Values.sharedProxyRepoVolume }}
+        - name: shared-repo
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
