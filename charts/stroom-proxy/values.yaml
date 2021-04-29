@@ -28,6 +28,7 @@ storing:
   enabled: true
 
 forwarding:
+  # Whether to forward to another proxy. If disabled, `clientKeyStore` and `trustStore` options are ignored.
   enabled: true
 
   # Number of threads to forward with
