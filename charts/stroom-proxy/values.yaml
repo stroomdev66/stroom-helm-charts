@@ -95,6 +95,11 @@ volumeClaims:
       - ReadWriteOnce
     volumeMode: { }
 
+sharedProxyRepoVolume: { }
+  # nfs:
+  #   server: file-server.example.com
+  #   path: /data
+
 ingress:
   enabled: false
   annotations:

@@ -128,8 +128,12 @@ spec:
               subPath: logs
               name: local-data
             - mountPath: /stroom-proxy/repo
+              {{- if .Values.sharedProxyRepoVolume }}
+              name: shared-repo
+              {{- else }}
               subPath: repo
               name: local-data
+              {{- end }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -177,6 +181,10 @@ spec:
         - name: config
           configMap:
             name: {{ include "stroom-proxy.fullname" . }}
+        {{- with .Values.sharedProxyRepoVolume }}
+        - name: shared-repo
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
