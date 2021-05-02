@@ -47,6 +47,9 @@ repository:
   # Stream size (uncompressed) to break at when building an aggregate
   maxStreamSize: 1G
 
+  # Maximum number of files to include in a single aggregate, before rolling over
+  maxFilesPerAggregate: 10000
+
 # Used for client connections to Stroom or a downstream proxy
 clientKeyStore:
   type: PKCS12 # PKCS12, JKS, ...

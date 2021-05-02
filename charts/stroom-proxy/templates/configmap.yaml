@@ -135,6 +135,7 @@ data:
         maxFileScan: ${REPO_MAX_FILE_SCAN:-100000}
         maxConcurrentMappedFiles: ${REPO_MAX_CONCURRENT_MAPPED_FILES:-100000}
         maxStreamSize: "${REPO_MAX_STREAM_SIZE:-1G}"
+        maxAggregation: "${REPO_MAX_AGGREGATION:-1000}"
       logStreamConfig:
         metaKeys: "guid,feed,system,environment,remotehost,remoteaddress,remotedn,remotecertexpiry"
       #  contentSyncConfig:
