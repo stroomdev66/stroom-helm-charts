@@ -60,6 +60,8 @@ spec:
               value: {{ .Values.repository.maxConcurrentMappedFiles | quote }}
             - name: REPO_MAX_STREAM_SIZE
               value: {{ .Values.repository.maxStreamSize }}
+            - name: REPO_MAX_AGGREGATION
+              value: {{ .Values.repository.maxFilesPerAggregate | quote }}
             - name: STROOM_PROXY_ADMIN_PORT
               value: {{ .Values.ports.admin | quote }}
             - name: STROOM_PROXY_APP_PORT
