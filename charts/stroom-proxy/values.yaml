@@ -28,6 +28,7 @@ storing:
   enabled: true
 
 forwarding:
+  # Whether to forward to another proxy. If disabled, `clientKeyStore` and `trustStore` options are ignored.
   enabled: true
 
   # Number of threads to forward with
@@ -45,6 +46,9 @@ repository:
 
   # Stream size (uncompressed) to break at when building an aggregate
   maxStreamSize: 1G
+
+  # Maximum number of files to include in a single aggregate, before rolling over
+  maxFilesPerAggregate: 10000
 
 # Used for client connections to Stroom or a downstream proxy
 clientKeyStore:
@@ -94,6 +98,11 @@ volumeClaims:
     accessModes:
       - ReadWriteOnce
     volumeMode: { }
+
+sharedProxyRepoVolume: { }
+  # nfs:
+  #   server: file-server.example.com
+  #   path: /data
 
 ingress:
   enabled: false

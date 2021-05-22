@@ -162,6 +162,8 @@ spec:
                 configMapKeyRef:
                   name: {{ include "stroom-node.fullname" . }}
                   key: stat-docref-volumes
+            - name: STROOM_TEMP
+              value: {{ .Values.stroomTempDir }}
             - name: STROOM_PROXY_DIR
               valueFrom:
                 configMapKeyRef:
@@ -176,8 +178,8 @@ spec:
             - mountPath: /stroom/output
               subPath: output
               name: data
-            - mountPath: /stroom/proxy-repo
-              subPath: proxy-repo
+            - mountPath: /stroom/tmp
+              subPath: tmp
               name: data
             - mountPath: /stroom/volumes
               name: stroom-shared
