@@ -15,6 +15,9 @@ jdbcDriver: com.mysql.cj.jdbc.Driver
 developmentMode: false
 
 contentPackImportEnabled: false
+createVolumes:
+  stream: true
+  index: true
 
 loggingLevel: INFO
 
@@ -22,7 +25,6 @@ serviceDiscovery:
   enabled: false
 
 stroomTempDir: /stroom/tmp
-stroomProxyDir: /stroom/volumes/proxy-repo
 
 stroomHelpUrl: https://gchq.github.io/stroom-docs
 
@@ -68,12 +70,12 @@ sharedDataVolume: { }
   #   path: /data
 
 startupProbe:
-  initialDelaySeconds: 10
+  initialDelaySeconds: 5
   periodSeconds: 5
   timeoutSeconds: 5
   failureThreshold: 10
 livenessProbe:
-  initialDelaySeconds: 60
+  initialDelaySeconds: 10
   periodSeconds: 10
   timeoutSeconds: 5
   failureThreshold: 3

@@ -33,6 +33,8 @@ spec:
               value: {{ .Values.global.advertisedHost }}
             - name: API_GATEWAY_PORT
               value: {{ .Values.global.advertisedPort | quote }}
+            - name: APPLICATION_CONTEXT_PATH
+              value: /
             - name: DOCKER_HOST_HOSTNAME
               valueFrom:
                 fieldRef:
@@ -41,6 +43,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
+            - name: POD_HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['statefulset.kubernetes.io/pod-name']
             - name: JAVA_OPTS
               value: {{ .Values.javaOpts }}
             - name: STROOM_APP_PORT
@@ -64,114 +70,36 @@ spec:
                 secretKeyRef:
                   name: {{ include "stroom.globalSecretName" . }}
                   key: mysql-service-password
-            - name: STROOM_STATISTICS_SQL_JDBC_DRIVER_CLASS_NAME
+            - name: STROOM_STATISTICS_JDBC_DRIVER_CLASS_NAME
               value: com.mysql.cj.jdbc.Driver
-            - name: STROOM_STATISTICS_SQL_JDBC_DRIVER_URL
+            - name: STROOM_STATISTICS_JDBC_DRIVER_URL
               value: {{ printf "jdbc:mysql://%s/%s?useUnicode=yes&characterEncoding=UTF-8" (include "mysql.connectionAddress" .) .Values.global.mysql.databases.stats }}
-            - name: STROOM_STATISTICS_SQL_JDBC_DRIVER_USERNAME
+            - name: STROOM_STATISTICS_JDBC_DRIVER_USERNAME
               value: {{ .Values.global.mysql.users.service.name }}
-            - name: STROOM_STATISTICS_SQL_JDBC_DRIVER_PASSWORD
+            - name: STROOM_STATISTICS_JDBC_DRIVER_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ include "stroom.globalSecretName" . }}
                   key: mysql-service-password
-            - name: STROOM_AUTH_CLIENT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "stroom.globalSecretName" . }}
-                  key: auth-client-id
-            - name: STROOM_AUTH_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "stroom.globalSecretName" . }}
-                  key: auth-client-secret
             - name: STROOM_LOGGING_LEVEL
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "stroom-node.fullname" . }}
-                  key: stroom-logging-level
-            - name: STROOM_PLUGINS_LIB_DIR
-              value: /stroom/plugins
-            - name: STROOM_CONNECTORS_KAFKA_DEFAULT_BOOTSTRAP_SERVERS
-              value: {{ include "kafka.advertisedHostName" . }}:{{ .Values.global.kafka.port }}
-            - name: STROOM_CONNECTORS_KAFKA_DEFAULT_CONNECTOR_VERSION
-              value: {{ .Values.global.kafka.connectorVersion }}
+              value: {{ .Values.loggingLevel }}
             - name: STROOM_CONTENT_PACK_IMPORT_ENABLED
               value: {{ .Values.contentPackImportEnabled | quote }}
+            - name: STROOM_CREATE_DEFAULT_INDEX_VOLUMES
+              value: {{ .Values.createVolumes.index | quote }}
+            - name: STROOM_CREATE_DEFAULT_STREAM_VOLUMES
+              value: {{ .Values.createVolumes.stream | quote }}
             - name: STROOM_SERVICE_DISCOVERY_ENABLED
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "stroom-node.fullname" . }}
-                  key: stroom-service-discovery-enabled
+              value: {{ .Values.serviceDiscovery.enabled | quote }}
             - name: STROOM_SERVICE_DISCOVERY_ZOOKEEPER_URL
               value: {{ include "zookeeper.connectionString" . | trimSuffix "," }}
-            - name: STROOM_DEVELOPMENT_MODE
-              value: {{ .Values.developmentMode | quote }}
-            - name: STROOM_INTERNALSTATISTICS_BENCHMARK_CLUSTER_DOC_REFS
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "stroom-node.fullname" . }}
-                  key: stat-docref-benchmark-cluster
-            - name: STROOM_INTERNALSTATISTICS_CPU_DOC_REFS
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "stroom-node.fullname" . }}
-                  key: stat-docref-cpu
-            - name: STROOM_INTERNALSTATISTICS_EVENTS_PER_SECOND_DOC_REFS
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "stroom-node.fullname" . }}
-                  key: stat-docref-events-per-second
-            - name: STROOM_INTERNALSTATISTICS_HEAP_HISTOGRAM_BYTES_DOC_REFS
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "stroom-node.fullname" . }}
-                  key: stat-docref-heap-histogram-bytes
-            - name: STROOM_INTERNALSTATISTICS_HEAP_HISTOGRAM_INSTANCES_DOC_REFS
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "stroom-node.fullname" . }}
-                  key: stat-docref-heap-histogram-instances
-            - name: STROOM_INTERNALSTATISTICS_MEMORY_DOC_REFS
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "stroom-node.fullname" . }}
-                  key: stat-docref-memory
-            - name: STROOM_INTERNALSTATISTICS_META_DATA_STREAM_SIZE_DOC_REFS
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "stroom-node.fullname" . }}
-                  key: stat-docref-metadata-stream-size
-            - name: STROOM_INTERNALSTATISTICS_META_DATA_STREAMS_RECEIVED_DOC_REFS
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "stroom-node.fullname" . }}
-                  key: stat-docref-metadata-streams-received
-            - name: STROOM_INTERNALSTATISTICS_PIPELINE_STREAM_PROCESSOR_DOC_REFS
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "stroom-node.fullname" . }}
-                  key: stat-docref-pipeline-stream-processor
-            - name: STROOM_INTERNALSTATISTICS_STREAM_TASK_QUEUE_SIZE_DOC_REFS
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "stroom-node.fullname" . }}
-                  key: stat-docref-stream-task-queue-size
-            - name: STROOM_INTERNALSTATISTICS_VOLUMES_DOC_REFS
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "stroom-node.fullname" . }}
-                  key: stat-docref-volumes
             - name: STROOM_TEMP
               value: {{ .Values.stroomTempDir }}
-            - name: STROOM_PROXY_DIR
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "stroom-node.fullname" . }}
-                  key: stroom-proxy-dir
-            - name: STROOM_HELP_URL
-              value: {{ .Values.stroomHelpUrl }}
           volumeMounts:
+            - mountPath: /stroom/config/config.yml
+              subPath: config.yml
+              name: config
+              readOnly: true
             - mountPath: /stroom/logs
               subPath: logs
               name: data
@@ -180,6 +108,15 @@ spec:
               name: data
             - mountPath: /stroom/tmp
               subPath: tmp
+              name: data
+            - mountPath: /stroom/proxy_repo
+              subPath: proxy-repo
+              name: data
+            - mountPath: /stroom/reference_data
+              subPath: reference-data
+              name: data
+            - mountPath: /stroom/search_results
+              subPath: search-results
               name: data
             - mountPath: /stroom/volumes
               name: stroom-shared
@@ -225,10 +162,13 @@ spec:
               cpu: {{ .Values.resources.limits.cpu }}
               memory: {{ .Values.resources.limits.memory }}
       volumes:
+        - name: config
+          configMap:
+            name: {{ include "stroom-node.fullname" . }}
+        {{- with .Values.sharedDataVolume }}
         - name: stroom-shared
-          {{- with .Values.sharedDataVolume }}
           {{- toYaml . | nindent 10 }}
-          {{- end }}
+        {{- end }}
         {{- with .Values.caCert.secretName }}
         - name: ca-cert
           secret:

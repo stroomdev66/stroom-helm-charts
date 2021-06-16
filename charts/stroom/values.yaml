@@ -21,24 +21,6 @@ global:
     annotations:
       kubernetes.io/ingress.class: nginx
 
-  authService:
-    chartId: auth-service
-
-    ports:
-      auth: 8099
-      admin: 8100
-      debug: 10769
-
-    clientId: PZnJr8kHRKqnlJRQThSI
-    clientSecret: OtzHiAWLj8QWcwO2IxXmqxpzE2pyg0pMKCghR2aU
-
-  authUi:
-    chartId: auth-ui
-
-    ports:
-      http: 5000
-      https: 9443
-
   kafka:
     chartId: kafka
 
@@ -70,12 +52,6 @@ global:
       process: process
       stats: stats
       stroom: stroom
-
-  smtp:
-    chartId: smtp
-
-    port: 2525
-    transport: plain
 
   solr:
     chartId: solr

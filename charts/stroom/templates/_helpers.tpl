@@ -39,7 +39,6 @@ Stroom-specific labels, used by subcharts
 */}}
 {{- define "stroom.extraLabels" -}}
 stroom/stack: {{ .Values.global.stackName }}
-stroom/rack: {{ .Values.global.rackName }}
 {{- end }}
 
 {{/*

@@ -1,6 +1,5 @@
 global:
   stackName: stroom-dev
-  rackName: rack-1
 
   # Must be changed
   advertisedHost: stroom.example.com
