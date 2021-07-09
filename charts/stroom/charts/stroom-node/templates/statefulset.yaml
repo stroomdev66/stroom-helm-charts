@@ -120,12 +120,6 @@ spec:
               name: data
             - mountPath: /stroom/volumes
               name: stroom-shared
-            {{- if .Values.caCert.secretName }}
-            - mountPath: {{ .Values.caCert.mountPath }}
-              subPath: {{ .Values.caCert.subPath }}
-              name: ca-cert
-              readOnly: true
-            {{- end }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           ports:
@@ -168,11 +162,6 @@ spec:
         {{- with .Values.sharedDataVolume }}
         - name: stroom-shared
           {{- toYaml . | nindent 10 }}
-        {{- end }}
-        {{- with .Values.caCert.secretName }}
-        - name: ca-cert
-          secret:
-            secretName: {{ . }}
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
