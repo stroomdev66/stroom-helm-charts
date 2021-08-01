@@ -19,7 +19,7 @@ data:
 
     SELECT 'Dumping list of databases' AS '';
     SELECT '---------------------------------------' AS '';
-    SHOW DATABASES;
+    SHOW databases;
 
     SELECT 'Dumping list of users' AS '';
     SELECT '---------------------------------------' AS '';

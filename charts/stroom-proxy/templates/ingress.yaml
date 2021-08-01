@@ -9,7 +9,7 @@ metadata:
   annotations:
     {{- toYaml . | nindent 4 }}
     nginx.ingress.kubernetes.io/proxy-body-size: {{ $.Values.maxClientBodySize }}
-    nginx.ingress.kubernetes.io/rewrite-target: /stroom/datafeed
+    nginx.ingress.kubernetes.io/rewrite-target: /stroom/noauth/datafeed
   {{- end }}
 spec:
   {{- if .Values.ingress.tls }}

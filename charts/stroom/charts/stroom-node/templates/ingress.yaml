@@ -21,14 +21,7 @@ spec:
     - host: {{ .Values.global.advertisedHost }}
       http:
         paths:
-          - path: /api
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ include "stroom-node.fullname" . }}
-                port:
-                  name: app
-          - path: /stroom
+          - path: /
             pathType: Prefix
             backend:
               service:
@@ -36,7 +29,7 @@ spec:
                 port:
                   name: app
 ---
-# Rewrite requests to `/stroom/datafeeddirect` to `/stroom/datafeed`
+# Rewrite requests to `/stroom/datafeeddirect` to `/stroom/noauth/datafeed`
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -46,7 +39,7 @@ metadata:
   {{- with .Values.global.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
-    nginx.ingress.kubernetes.io/rewrite-target: /stroom/datafeed$1$2
+    nginx.ingress.kubernetes.io/rewrite-target: /stroom/noauth/datafeed$1$2
   {{- end }}
 spec:
   tls:
@@ -59,35 +52,6 @@ spec:
         paths:
           - path: /stroom/datafeeddirect(/|$)(.*)
             pathType: Prefix
-            backend:
-              service:
-                name: {{ include "stroom-node.fullname" . }}
-                port:
-                  name: app
----
-# Redirect requests to either `/` or `/stroom` to `/stroom/ui`
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: {{ include "stroom-node.fullname" . }}-stroom-ui
-  labels:
-    {{- include "stroom-node.labels" . | nindent 4 }}
-  {{- with .Values.global.ingress.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-    nginx.ingress.kubernetes.io/app-root: /stroom
-  {{- end }}
-spec:
-  tls:
-    - hosts:
-        - {{ .Values.global.advertisedHost }}
-      secretName: {{ required "Ingress TLS secret name is required" .Values.global.ingress.tls.secretName }}
-  rules:
-    - host: {{ .Values.global.advertisedHost }}
-      http:
-        paths:
-          - path: /
-            pathType: Exact
             backend:
               service:
                 name: {{ include "stroom-node.fullname" . }}
@@ -118,7 +82,7 @@ spec:
     - host: {{ .Values.global.advertisedHost }}
       http:
         paths:
-          - path: /stroom/clustercall.rpc
+          - path: /clustercall.rpc
             pathType: Exact
             backend:
               service:

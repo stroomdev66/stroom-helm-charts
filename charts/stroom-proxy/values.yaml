@@ -20,7 +20,7 @@ stroom:
   port: 8080
   apiKey:
     # Requires:
-    # - stroom_api_key - API key issued by Stroom, to enable feed status lookups
+    # - stroom_api_key - API key issued by Stroom, to enable feed status lookups. Secret key is `stroom_api_key`
     secretRef:
       secretName: "" # stroom-proxy-api-key
 
@@ -45,7 +45,7 @@ repository:
   maxConcurrentMappedFiles: 100000
 
   # Stream size (uncompressed) to break at when building an aggregate
-  maxStreamSize: 1G
+  maxUncompressedSizeBytes: 1G
 
   # Maximum number of files to include in a single aggregate, before rolling over
   maxFilesPerAggregate: 10000
@@ -124,13 +124,13 @@ resources:
     memory: 2Gi
     storage: 2Gi
 
-startupProbe:
-  initialDelaySeconds: 5
+readinessProbe:
+  initialDelaySeconds: 10
   periodSeconds: 5
   timeoutSeconds: 5
   failureThreshold: 10
 livenessProbe:
-  initialDelaySeconds: 60
+  initialDelaySeconds: 30
   periodSeconds: 10
   timeoutSeconds: 5
   failureThreshold: 3
