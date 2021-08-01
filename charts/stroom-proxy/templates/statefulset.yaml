@@ -45,7 +45,7 @@ spec:
                   key: password
                   name: {{ .Values.trustStore.secretKeyRef.secretName }}
             - name: FORWARD_URL
-              value: http://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/stroom/datafeed
+              value: http://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/stroom/noauth/datafeed
             - name: FORWARDING_THREAD_COUNT
               value: {{ .Values.forwarding.threadCount | quote }}
             - name: JAVA_OPTS
@@ -59,7 +59,7 @@ spec:
             - name: REPO_MAX_CONCURRENT_MAPPED_FILES
               value: {{ .Values.repository.maxConcurrentMappedFiles | quote }}
             - name: REPO_MAX_STREAM_SIZE
-              value: {{ .Values.repository.maxStreamSize }}
+              value: {{ .Values.repository.maxUncompressedSizeBytes }}
             - name: REPO_MAX_AGGREGATION
               value: {{ .Values.repository.maxFilesPerAggregate | quote }}
             - name: STROOM_PROXY_ADMIN_PORT
@@ -158,8 +158,8 @@ spec:
               containerPort: {{ $number }}
               protocol: TCP
             {{- end }}
-          startupProbe:
-            {{- with .Values.startupProbe }}
+          readinessProbe:
+            {{- with .Values.readinessProbe }}
             initialDelaySeconds: {{ .initialDelaySeconds }}
             periodSeconds: {{ .periodSeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
