@@ -2,16 +2,26 @@
 
 replicaCount: 1
 
-advertisedHost: "stroom-proxy.internal"
-stroomBaseUri: "stroom.internal"
+advertisedHost: "proxy.stroom.example.com"
+stroomBaseUri: "stroom.example.com"
 
 forwarding:
   enabled: true
 
 clientKeyStore:
-  secretKeyRef:
+  type: JKS
+  secretRef:
     secretName: stroom-proxy-keystore
+    key: keystore.jks
+  passwordSecretRef:
+    secretName: stroom-proxy-keystore-password
+    key: password
 
 trustStore:
-  secretKeyRef:
+  type: JKS
+  secretRef:
     secretName: stroom-proxy-truststore
+    key: truststore.jks
+  passwordSecretRef:
+    secretName: stroom-proxy-truststore-password
+    key: password

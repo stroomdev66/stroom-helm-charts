@@ -1,3 +1,5 @@
+{{- $keystorePath := print "/stroom-proxy/pki/" .Values.clientKeyStore.secretRef.key }}
+{{- $truststorePath := print "/stroom-proxy/pki/" .Values.trustStore.secretRef.key }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -27,29 +29,33 @@ spec:
             - name: FORWARDING_ENABLED
               value: {{ .Values.forwarding.enabled | quote }}
             - name: FORWARDING_KEYSTORE_TYPE
-              value: {{ .Values.clientKeyStore.type }}
+              value: {{ .Values.clientKeyStore.type | quote }}
             - name: FORWARDING_KEYSTORE_PATH
-              value: {{ .Values.clientKeyStore.path }}
+              value: {{ $keystorePath | quote }}
             - name: FORWARDING_KEYSTORE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  key: password
-                  name: {{ .Values.clientKeyStore.secretKeyRef.secretName }}
+                  {{- with .Values.clientKeyStore.passwordSecretRef }}
+                  key: {{ .key }}
+                  name: {{ .secretName }}
+                  {{- end }}
             - name: FORWARDING_TRUSTSTORE_TYPE
-              value: {{ .Values.trustStore.type }}
+              value: {{ .Values.trustStore.type | quote }}
             - name: FORWARDING_TRUSTSTORE_PATH
-              value: {{ .Values.trustStore.path }}
+              value: {{ $truststorePath }}
             - name: FORWARDING_TRUSTSTORE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  key: password
-                  name: {{ .Values.trustStore.secretKeyRef.secretName }}
+                  {{- with .Values.trustStore.passwordSecretRef }}
+                  key: {{ .key }}
+                  name: {{ .secretName }}
+                  {{- end }}
             - name: FORWARD_URL
-              value: http://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/stroom/noauth/datafeed
+              value: {{ .Values.forwarding.scheme }}://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/stroom/noauth/datafeed
             - name: FORWARDING_THREAD_COUNT
               value: {{ .Values.forwarding.threadCount | quote }}
             - name: JAVA_OPTS
-              value: {{ .Values.javaOpts }}
+              value: {{ .Values.javaOpts | quote }}
             - name: STORING_ENABLED
               value: {{ .Values.storing.enabled | quote }}
             - name: REPO_READ_CRON
@@ -59,7 +65,7 @@ spec:
             - name: REPO_MAX_CONCURRENT_MAPPED_FILES
               value: {{ .Values.repository.maxConcurrentMappedFiles | quote }}
             - name: REPO_MAX_STREAM_SIZE
-              value: {{ .Values.repository.maxUncompressedSizeBytes }}
+              value: {{ .Values.repository.maxUncompressedSizeBytes | quote }}
             - name: REPO_MAX_AGGREGATION
               value: {{ .Values.repository.maxFilesPerAggregate | quote }}
             - name: STROOM_PROXY_ADMIN_PORT
@@ -69,38 +75,44 @@ spec:
             - name: STROOM_PROXY_DEBUG_PORT
               value: {{ .Values.ports.debug | quote }}
             - name: FEED_STATUS_URL
-              value: http://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/api/feedStatus/v1
+              value: {{ .Values.stroom.apiScheme }}://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/api/feedStatus/v1
             - name: FEED_STATUS_API_KEY
               valueFrom:
                 secretKeyRef:
-                  key: stroom_api_key
-                  name: {{ .Values.stroom.apiKey.secretRef.secretName }}
+                  {{- with .Values.stroom.apiKey.secretRef }}
+                  key: {{ .key }}
+                  name: {{ .secretName }}
+                  {{- end }}
             - name: STROOM_PROXY_CLIENT_KEYSTORE_TYPE
-              value: {{ .Values.clientKeyStore.type }}
+              value: {{ .Values.clientKeyStore.type | quote }}
             - name: STROOM_PROXY_CLIENT_KEYSTORE_PATH
               {{- if .Values.forwarding.enabled }}
-              value: {{ .Values.clientKeyStore.path }}
+              value: {{ $keystorePath }}
               {{- else }}
               value: ""
               {{- end }}
             - name: STROOM_PROXY_CLIENT_KEYSTORE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  key: password
-                  name: {{ .Values.clientKeyStore.secretKeyRef.secretName }}
+                  {{- with .Values.clientKeyStore.passwordSecretRef }}
+                  key: {{ .key }}
+                  name: {{ .secretName }}
+                  {{- end }}
             - name: STROOM_PROXY_CLIENT_TRUSTSTORE_TYPE
-              value: {{ .Values.trustStore.type }}
+              value: {{ .Values.trustStore.type | quote }}
             - name: STROOM_PROXY_CLIENT_TRUSTSTORE_PATH
               {{- if .Values.forwarding.enabled }}
-              value: {{ .Values.trustStore.path }}
+              value: {{ $truststorePath }}
               {{- else }}
               value: ""
               {{- end }}
             - name: STROOM_PROXY_CLIENT_TRUSTSTORE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  key: password
-                  name: {{ .Values.trustStore.secretKeyRef.secretName }}
+                  {{- with .Values.trustStore.passwordSecretRef }}
+                  key: {{ .key }}
+                  name: {{ .secretName }}
+                  {{- end }}
             - name: JERSEY_TIMEOUT
               value: {{ .Values.webServer.timeout | quote }}
             - name: JERSEY_CONN_TIMEOUT
@@ -121,14 +133,14 @@ spec:
               value: {{ .Values.webServer.trustSelfSignedCertificates | quote }}
           volumeMounts:
             {{- if .Values.forwarding.enabled }}
-            - mountPath: /stroom-proxy/certs/{{ base .Values.clientKeyStore.path }}
-              subPath: {{ base .Values.clientKeyStore.path }}
+            - mountPath: {{ $keystorePath }}
+              subPath: {{ .Values.clientKeyStore.secretRef.key }}
               name: client-keystore
               readOnly: true
             {{- end }}
             {{- if .Values.forwarding.enabled }}
-            - mountPath: /stroom-proxy/certs/{{ base .Values.trustStore.path }}
-              subPath: {{ base .Values.trustStore.path }}
+            - mountPath: {{ $truststorePath }}
+              subPath: {{ .Values.trustStore.secretRef.key }}
               name: trust-store
               readOnly: true
             {{- end }}
@@ -186,12 +198,12 @@ spec:
               cpu: {{ .Values.resources.limits.cpu }}
               memory: {{ .Values.resources.limits.memory }}
       volumes:
-        {{- with .Values.clientKeyStore.secretKeyRef.secretName }}
+        {{- with .Values.clientKeyStore.secretRef.secretName }}
         - name: client-keystore
           secret:
             secretName: {{ . }}
         {{- end }}
-        {{- with .Values.trustStore.secretKeyRef.secretName }}
+        {{- with .Values.trustStore.secretRef.secretName }}
         - name: trust-store
           secret:
             secretName: {{ . }}

@@ -18,11 +18,13 @@ advertisedHost: stroom-proxy.example.com
 stroom:
   host: stroom-node.stroom.svc
   port: 8080
+  apiScheme: http # http, https
   apiKey:
     # Requires:
     # - stroom_api_key - API key issued by Stroom, to enable feed status lookups. Secret key is `stroom_api_key`
     secretRef:
-      secretName: "" # stroom-proxy-api-key
+      secretName: ""
+      key: ""
 
 storing:
   enabled: true
@@ -30,6 +32,8 @@ storing:
 forwarding:
   # Whether to forward to another proxy. If disabled, `clientKeyStore` and `trustStore` options are ignored.
   enabled: true
+
+  scheme: http # http, https
 
   # Number of threads to forward with
   threadCount: 4
@@ -52,20 +56,22 @@ repository:
 
 # Used for client connections to Stroom or a downstream proxy
 clientKeyStore:
-  type: PKCS12 # PKCS12, JKS, ...
-  path: /stroom-proxy/certs/client.pfx
-
-  # Requires two items:
-  # - `client.pfx` - Encoded keystore (must match filename of `path`)
-  # - `password` - Keystore password
-  secretKeyRef:
-    secretName: "" # stroom-proxy-keystore
+  type: "" # PKCS12, JKS, ...
+  secretRef:
+    secretName: ""
+    key: "keystore.jks" # keystore.jks
+  passwordSecretRef:
+    secretName: ""
+    key: "password"
 
 trustStore:
-  type: JKS
-  path: /stroom-proxy/certs/ca.jks
-  secretKeyRef:
-    secretName: "" # stroom-proxy-truststore
+  type: "" # PKCS12, JKS
+  secretRef:
+    secretName: ""
+    key: "" # truststore.jks
+  passwordSecretRef:
+    secretName: "truststore.jks"
+    key: "password"
 
 # Maximum size of a HTTP POST to the ingress. Ensure this is large enough to cater for posted event files
 maxClientBodySize: 10g
@@ -92,14 +98,14 @@ volumeClaims:
     volumeName: ""
     storageClassName: ""
     selector:
-      matchLabels: { }
-      matchExpressions: { }
-    dataSource: { }
+      matchLabels: {}
+      matchExpressions: {}
+    dataSource: {}
     accessModes:
       - ReadWriteOnce
-    volumeMode: { }
+    volumeMode: {}
 
-sharedProxyRepoVolume: { }
+sharedProxyRepoVolume: {}
   # nfs:
   #   server: file-server.example.com
   #   path: /data
