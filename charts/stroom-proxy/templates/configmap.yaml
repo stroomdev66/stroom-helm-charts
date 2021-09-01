@@ -11,10 +11,10 @@ data:
       adminContextPath: /proxyAdmin
       applicationConnectors:
         - type: http
-          port: ${STROOM_PROXY_APP_PORT:-8090}
+          port: {{ .Values.ports.app }}
       adminConnectors:
         - type: http
-          port: ${STROOM_PROXY_ADMIN_PORT:-8091}
+          port: {{ .Values.ports.admin }}
       requestLog:
         appenders:
           - type: file
@@ -29,7 +29,7 @@ data:
             logFormat: '%h %l "%u" [%t] "%r" %s %b "%i{Referer}" "%i{User-Agent}" %D'
 
     logging:
-      level: ${STROOM_PROXY_LOGGING_LEVEL:- WARN}
+      level: {{ .Values.loggingLevel }}
       loggers:
         stroom: INFO
         io.dropwizard: INFO
@@ -84,64 +84,66 @@ data:
           logFormat: "%-6level [%d{\"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\",UTC}] [%t] %logger - %X{code} %msg %n"
 
     proxyConfig:
-      useDefaultOpenIdCredentials: false
+      aggregator:
+        {{- with .Values.repository.aggregation }}
+        enabled: {{ .enabled }}
+        aggregationFrequency: {{ .frequency | quote }}
+        maxAggregateAge: {{ .maxAge | quote }}
+        maxItemsPerAggregate: {{ .maxItems }}
+        maxUncompressedByteSize: {{ .maxUncompressedSizeBytes | quote }}
+        {{- end }}
 
       feedStatus:
-        url: "${FEED_STATUS_URL:-http://stroom:8080/api/feedStatus/v1}"
+        url: "{{ .Values.stroom.apiScheme }}://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/api/feedStatus/v1"
         apiKey: "${FEED_STATUS_API_KEY:-}"
 
-      forwardStreamConfig:
+      forwarder:
         forwardingEnabled: ${FORWARDING_ENABLED:-true}
+        retryFrequency: {{ .Values.forwarding.retryFrequency | quote }}
         forwardDestinations:
-          # If you want multiple forward destinations then you will need to edit this file directly
-          # instead of using env var substitution
-          - forwardUrl: "${FORWARD_URL:-https://nginx/stroom/datafeed}"
+          - forwardUrl: "{{ .Values.forwarding.scheme }}://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/stroom/noauth/datafeed"
             sslConfig:
               keyStorePath: "${FORWARDING_KEYSTORE_PATH:-/stroom-proxy/certs/client.jks}"
               keyStorePassword: "${FORWARDING_KEYSTORE_PASSWORD:-password}"
-              keyStoreType: "${FORWARDING_KEYSTORE_TYPE:-JKS}"
+              keyStoreType: {{ .Values.clientKeyStore.type | quote }}
               trustStorePath: "${FORWARDING_TRUSTSTORE_PATH:-/stroom-proxy/certs/ca.jks}"
               trustStorePassword: "${FORWARDING_TRUSTSTORE_PASSWORD:-password}"
-              trustStoreType: "${FORWARDING_TRUSTSTORE_TYPE:-JKS}"
-              hostnameVerificationEnabled: ${FORWARDING_HOST_VERIFICATION_ENABLED:-true}
+              trustStoreType: {{ .Values.trustStore.type | quote }}
+              hostnameVerificationEnabled: {{ .Values.restClient.verifyHostname }}
 
       path:
         home: "/stroom-proxy/"
         temp: "/tmp/stroom-proxy"
 
-      proxyRepositoryConfig:
-        storingEnabled: ${STORING_ENABLED:-true}
-        repoDir: "${REPO_DIR:-/stroom-proxy/repo}"
-        repoDir: "${REPO_DIR:-/stroom-proxy/repo}"
-        format: "${executionUuid}/${year}-${month}-${day}/${feed}/${pathId}/${id}"
-        # cleanupFrequency: 1h
-        # lockDeleteAge: 1h
-        # dirCleanDelay: 10s
+      logStream:
+        metaKeys: "guid,feed,system,environment,remotehost,remoteaddress,remotedn,remotecertexpiry"
 
-      proxyRepositoryReaderConfig:
-        readCron: "${REPO_READ_CRON:-* * *}"
-        forwardThreadCount: ${FORWARDING_THREAD_COUNT:-4}
-        maxFileScan: ${REPO_MAX_FILE_SCAN:-100000}
-        maxConcurrentMappedFiles: ${REPO_MAX_CONCURRENT_MAPPED_FILES:-100000}
-        maxStreamSize: "${REPO_MAX_STREAM_SIZE:-1G}"
-        maxAggregation: "${REPO_MAX_AGGREGATION:-1000}"
+      repository:
+        {{- with .Values.repository }}
+        cleanupFrequency: {{ .cleanupFrequency | quote }}
+        dbDir: {{ .dbDir }}
+        dirCleanDelay: {{ .dirCleanDelay | quote }}
+        format: {{ .format | quote }}
+        lockDeleteAge: {{ .lockDeleteAge | quote }}
+        repoDir: {{ .repoDir }}
+        storingEnabled: {{ .storingEnabled }}
+        {{- end }}
 
       # restClient is used for making feed status REST calls
       restClient:
-        timeout: "${JERSEY_TIMEOUT:-10s}"
-        connectionTimeout: "${JERSEY_CONN_TIMEOUT:-10s}"
-        timeToLive: "${JERSEY_TIME_TO_LIVE:-1h}"
-        cookiesEnabled: false
-        maxConnections: "${JERSEY_MAX_CONNECTIONS:-1024}"
-        maxConnectionsPerRoute: "${JERSEY_MAX_CONNECTIONS_PER_ROUTE:-1024}"
-        keepAlive: "${JERSEY_KEEP_ALIVE:-0ms}"
-        retries: "${JERSEY_RETRIES:-0}"
+        {{- with .Values.restClient }}
+        chunkedEncodingEnabled: true
+        connectionTimeout: {{ .connectionTimeout | quote }}
+        maxThreads: {{ $.Values.forwarding.maxThreads }}
+        {{- end }}
         tls:
-          verifyHostname: ${JERSEY_VERIFY_HOSTNAME:-true}
+          verifyHostname: {{ .Values.restClient.verifyHostname }}
           keyStorePath: "${STROOM_PROXY_CLIENT_KEYSTORE_PATH:-/stroom-proxy/certs/client.jks}"
           keyStorePassword: "${STROOM_PROXY_CLIENT_KEYSTORE_PASSWORD:-password}"
-          keyStoreType: "${STROOM_PROXY_CLIENT_KEYSTORE_TYPE:-JKS}"
+          keyStoreType: {{ .Values.clientKeyStore.type | quote }}
           trustStorePath: "${STROOM_PROXY_CLIENT_TRUSTSTORE_PATH:-/stroom-proxy/certs/ca.jks}"
           trustStorePassword: "${STROOM_PROXY_CLIENT_TRUSTSTORE_PASSWORD:-password}"
-          trustStoreType: "${STROOM_PROXY_CLIENT_TRUSTSTORE_TYPE:-JKS}"
-          trustSelfSignedCertificates: ${JERSEY_TRUST_SELF_SIGNED:-false}
+          trustStoreType: {{ .Values.trustStore.type | quote }}
+          trustSelfSignedCertificates: {{ .Values.restClient.trustSelfSignedCertificates }}
+
+      useDefaultOpenIdCredentials: false

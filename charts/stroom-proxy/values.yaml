@@ -15,6 +15,8 @@ fullnameOverride: ""
 
 advertisedHost: stroom-proxy.example.com
 
+loggingLevel: INFO
+
 stroom:
   host: stroom-node.stroom.svc
   port: 8080
@@ -35,24 +37,30 @@ forwarding:
 
   scheme: http # http, https
 
+  retryFrequency: PT1M
+
   # Number of threads to forward with
-  threadCount: 4
+  maxThreads: 4
 
 repository:
-  # How often to scan the repository
-  readCron: "* * *"
+  cleanupFrequency: PT1H
+  dbDir: repo
+  dirCleanDelay: PT10S
+  format: ${executionUuid}/${year}-${month}-${day}/${feed}/${pathId}/${id}
+  lockDeleteAge: PT1H
+  repoDir: repo
+  storingEnabled: true
 
-  # Max number of files to scan over during forwarding. Once this limit is reached it will wait until next read interval
-  maxFileScan: 100000
+  aggregation:
+    enabled: true
+    frequency: PT1M
+    maxAge: PT10M
 
-  # The maximum number of concurrent mapped files we can hold before we send the largest set for aggregation
-  maxConcurrentMappedFiles: 100000
+    # Maximum number of files to include in a single aggregate, before rolling over
+    maxItems: 10000
 
-  # Stream size (uncompressed) to break at when building an aggregate
-  maxUncompressedSizeBytes: 1G
-
-  # Maximum number of files to include in a single aggregate, before rolling over
-  maxFilesPerAggregate: 10000
+    # Stream size (uncompressed) to break at when building an aggregate
+    maxUncompressedSizeBytes: 1.0G
 
 # Used for client connections to Stroom or a downstream proxy
 clientKeyStore:
@@ -73,17 +81,11 @@ trustStore:
     secretName: "truststore.jks"
     key: "password"
 
-# Maximum size of a HTTP POST to the ingress. Ensure this is large enough to cater for posted event files
+# Maximum size of an HTTP POST to the ingress. Ensure this is large enough to cater for posted event files
 maxClientBodySize: 10g
 
-webServer:
-  timeout: 10s
-  connectionTimeout: 10s
-  timeToLive: 1h
-  maxConnections: 1024
-  maxConnectionsPerRoute: 1024
-  keepAlive: 0ms
-  retries: 0
+restClient:
+  connectionTimeout: PT3S
   verifyHostname: true
   trustSelfSignedCertificates: false
 

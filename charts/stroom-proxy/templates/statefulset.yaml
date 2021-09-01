@@ -26,10 +26,6 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           env:
-            - name: FORWARDING_ENABLED
-              value: {{ .Values.forwarding.enabled | quote }}
-            - name: FORWARDING_KEYSTORE_TYPE
-              value: {{ .Values.clientKeyStore.type | quote }}
             - name: FORWARDING_KEYSTORE_PATH
               value: {{ $keystorePath | quote }}
             - name: FORWARDING_KEYSTORE_PASSWORD
@@ -39,8 +35,6 @@ spec:
                   key: {{ .key }}
                   name: {{ .secretName }}
                   {{- end }}
-            - name: FORWARDING_TRUSTSTORE_TYPE
-              value: {{ .Values.trustStore.type | quote }}
             - name: FORWARDING_TRUSTSTORE_PATH
               value: {{ $truststorePath }}
             - name: FORWARDING_TRUSTSTORE_PASSWORD
@@ -50,32 +44,8 @@ spec:
                   key: {{ .key }}
                   name: {{ .secretName }}
                   {{- end }}
-            - name: FORWARD_URL
-              value: {{ .Values.forwarding.scheme }}://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/stroom/noauth/datafeed
-            - name: FORWARDING_THREAD_COUNT
-              value: {{ .Values.forwarding.threadCount | quote }}
             - name: JAVA_OPTS
               value: {{ .Values.javaOpts | quote }}
-            - name: STORING_ENABLED
-              value: {{ .Values.storing.enabled | quote }}
-            - name: REPO_READ_CRON
-              value: {{ .Values.repository.readCron | quote }}
-            - name: REPO_MAX_FILE_SCAN
-              value: {{ .Values.repository.maxFileScan | quote }}
-            - name: REPO_MAX_CONCURRENT_MAPPED_FILES
-              value: {{ .Values.repository.maxConcurrentMappedFiles | quote }}
-            - name: REPO_MAX_STREAM_SIZE
-              value: {{ .Values.repository.maxUncompressedSizeBytes | quote }}
-            - name: REPO_MAX_AGGREGATION
-              value: {{ .Values.repository.maxFilesPerAggregate | quote }}
-            - name: STROOM_PROXY_ADMIN_PORT
-              value: {{ .Values.ports.admin | quote }}
-            - name: STROOM_PROXY_APP_PORT
-              value: {{ .Values.ports.app | quote }}
-            - name: STROOM_PROXY_DEBUG_PORT
-              value: {{ .Values.ports.debug | quote }}
-            - name: FEED_STATUS_URL
-              value: {{ .Values.stroom.apiScheme }}://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/api/feedStatus/v1
             - name: FEED_STATUS_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -83,8 +53,6 @@ spec:
                   key: {{ .key }}
                   name: {{ .secretName }}
                   {{- end }}
-            - name: STROOM_PROXY_CLIENT_KEYSTORE_TYPE
-              value: {{ .Values.clientKeyStore.type | quote }}
             - name: STROOM_PROXY_CLIENT_KEYSTORE_PATH
               {{- if .Values.forwarding.enabled }}
               value: {{ $keystorePath }}
@@ -98,8 +66,6 @@ spec:
                   key: {{ .key }}
                   name: {{ .secretName }}
                   {{- end }}
-            - name: STROOM_PROXY_CLIENT_TRUSTSTORE_TYPE
-              value: {{ .Values.trustStore.type | quote }}
             - name: STROOM_PROXY_CLIENT_TRUSTSTORE_PATH
               {{- if .Values.forwarding.enabled }}
               value: {{ $truststorePath }}
@@ -113,24 +79,6 @@ spec:
                   key: {{ .key }}
                   name: {{ .secretName }}
                   {{- end }}
-            - name: JERSEY_TIMEOUT
-              value: {{ .Values.webServer.timeout | quote }}
-            - name: JERSEY_CONN_TIMEOUT
-              value: {{ .Values.webServer.connectionTimeout | quote }}
-            - name: JERSEY_TIME_TO_LIVE
-              value: {{ .Values.webServer.timeToLive | quote }}
-            - name: JERSEY_MAX_CONNECTIONS
-              value: {{ .Values.webServer.maxConnections | quote }}
-            - name: JERSEY_MAX_CONNECTIONS_PER_ROUTE
-              value: {{ .Values.webServer.maxConnectionsPerRoute | quote }}
-            - name: JERSEY_KEEP_ALIVE
-              value: {{ .Values.webServer.keepAlive | quote }}
-            - name: JERSEY_RETRIES
-              value: {{ .Values.webServer.retries | quote }}
-            - name: JERSEY_VERIFY_HOSTNAME
-              value: {{ .Values.webServer.verifyHostname | quote }}
-            - name: JERSEY_TRUST_SELF_SIGNED
-              value: {{ .Values.webServer.trustSelfSignedCertificates | quote }}
           volumeMounts:
             {{- if .Values.forwarding.enabled }}
             - mountPath: {{ $keystorePath }}
