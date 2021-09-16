@@ -129,6 +129,12 @@ data:
         storingEnabled: {{ .storingEnabled }}
         {{- end }}
 
+      {{- with .Values.repository.scanning }}
+      scanner:
+        scanningEnabled: {{ .enabled }}
+        scanFrequency: {{ .frequency | quote }}
+      {{- end }}
+
       # restClient is used for making feed status REST calls
       restClient:
         {{- with .Values.restClient }}

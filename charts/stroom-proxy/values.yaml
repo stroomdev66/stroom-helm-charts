@@ -50,6 +50,9 @@ repository:
   lockDeleteAge: PT1H
   repoDir: repo
   storingEnabled: true
+  scanning:
+    enabled: true
+    frequency: PT1M
 
   aggregation:
     enabled: true
