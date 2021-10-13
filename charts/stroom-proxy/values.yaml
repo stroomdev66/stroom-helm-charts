@@ -42,9 +42,11 @@ forwarding:
   # Number of threads to forward with
   maxThreads: 4
 
+db:
+  dbDir: db
+
 repository:
   cleanupFrequency: PT1H
-  dbDir: repo
   dirCleanDelay: PT10S
   format: ${executionUuid}/${year}-${month}-${day}/${feed}/${pathId}/${id}
   lockDeleteAge: PT1H

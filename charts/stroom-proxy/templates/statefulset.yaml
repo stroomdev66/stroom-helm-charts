@@ -98,6 +98,9 @@ spec:
             - mountPath: /stroom-proxy/content
               subPath: content
               name: local-data
+            - mountPath: /stroom-proxy/db
+              subPath: db
+              name: local-data
             - mountPath: /stroom-proxy/logs
               subPath: logs
               name: local-data
