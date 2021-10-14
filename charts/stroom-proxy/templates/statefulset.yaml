@@ -26,6 +26,7 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           env:
+            {{- if .Values.forwarding.enabled }}
             - name: FORWARDING_KEYSTORE_PATH
               value: {{ $keystorePath | quote }}
             - name: FORWARDING_KEYSTORE_PASSWORD
@@ -44,6 +45,7 @@ spec:
                   key: {{ .key }}
                   name: {{ .secretName }}
                   {{- end }}
+            {{- end }}
             - name: JAVA_OPTS
               value: {{ .Values.javaOpts | quote }}
             - name: FEED_STATUS_API_KEY
@@ -54,11 +56,7 @@ spec:
                   name: {{ .secretName }}
                   {{- end }}
             - name: STROOM_PROXY_CLIENT_KEYSTORE_PATH
-              {{- if .Values.forwarding.enabled }}
               value: {{ $keystorePath }}
-              {{- else }}
-              value: ""
-              {{- end }}
             - name: STROOM_PROXY_CLIENT_KEYSTORE_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -67,11 +65,7 @@ spec:
                   name: {{ .secretName }}
                   {{- end }}
             - name: STROOM_PROXY_CLIENT_TRUSTSTORE_PATH
-              {{- if .Values.forwarding.enabled }}
               value: {{ $truststorePath }}
-              {{- else }}
-              value: ""
-              {{- end }}
             - name: STROOM_PROXY_CLIENT_TRUSTSTORE_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -80,18 +74,14 @@ spec:
                   name: {{ .secretName }}
                   {{- end }}
           volumeMounts:
-            {{- if .Values.forwarding.enabled }}
             - mountPath: {{ $keystorePath }}
               subPath: {{ .Values.clientKeyStore.secretRef.key }}
               name: client-keystore
               readOnly: true
-            {{- end }}
-            {{- if .Values.forwarding.enabled }}
             - mountPath: {{ $truststorePath }}
               subPath: {{ .Values.trustStore.secretRef.key }}
               name: trust-store
               readOnly: true
-            {{- end }}
             - mountPath: /stroom-proxy/config
               name: config
               readOnly: true
