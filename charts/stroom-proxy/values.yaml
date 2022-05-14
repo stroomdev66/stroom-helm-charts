@@ -46,15 +46,8 @@ db:
   dbDir: db
 
 repository:
-  cleanupFrequency: PT1H
-  dirCleanDelay: PT10S
-  format: ${executionUuid}/${year}-${month}-${day}/${feed}/${pathId}/${id}
-  lockDeleteAge: PT1H
   repoDir: repo
   storingEnabled: true
-  scanning:
-    enabled: true
-    frequency: PT1M
 
   aggregation:
     enabled: true

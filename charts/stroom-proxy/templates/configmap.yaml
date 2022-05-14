@@ -97,21 +97,21 @@ data:
         url: "{{ .Values.stroom.apiScheme }}://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/api/feedStatus/v1"
         apiKey: "${FEED_STATUS_API_KEY:-}"
 
-      forwarder:
-        forwardingEnabled: {{ .Values.forwarding.enabled }}
-        retryFrequency: {{ .Values.forwarding.retryFrequency | quote }}
-        {{- if .Values.forwarding.enabled }}
-        forwardDestinations:
-          - forwardUrl: "{{ .Values.forwarding.scheme }}://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/stroom/noauth/datafeed"
-            sslConfig:
-              keyStorePath: "${FORWARDING_KEYSTORE_PATH:-/stroom-proxy/certs/client.jks}"
-              keyStorePassword: "${FORWARDING_KEYSTORE_PASSWORD:-password}"
-              keyStoreType: {{ .Values.clientKeyStore.type | quote }}
-              trustStorePath: "${FORWARDING_TRUSTSTORE_PATH:-/stroom-proxy/certs/ca.jks}"
-              trustStorePassword: "${FORWARDING_TRUSTSTORE_PASSWORD:-password}"
-              trustStoreType: {{ .Values.trustStore.type | quote }}
-              hostnameVerificationEnabled: {{ .Values.restClient.verifyHostname }}
-        {{- end }}
+      {{- if .Values.forwarding.enabled }}
+      forwardDestinations:
+        - type: post
+          name: stroom
+          forwardUrl: "{{ .Values.forwarding.scheme }}://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/stroom/noauth/datafeed"
+          enabled: {{ .Values.forwarding.enabled }}
+          sslConfig:
+            keyStorePath: "${FORWARDING_KEYSTORE_PATH:-/stroom-proxy/certs/client.jks}"
+            keyStorePassword: "${FORWARDING_KEYSTORE_PASSWORD:-password}"
+            keyStoreType: {{ .Values.clientKeyStore.type | quote }}
+            trustStorePath: "${FORWARDING_TRUSTSTORE_PATH:-/stroom-proxy/certs/ca.jks}"
+            trustStorePassword: "${FORWARDING_TRUSTSTORE_PASSWORD:-password}"
+            trustStoreType: {{ .Values.trustStore.type | quote }}
+            hostnameVerificationEnabled: {{ .Values.restClient.verifyHostname }}
+      {{- end }}
 
       path:
         home: "/stroom-proxy/"
@@ -125,19 +125,9 @@ data:
 
       repository:
         {{- with .Values.repository }}
-        cleanupFrequency: {{ .cleanupFrequency | quote }}
-        dirCleanDelay: {{ .dirCleanDelay | quote }}
-        format: {{ .format | quote }}
-        lockDeleteAge: {{ .lockDeleteAge | quote }}
         repoDir: {{ .repoDir }}
         storingEnabled: {{ .storingEnabled }}
         {{- end }}
-
-      {{- with .Values.repository.scanning }}
-      scanner:
-        scanningEnabled: {{ .enabled }}
-        scanFrequency: {{ .frequency | quote }}
-      {{- end }}
 
       # restClient is used for making feed status REST calls
       restClient:
