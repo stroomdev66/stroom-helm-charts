@@ -178,7 +178,7 @@ spec:
             failureThreshold: {{ .failureThreshold }}
             {{- end }}
             httpGet:
-              path: /proxyAdmin/filteredhealthcheck?deny=stroom.proxy.app.forwarder.ForwarderDestinationsImpl,stroom.proxy.app.handler.RemoteFeedStatusService
+              path: /proxyAdmin/filteredhealthcheck?deny=stroom.proxy.app.handler.RemoteFeedStatusService,stroom.proxy.app.handler.ForwardStreamHandlerFactory
               port: admin
           livenessProbe:
             {{- with .Values.livenessProbe }}
@@ -188,7 +188,7 @@ spec:
             failureThreshold: {{ .failureThreshold }}
             {{- end }}
             httpGet:
-              path: /proxyAdmin/filteredhealthcheck?deny=stroom.proxy.app.forwarder.ForwarderDestinationsImpl,stroom.proxy.app.handler.RemoteFeedStatusService
+              path: /proxyAdmin/filteredhealthcheck?deny=stroom.proxy.app.handler.RemoteFeedStatusService,stroom.proxy.app.handler.ForwardStreamHandlerFactory
               port: admin
           resources:
             requests:
