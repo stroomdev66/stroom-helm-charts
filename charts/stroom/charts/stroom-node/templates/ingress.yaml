@@ -36,11 +36,12 @@ metadata:
   name: {{ include "stroom-node.fullname" . }}-datafeeddirect
   labels:
     {{- include "stroom-node.labels" . | nindent 4 }}
-  {{- with .Values.global.ingress.annotations }}
   annotations:
+    {{- with .Values.global.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
+    {{- end }}
     nginx.ingress.kubernetes.io/rewrite-target: /stroom/noauth/datafeed$1$2
-  {{- end }}
+
 spec:
   tls:
     - hosts:
