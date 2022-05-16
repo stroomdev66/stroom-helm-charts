@@ -111,7 +111,7 @@ sharedProxyRepoVolume: {}
   #   path: /data
 
 ingress:
-  enabled: false
+  enabled: true
   className: nginx
   annotations: {} # Extra annotations to add to the Ingress resource
   tls:
