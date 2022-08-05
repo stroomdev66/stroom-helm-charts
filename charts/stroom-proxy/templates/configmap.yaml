@@ -110,7 +110,6 @@ data:
       proxyRepositoryConfig:
         storingEnabled: ${STORING_ENABLED:-true}
         repoDir: "${REPO_DIR:-/stroom-proxy/repo}"
-        repoDir: "${REPO_DIR:-/stroom-proxy/repo}"
         format: "${executionUuid}/${year}-${month}-${day}/${feed}/${pathId}/${id}"
         # cleanupFrequency: 1h
         # lockDeleteAge: 1h
