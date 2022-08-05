@@ -39,8 +39,10 @@ forwarding:
 
   retryFrequency: PT1M
 
-  # Number of threads to forward with
-  maxThreads: 4
+threads:
+  examineSource: 4
+  forwarding: 4
+  forwardRetry: 2
 
 db:
   dbDir: db

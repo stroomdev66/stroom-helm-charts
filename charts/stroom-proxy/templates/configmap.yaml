@@ -134,7 +134,6 @@ data:
         {{- with .Values.restClient }}
         chunkedEncodingEnabled: true
         connectionTimeout: {{ .connectionTimeout | quote }}
-        maxThreads: {{ $.Values.forwarding.maxThreads }}
         {{- end }}
         tls:
           verifyHostname: {{ .Values.restClient.verifyHostname }}
@@ -145,5 +144,14 @@ data:
           trustStorePassword: "${STROOM_PROXY_CLIENT_TRUSTSTORE_PASSWORD:-password}"
           trustStoreType: {{ .Values.trustStore.type | quote }}
           trustSelfSignedCertificates: {{ .Values.restClient.trustSelfSignedCertificates }}
+
+      retryFrequency: {{ .Values.forwarding.retryFrequency | quote }}
+
+      {{- with .Values.threads }}
+      threads:
+        examineSourceThreadCount: {{ .examineSource }}
+        forwardRetryThreadCount: {{ .forwardRetry }}
+        forwardThreadCount: {{ .forwardRetry }}
+      {{- end }}
 
       useDefaultOpenIdCredentials: false
