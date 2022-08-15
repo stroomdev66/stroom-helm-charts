@@ -10,6 +10,9 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
+busybox:
+  repository: busybox
+
 nameOverride: ""
 fullnameOverride: ""
 
@@ -106,11 +109,6 @@ volumeClaims:
     accessModes:
       - ReadWriteOnce
     volumeMode: {}
-
-sharedProxyRepoVolume: {}
-  # nfs:
-  #   server: file-server.example.com
-  #   path: /data
 
 ingress:
   enabled: true

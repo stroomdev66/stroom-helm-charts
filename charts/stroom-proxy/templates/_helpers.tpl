@@ -49,3 +49,18 @@ Selector labels
 app.kubernetes.io/name: {{ include "stroom-proxy.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{- define "stroom-proxy.localDataVolumeMounts" -}}
+- mountPath: /stroom-proxy/content
+  subPath: content
+  name: local-data
+- mountPath: /stroom-proxy/db
+  subPath: db
+  name: local-data
+- mountPath: /stroom-proxy/logs
+  subPath: logs
+  name: local-data
+- mountPath: /stroom-proxy/repo
+  subPath: repo
+  name: local-data
+{{- end }}
