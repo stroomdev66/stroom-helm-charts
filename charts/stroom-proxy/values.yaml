@@ -16,29 +16,34 @@ busybox:
 nameOverride: ""
 fullnameOverride: ""
 
-advertisedHost: stroom-proxy.example.com
-
-loggingLevel: INFO
+logging:
+  level: WARN
+  archive:
+    enabled: true
+    maxFileCount: 90
+  timeZone: UTC
+  baseDir: /stroom-proxy/logs
+  fileDateFormat: yyyy-MM-dd
 
 stroom:
-  host: stroom-node.stroom.svc
-  port: 8080
-  apiScheme: http # http, https
-  apiKey:
-    # Requires:
-    # - stroom_api_key - API key issued by Stroom, to enable feed status lookups. Secret key is `stroom_api_key`
-    secretRef:
-      secretName: ""
-      key: ""
-
-storing:
-  enabled: true
+  baseUri: http://stroom-node.stroom.svc:8080
+  paths:
+    datafeed: /stroom/noauth/datafeed
+    feedStatus: /api/feedStatus/v1
+  # Stroom API key to enable feed status lookups
+  apiKeySecretRef:
+    name: ""
+    key: ""
+  tls:
+    verifyHostName: true
+    trustSelfSignedCertificates: false
 
 forwarding:
   # Whether to forward to another proxy. If disabled, `clientKeyStore` and `trustStore` options are ignored.
   enabled: true
 
-  scheme: http # http, https
+  # Override the forwarding URL. By default, `{stroom.baseUri}/stroom/noauth/datafeed` is used.
+  url: ""
 
   retryFrequency: PT1M
 
@@ -66,26 +71,23 @@ repository:
     maxUncompressedSizeBytes: 1.0G
 
 # Used for client connections to Stroom or a downstream proxy
-clientKeyStore:
-  type: "" # PKCS12, JKS, ...
+keyStore:
+  type: PKCS12 # PKCS12|JKS
   secretRef:
-    secretName: ""
-    key: "keystore.jks" # keystore.jks
+    name: ""
+    key: keystore.jks
   passwordSecretRef:
-    secretName: ""
-    key: "password"
+    name: ""
+    key: ""
 
 trustStore:
-  type: "" # PKCS12, JKS
+  type: PKCS12 # PKCS12, JKS
   secretRef:
-    secretName: ""
-    key: "" # truststore.jks
+    name: ""
+    key: truststore.jks
   passwordSecretRef:
-    secretName: "truststore.jks"
-    key: "password"
-
-# Maximum size of an HTTP POST to the ingress. Ensure this is large enough to cater for posted event files
-maxClientBodySize: 10g
+    name: ""
+    key: ""
 
 restClient:
   connectionTimeout: PT3S
@@ -99,63 +101,87 @@ ports:
 
 volumeClaims:
   # Local proxy storage. Recommend using fast storage tier especially when aggregation is enabled
-  localData:
-    volumeName: ""
-    storageClassName: ""
-    selector:
-      matchLabels: {}
-      matchExpressions: {}
-    dataSource: {}
-    accessModes:
-      - ReadWriteOnce
-    volumeMode: {}
+  data: { }
+#    storageClassName: ""
+#    selector:
+#      matchLabels: { }
+#      matchExpressions: { }
+#    accessModes:
+#      - ReadWriteOnce
+#    resources:
+#      requests:
+#        storage: ""
+#      limits:
+#        storage: ""
+
+extraEnv: [ ]
+#  - name: ENV_VAR
+#    value: "123"
+
+extraVolumes: [ ]
+#  - name: data
+#    nfs:
+#      server: fs.example.com
+#      path: /stroom-proxy
+
+extraVolumeMounts: [ ]
+#  - mountPath: /stroom-proxy/data
+#    name: data
 
 ingress:
   enabled: true
   className: nginx
-  annotations: {} # Extra annotations to add to the Ingress resource
+  hostName: stroom-proxy.example.com
+  annotations: { } # Extra annotations to add to the Ingress resource
+  # Maximum size of an HTTP POST to the ingress. Ensure this is large enough to cater for posted event files
+  maxClientBodySize: 10g
   tls:
     secretName: ""
 
-javaOpts: -Xms512m -Xmx1g -Xrunjdwp:server=y,transport=dt_socket,address=10765,suspend=n
+javaOpts: -Xms512m -Xmx1g
 
 resources:
   requests:
     cpu: 1000m
     memory: 1Gi
-    storage: 1Gi
 
   limits:
     cpu: 2000m
     memory: 2Gi
-    storage: 2Gi
 
-readinessProbe:
-  initialDelaySeconds: 5
-  periodSeconds: 5
-  timeoutSeconds: 5
-  failureThreshold: 10
-livenessProbe:
-  initialDelaySeconds: 10
-  periodSeconds: 5
-  timeoutSeconds: 5
-  failureThreshold: 5
+probeTimings:
+  startup:
+    initialDelaySeconds: 5
+    timeoutSeconds: 1
+    periodSeconds: 5
+    failureThreshold: 10
+  readiness:
+    initialDelaySeconds: 5
+    timeoutSeconds: 1
+    periodSeconds: 10
+    failureThreshold: 3
+  liveness:
+    initialDelaySeconds: 30
+    timeoutSeconds: 3
+    periodSeconds: 10
+    failureThreshold: 3
 
-podAnnotations: {}
+podAnnotations: { }
 
-podSecurityContext: {}
-# fsGroup: 2000
+podSecurityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  runAsNonRoot: true
 
-securityContext: {}
+securityContext: { }
   # capabilities:
   #   drop:
   #   - ALL
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
-# runAsUser: 1000
+  # runAsUser: 1000
 
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
+nodeSelector: { }
+tolerations: [ ]
+affinity: { }
