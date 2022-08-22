@@ -9,18 +9,18 @@ metadata:
     {{- with .Values.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-    nginx.ingress.kubernetes.io/proxy-body-size: {{ $.Values.maxClientBodySize }}
-    nginx.ingress.kubernetes.io/rewrite-target: /stroom/noauth/datafeed
+    nginx.ingress.kubernetes.io/proxy-body-size: {{ .Values.ingress.maxClientBodySize | quote }}
+    nginx.ingress.kubernetes.io/rewrite-target: "/stroom/noauth/datafeed"
 spec:
   {{- if .Values.ingress.tls }}
   ingressClassName: {{ .Values.ingress.className }}
   tls:
     - hosts:
-        - {{ .Values.advertisedHost | quote }}
+        - {{ .Values.ingress.hostName | quote }}
       secretName: {{ .Values.ingress.tls.secretName }}
   {{- end }}
   rules:
-    - host: {{ .Values.advertisedHost | quote }}
+    - host: {{ .Values.ingress.hostName | quote }}
       http:
         paths:
           - path: /datafeed

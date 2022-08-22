@@ -49,3 +49,34 @@ Selector labels
 app.kubernetes.io/name: {{ include "stroom-proxy.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{- define "stroom-proxy.feedStatusUrl" -}}
+{{- printf "%s%s" .Values.stroom.baseUri .Values.stroom.paths.feedStatus }}
+{{- end }}
+
+{{- define "stroom-proxy.forwardUrl" -}}
+{{- .Values.forwarding.url | default (printf "%s%s" .Values.stroom.baseUri .Values.stroom.paths.datafeed) }}
+{{- end }}
+
+{{- define "stroom-proxy.trustStorePath" -}}
+{{- print "/stroom-proxy/pki/" .Values.trustStore.secretRef.key }}
+{{- end }}
+
+{{- define "stroom-proxy.keyStorePath" -}}
+{{- print "/stroom-proxy/pki/" .Values.keyStore.secretRef.key }}
+{{- end }}
+
+{{- define "stroom-proxy.localDataVolumeMounts" -}}
+- mountPath: /stroom-proxy/content
+  subPath: content
+  name: data
+- mountPath: /stroom-proxy/db
+  subPath: db
+  name: data
+- mountPath: /stroom-proxy/logs
+  subPath: logs
+  name: data
+- mountPath: /stroom-proxy/repo
+  subPath: repo
+  name: data
+{{- end }}

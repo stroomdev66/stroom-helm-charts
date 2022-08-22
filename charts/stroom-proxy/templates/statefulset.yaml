@@ -1,5 +1,3 @@
-{{- $keystorePath := print "/stroom-proxy/pki/" .Values.clientKeyStore.secretRef.key }}
-{{- $truststorePath := print "/stroom-proxy/pki/" .Values.trustStore.secretRef.key }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -23,143 +21,56 @@ spec:
     spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: take-ownership
+          image: {{ .Values.busybox.repository }}
+          command:
+            - sh
+            - -c
+            - |
+              chown 1000:1000 /stroom-proxy/*
+          volumeMounts:
+            {{- include "stroom-proxy.localDataVolumeMounts" . | nindent 12 }}
+          securityContext:
+            runAsUser: 0
+            runAsNonRoot: false
       containers:
         - name: {{ .Chart.Name }}
           env:
-            - name: FORWARDING_ENABLED
-              value: {{ .Values.forwarding.enabled | quote }}
-            - name: FORWARDING_KEYSTORE_TYPE
-              value: {{ .Values.clientKeyStore.type | quote }}
-            - name: FORWARDING_KEYSTORE_PATH
-              value: {{ $keystorePath | quote }}
-            - name: FORWARDING_KEYSTORE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  {{- with .Values.clientKeyStore.passwordSecretRef }}
-                  key: {{ .key }}
-                  name: {{ .secretName }}
-                  {{- end }}
-            - name: FORWARDING_TRUSTSTORE_TYPE
-              value: {{ .Values.trustStore.type | quote }}
-            - name: FORWARDING_TRUSTSTORE_PATH
-              value: {{ $truststorePath }}
-            - name: FORWARDING_TRUSTSTORE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  {{- with .Values.trustStore.passwordSecretRef }}
-                  key: {{ .key }}
-                  name: {{ .secretName }}
-                  {{- end }}
-            - name: FORWARD_URL
-              value: {{ .Values.forwarding.scheme }}://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/stroom/noauth/datafeed
-            - name: FORWARDING_THREAD_COUNT
-              value: {{ .Values.forwarding.threadCount | quote }}
             - name: JAVA_OPTS
               value: {{ .Values.javaOpts | quote }}
-            - name: STORING_ENABLED
-              value: {{ .Values.storing.enabled | quote }}
-            - name: REPO_READ_CRON
-              value: {{ .Values.repository.readCron | quote }}
-            - name: REPO_MAX_FILE_SCAN
-              value: {{ .Values.repository.maxFileScan | quote }}
-            - name: REPO_MAX_CONCURRENT_MAPPED_FILES
-              value: {{ .Values.repository.maxConcurrentMappedFiles | quote }}
-            - name: REPO_MAX_STREAM_SIZE
-              value: {{ .Values.repository.maxUncompressedSizeBytes | quote }}
-            - name: REPO_MAX_AGGREGATION
-              value: {{ .Values.repository.maxFilesPerAggregate | quote }}
-            - name: STROOM_PROXY_ADMIN_PORT
-              value: {{ .Values.ports.admin | quote }}
-            - name: STROOM_PROXY_APP_PORT
-              value: {{ .Values.ports.app | quote }}
-            - name: STROOM_PROXY_DEBUG_PORT
-              value: {{ .Values.ports.debug | quote }}
-            - name: FEED_STATUS_URL
-              value: {{ .Values.stroom.apiScheme }}://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/api/feedStatus/v1
+            - name: KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  {{- toYaml .Values.keyStore.passwordSecretRef | nindent 18 }}
+            - name: TRUSTSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  {{- toYaml .Values.trustStore.passwordSecretRef | nindent 18 }}
             - name: FEED_STATUS_API_KEY
               valueFrom:
                 secretKeyRef:
-                  {{- with .Values.stroom.apiKey.secretRef }}
-                  key: {{ .key }}
-                  name: {{ .secretName }}
-                  {{- end }}
-            - name: STROOM_PROXY_CLIENT_KEYSTORE_TYPE
-              value: {{ .Values.clientKeyStore.type | quote }}
-            - name: STROOM_PROXY_CLIENT_KEYSTORE_PATH
-              {{- if .Values.forwarding.enabled }}
-              value: {{ $keystorePath }}
-              {{- else }}
-              value: ""
-              {{- end }}
-            - name: STROOM_PROXY_CLIENT_KEYSTORE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  {{- with .Values.clientKeyStore.passwordSecretRef }}
-                  key: {{ .key }}
-                  name: {{ .secretName }}
-                  {{- end }}
-            - name: STROOM_PROXY_CLIENT_TRUSTSTORE_TYPE
-              value: {{ .Values.trustStore.type | quote }}
-            - name: STROOM_PROXY_CLIENT_TRUSTSTORE_PATH
-              {{- if .Values.forwarding.enabled }}
-              value: {{ $truststorePath }}
-              {{- else }}
-              value: ""
-              {{- end }}
-            - name: STROOM_PROXY_CLIENT_TRUSTSTORE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  {{- with .Values.trustStore.passwordSecretRef }}
-                  key: {{ .key }}
-                  name: {{ .secretName }}
-                  {{- end }}
-            - name: JERSEY_TIMEOUT
-              value: {{ .Values.webServer.timeout | quote }}
-            - name: JERSEY_CONN_TIMEOUT
-              value: {{ .Values.webServer.connectionTimeout | quote }}
-            - name: JERSEY_TIME_TO_LIVE
-              value: {{ .Values.webServer.timeToLive | quote }}
-            - name: JERSEY_MAX_CONNECTIONS
-              value: {{ .Values.webServer.maxConnections | quote }}
-            - name: JERSEY_MAX_CONNECTIONS_PER_ROUTE
-              value: {{ .Values.webServer.maxConnectionsPerRoute | quote }}
-            - name: JERSEY_KEEP_ALIVE
-              value: {{ .Values.webServer.keepAlive | quote }}
-            - name: JERSEY_RETRIES
-              value: {{ .Values.webServer.retries | quote }}
-            - name: JERSEY_VERIFY_HOSTNAME
-              value: {{ .Values.webServer.verifyHostname | quote }}
-            - name: JERSEY_TRUST_SELF_SIGNED
-              value: {{ .Values.webServer.trustSelfSignedCertificates | quote }}
+                  {{- toYaml .Values.stroom.apiKeySecretRef | nindent 18 }}
+            {{- with .Values.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           volumeMounts:
             {{- if .Values.forwarding.enabled }}
-            - mountPath: {{ $keystorePath }}
-              subPath: {{ .Values.clientKeyStore.secretRef.key }}
-              name: client-keystore
+            - mountPath: {{ include "stroom-proxy.keyStorePath" . }}
+              subPath: {{ .Values.keyStore.secretRef.key }}
+              name: keystore
               readOnly: true
             {{- end }}
             {{- if .Values.forwarding.enabled }}
-            - mountPath: {{ $truststorePath }}
+            - mountPath: {{ include "stroom-proxy.trustStorePath" . }}
               subPath: {{ .Values.trustStore.secretRef.key }}
-              name: trust-store
+              name: truststore
               readOnly: true
             {{- end }}
             - mountPath: /stroom-proxy/config
               name: config
               readOnly: true
-            - mountPath: /stroom-proxy/content
-              subPath: content
-              name: local-data
-            - mountPath: /stroom-proxy/logs
-              subPath: logs
-              name: local-data
-            - mountPath: /stroom-proxy/repo
-              {{- if .Values.sharedProxyRepoVolume }}
-              name: shared-repo
-              {{- else }}
-              subPath: repo
-              name: local-data
-              {{- end }}
+            {{- include "stroom-proxy.localDataVolumeMounts" . | nindent 12 }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -170,26 +81,21 @@ spec:
               containerPort: {{ $number }}
               protocol: TCP
             {{- end }}
+          startupProbe:
+            httpGet:
+              path: /proxyAdmin/filteredhealthcheck?deny=stroom.proxy.app.handler.RemoteFeedStatusService
+              port: admin
+            {{- toYaml .Values.probeTimings.startup | nindent 12 }}
           readinessProbe:
-            {{- with .Values.readinessProbe }}
-            initialDelaySeconds: {{ .initialDelaySeconds }}
-            periodSeconds: {{ .periodSeconds }}
-            timeoutSeconds: {{ .timeoutSeconds }}
-            failureThreshold: {{ .failureThreshold }}
-            {{- end }}
             httpGet:
-              path: /proxyAdmin/filteredhealthcheck?deny=stroom.proxy.app.handler.RemoteFeedStatusService,stroom.proxy.app.handler.ForwardStreamHandlerFactory
+              path: /proxyAdmin/filteredhealthcheck?deny=stroom.proxy.app.handler.RemoteFeedStatusService
               port: admin
+            {{- toYaml .Values.probeTimings.readiness | nindent 12 }}
           livenessProbe:
-            {{- with .Values.livenessProbe }}
-            initialDelaySeconds: {{ .initialDelaySeconds }}
-            periodSeconds: {{ .periodSeconds }}
-            timeoutSeconds: {{ .timeoutSeconds }}
-            failureThreshold: {{ .failureThreshold }}
-            {{- end }}
             httpGet:
-              path: /proxyAdmin/filteredhealthcheck?deny=stroom.proxy.app.handler.RemoteFeedStatusService,stroom.proxy.app.handler.ForwardStreamHandlerFactory
+              path: /proxyAdmin/filteredhealthcheck?deny=stroom.proxy.app.handler.RemoteFeedStatusService
               port: admin
+            {{- toYaml .Values.probeTimings.liveness | nindent 12 }}
           resources:
             requests:
               cpu: {{ .Values.resources.requests.cpu }}
@@ -198,22 +104,17 @@ spec:
               cpu: {{ .Values.resources.limits.cpu }}
               memory: {{ .Values.resources.limits.memory }}
       volumes:
-        {{- with .Values.clientKeyStore.secretRef.secretName }}
-        - name: client-keystore
+        - name: keystore
           secret:
-            secretName: {{ . }}
-        {{- end }}
-        {{- with .Values.trustStore.secretRef.secretName }}
-        - name: trust-store
+            secretName: {{ .Values.keyStore.secretRef.name }}
+        - name: truststore
           secret:
-            secretName: {{ . }}
-        {{- end }}
+            secretName: {{ .Values.trustStore.secretRef.name }}
         - name: config
           configMap:
             name: {{ include "stroom-proxy.fullname" . }}
-        {{- with .Values.sharedProxyRepoVolume }}
-        - name: shared-repo
-          {{- toYaml . | nindent 10 }}
+        {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -227,39 +128,14 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+  {{- with .Values.volumeClaims }}
   volumeClaimTemplates:
-    {{- with .Values.volumeClaims.localData }}
+    {{- range $name, $volumeClaim := . }}
     - metadata:
-        name: local-data
+        name: {{ $name }}
         labels:
           {{- include "stroom-proxy.labels" $ | nindent 10 }}
       spec:
-        volumeName: {{ .volumeName | quote }}
-        storageClassName: {{ .storageClassName | quote }}
-        selector:
-          {{- with .selector.matchLabels }}
-          matchLabels:
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
-          {{- with .selector.matchExpressions }}
-          matchExpressions:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-        {{- with .dataSource }}
-        dataSource:
-          {{- toYaml . | nindent 10 }}
-        {{- end }}
-        {{- with .accessModes }}
-        accessModes:
-          {{- toYaml . | nindent 10 }}
-        {{- end }}
-        {{- with .volumeMode }}
-        volumeMode:
-          {{- toYaml . | nindent 10 }}
-        {{- end }}
-        resources:
-          requests:
-            storage: {{ $.Values.resources.requests.storage }}
-          limits:
-            storage: {{ $.Values.resources.limits.storage }}
+        {{- toYaml $volumeClaim | nindent 8 }}
     {{- end }}
+  {{- end }}
