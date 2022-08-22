@@ -13,22 +13,27 @@ image:
 nameOverride: ""
 fullnameOverride: ""
 
-advertisedHost: stroom-proxy.example.com
+logging:
+  level: WARN
+  archive:
+    enabled: true
+    maxFileCount: 90
+  timeZone: UTC
+  baseDir: /stroom-proxy/logs
+  fileDateFormat: yyyy-MM-dd
 
 stroom:
   baseUri: http://stroom-node.stroom.svc:8080
   paths:
     datafeed: /stroom/noauth/datafeed
     feedStatus: /api/feedStatus/v1
-  apiKey:
-    # Requires:
-    # - stroom_api_key - API key issued by Stroom, to enable feed status lookups. Secret key is `stroom_api_key`
-    secretRef:
-      secretName: ""
-      key: ""
-
-storing:
-  enabled: true
+  # Stroom API key to enable feed status lookups
+  apiKeySecretRef:
+    name: ""
+    key: ""
+  tls:
+    verifyHostName: true
+    trustSelfSignedCertificates: false
 
 forwarding:
   # Whether to forward to another proxy. If disabled, `clientKeyStore` and `trustStore` options are ignored.
@@ -40,43 +45,51 @@ forwarding:
   # Number of threads to forward with
   threadCount: 4
 
+  # Perform X.509 host verification
+  hostVerificationEnabled: true
+
 repository:
-  # How often to scan the repository
-  readCron: "* * *"
+  # Folder structure
+  format: "${pathId}/${id}"
 
-  # Max number of files to scan over during forwarding. Once this limit is reached it will wait until next read interval
-  maxFileScan: 100000
+  storing:
+    enabled: true
 
-  # The maximum number of concurrent mapped files we can hold before we send the largest set for aggregation
-  maxConcurrentMappedFiles: 100000
+  reader:
+    # How often to scan the repository
+    cronSchedule: "* * *"
 
-  # Stream size (uncompressed) to break at when building an aggregate
-  maxUncompressedSizeBytes: 1G
+    # Max number of files to scan over during forwarding. Once this limit is reached it will wait until next read interval
+    maxFileScan: 100000
 
-  # Maximum number of files to include in a single aggregate, before rolling over
-  maxFilesPerAggregate: 10000
+    # The maximum number of concurrent mapped files we can hold before we send the largest set for aggregation
+    maxConcurrentMappedFiles: 100000
+
+  aggregation:
+    # Stream size (uncompressed) to break at when building an aggregate
+    maxStreamSize: 1G
+
+    # Maximum number of files to include in a single aggregate, before rolling over
+    maxFilesPerAggregate: 10000
 
 # Used for client connections to Stroom or a downstream proxy
-clientKeyStore:
-  type: "" # PKCS12, JKS, ...
+keyStore:
+  type: PKCS12 # PKCS12|JKS
   secretRef:
-    secretName: ""
-    key: "keystore.jks" # keystore.jks
+    name: ""
+    key: keystore.jks
   passwordSecretRef:
-    secretName: ""
-    key: "password"
+    name: ""
+    key: ""
 
 trustStore:
-  type: "" # PKCS12, JKS
+  type: PKCS12 # PKCS12, JKS
   secretRef:
-    secretName: ""
-    key: "" # truststore.jks
+    name: ""
+    key: truststore.jks
   passwordSecretRef:
-    secretName: "truststore.jks"
-    key: "password"
-
-# Maximum size of a HTTP POST to the ingress. Ensure this is large enough to cater for posted event files
-maxClientBodySize: 10g
+    name: ""
+    key: ""
 
 webServer:
   timeout: 10s
@@ -96,41 +109,53 @@ ports:
 
 volumeClaims:
   # Local proxy storage. Recommend using fast storage tier especially when aggregation is enabled
-  localData:
-    volumeName: ""
-    storageClassName: ""
-    selector:
-      matchLabels: {}
-      matchExpressions: {}
-    dataSource: {}
-    accessModes:
-      - ReadWriteOnce
-    volumeMode: {}
+  data: { }
+#    storageClassName: ""
+#    selector:
+#      matchLabels: { }
+#      matchExpressions: { }
+#    accessModes:
+#      - ReadWriteOnce
+#    resources:
+#      requests:
+#        storage: ""
+#      limits:
+#        storage: ""
 
-sharedProxyRepoVolume: {}
-  # nfs:
-  #   server: file-server.example.com
-  #   path: /data
+extraEnv: [ ]
+#  - name: ENV_VAR
+#    value: "123"
+
+extraVolumes: [ ]
+#  - name: data
+#    nfs:
+#      server: fs.example.com
+#      path: /stroom-proxy
+
+extraVolumeMounts: [ ]
+#  - mountPath: /stroom-proxy/data
+#    name: data
 
 ingress:
   enabled: true
   className: nginx
-  annotations: {} # Extra annotations to add to the Ingress resource
+  hostName: stroom-proxy.example.com
+  annotations: { } # Extra annotations to add to the Ingress resource
+  # Maximum size of an HTTP POST to the ingress. Ensure this is large enough to cater for posted event files
+  maxClientBodySize: 10g
   tls:
     secretName: ""
 
-javaOpts: -Xms512m -Xmx1g -Xrunjdwp:server=y,transport=dt_socket,address=10765,suspend=n
+javaOpts: -Xms512m -Xmx1g
 
 resources:
   requests:
     cpu: 1000m
     memory: 1Gi
-    storage: 1Gi
 
   limits:
     cpu: 2000m
     memory: 2Gi
-    storage: 2Gi
 
 probeTimings:
   startup:
@@ -149,21 +174,22 @@ probeTimings:
     periodSeconds: 10
     failureThreshold: 3
 
-podAnnotations: {}
+podAnnotations: { }
 
-podSecurityContext: {}
-# fsGroup: 2000
+podSecurityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  runAsNonRoot: true
 
-securityContext: {}
+securityContext: { }
   # capabilities:
   #   drop:
   #   - ALL
   # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
+# runAsNonRoot: true
 # runAsUser: 1000
 
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
+nodeSelector: { }
+tolerations: [ ]
+affinity: { }

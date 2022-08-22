@@ -11,25 +11,28 @@ data:
       adminContextPath: /proxyAdmin
       applicationConnectors:
         - type: http
-          port: ${STROOM_PROXY_APP_PORT:-8090}
+          port: {{ .Values.ports.app }}
       adminConnectors:
         - type: http
-          port: ${STROOM_PROXY_ADMIN_PORT:-8091}
+          port: {{ .Values.ports.admin }}
       requestLog:
+        {{- with .Values.logging }}
         appenders:
           - type: file
-            currentLogFilename: /stroom-proxy/logs/access/access.log
+            currentLogFilename: {{ printf "%s/access/access.log" .baseDir }}
             threshold: ALL
             queueSize: 256
             discardingThreshold: 0
-            archive: true
-            archivedLogFilenamePattern: /stroom-proxy/logs/access/access-%d{yyyy-MM-dd'T'HH:mm}.log.gz
-            archivedFileCount: 100
-            timeZone: UTC
+            archive: {{ .archive.enabled }}
+            archivedLogFilenamePattern: {{ printf "%s/access/access-%%d{%s}.log.gz" .baseDir .fileDateFormat }}
+            archivedFileCount: {{ .archive.maxFileCount }}
+            timeZone: {{ .timeZone }}
             logFormat: '%h %l "%u" [%t] "%r" %s %b "%i{Referer}" "%i{User-Agent}" %D'
+        {{- end }}
 
     logging:
-      level: ${STROOM_PROXY_LOGGING_LEVEL:- WARN}
+      {{- with .Values.logging }}
+      level: {{ .level }}
       loggers:
         stroom: INFO
         io.dropwizard: INFO
@@ -40,105 +43,105 @@ data:
           additive: false
           appenders:
             - type: file
-              currentLogFilename: /stroom-proxy/logs/receive/receive.log
+              currentLogFilename: {{ printf "%s/receive/receive.log" .baseDir }}
               threshold: ALL
               queueSize: 256
               discardingThreshold: 0
-              archive: true
-              archivedLogFilenamePattern: /stroom-proxy/logs/receive/receive-%d{yyyy-MM-dd'T'HH:mm}.log.gz
-              archivedFileCount: 100
-              timeZone: UTC
+              archive: {{ .archive.enabled }}
+              archivedLogFilenamePattern: {{ printf "%s/receive/receive-%%d{%s}.log.gz" .baseDir .fileDateFormat }}
+              archivedFileCount: {{ .archive.maxFileCount }}
+              timeZone: {{ .timeZone }}
               logFormat: "%-6level [%d{yyyy-MM-dd'T'HH:mm:ss.SSS'Z'}] [%t] %logger - %X{code} %msg %n"
         "send":
           level: INFO
           additive: false
           appenders:
             - type: file
-              currentLogFilename: /stroom-proxy/logs/send/send.log
+              currentLogFilename: {{ printf "%s/send/send.log" .baseDir }}
               threshold: ALL
               queueSize: 256
               discardingThreshold: 0
-              archive: true
-              archivedLogFilenamePattern: /stroom-proxy/logs/send/send-%d{yyyy-MM-dd'T'HH:mm}.log.gz
-              archivedFileCount: 100
-              timeZone: UTC
+              archive: {{ .archive.enabled }}
+              archivedLogFilenamePattern: {{ printf "%s/send/send-%%d{%s}.log.gz" .baseDir .fileDateFormat }}
+              archivedFileCount: {{ .archive.maxFileCount }}
+              timeZone: {{ .timeZone }}
               logFormat: "%-6level [%d{yyyy-MM-dd'T'HH:mm:ss.SSS'Z'}] [%t] %logger - %X{code} %msg %n"
+      {{- end }}
 
       appenders:
-        # stdout for docker
-        # Comment out for non-dockered environments
+        {{- with .Values.logging }}
         - type: console
           logFormat: "%highlight(%-6level) [%d{\"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\",UTC}] [%green(%t)] %cyan(%logger) - %X{code} %msg %n"
-          timeZone: UTC
-          # Minute rolled files for stroom/datafeed, will be curl'd/deleted by stroom-log-sender
+          timeZone: {{ .timeZone }}
         - type: file
-          currentLogFilename: /stroom-proxy/logs/app/app.log
+          currentLogFilename: {{ printf "%s/app/app.log" .baseDir }}
           threshold: ALL
           queueSize: 256
           discardingThreshold: 0
-          archive: true
-          archivedLogFilenamePattern: /stroom-proxy/logs/app/app-%d{yyyy-MM-dd'T'HH:mm}.log.gz
-          # One week using minute files
-          archivedFileCount: 10080
-          timeZone: UTC
+          archive: {{ .archive.enabled }}
+          archivedLogFilenamePattern: {{ printf "%s/app/app-%%d{%s}.log.gz" .baseDir .fileDateFormat }}
+          archivedFileCount: {{ .archive.maxFileCount }}
+          timeZone: {{ .timeZone }}
           logFormat: "%-6level [%d{\"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\",UTC}] [%t] %logger - %X{code} %msg %n"
+        {{- end }}
 
     proxyConfig:
       feedStatus:
-        url: "${FEED_STATUS_URL:-http://stroom:8080/api/feedStatus/v1}"
-        apiKey: "${FEED_STATUS_API_KEY:-}"
+        url: {{ include "stroom-proxy.feedStatusUrl" . | quote }}
+        apiKey: "${FEED_STATUS_API_KEY}"
 
       forwardStreamConfig:
-        forwardingEnabled: ${FORWARDING_ENABLED:-true}
+        forwardingEnabled: {{ .Values.forwarding.enabled }}
         forwardDestinations:
-          # If you want multiple forward destinations then you will need to edit this file directly
-          # instead of using env var substitution
-          - forwardUrl: "${FORWARD_URL:-https://nginx/stroom/datafeed}"
+          - forwardUrl: {{ include "stroom-proxy.forwardUrl" . }}
             sslConfig:
-              keyStorePath: "${FORWARDING_KEYSTORE_PATH:-/stroom-proxy/certs/client.jks}"
-              keyStorePassword: "${FORWARDING_KEYSTORE_PASSWORD:-password}"
-              keyStoreType: "${FORWARDING_KEYSTORE_TYPE:-JKS}"
-              trustStorePath: "${FORWARDING_TRUSTSTORE_PATH:-/stroom-proxy/certs/ca.jks}"
-              trustStorePassword: "${FORWARDING_TRUSTSTORE_PASSWORD:-password}"
-              trustStoreType: "${FORWARDING_TRUSTSTORE_TYPE:-JKS}"
-              hostnameVerificationEnabled: ${FORWARDING_HOST_VERIFICATION_ENABLED:-true}
+              keyStorePath: {{ include "stroom-proxy.keyStorePath" . }}
+              keyStorePassword: "${KEYSTORE_PASSWORD}"
+              keyStoreType: {{ .Values.keyStore.type }}
+              trustStorePath: {{ include "stroom-proxy.trustStorePath" . }}
+              trustStorePassword: "${TRUSTSTORE_PASSWORD}"
+              trustStoreType: {{ .Values.trustStore.type }}
+              hostnameVerificationEnabled: {{ .Values.forwarding.hostVerificationEnabled }}
 
       path:
         home: "/stroom-proxy/"
         temp: "/tmp/stroom-proxy"
 
       proxyRepositoryConfig:
-        storingEnabled: ${STORING_ENABLED:-true}
-        repoDir: "${REPO_DIR:-/stroom-proxy/repo}"
-        format: "${executionUuid}/${year}-${month}-${day}/${feed}/${pathId}/${id}"
-        # cleanupFrequency: 1h
-        # lockDeleteAge: 1h
-        # dirCleanDelay: 10s
+        {{- with .Values.repository }}
+        storingEnabled: {{ .storing.enabled }}
+        repoDir: "/stroom-proxy/repo"
+        format: {{ .format }}
+        {{- end }}
 
       proxyRepositoryReaderConfig:
-        readCron: "${REPO_READ_CRON:-* * *}"
-        forwardThreadCount: ${FORWARDING_THREAD_COUNT:-4}
-        maxFileScan: ${REPO_MAX_FILE_SCAN:-100000}
-        maxConcurrentMappedFiles: ${REPO_MAX_CONCURRENT_MAPPED_FILES:-100000}
-        maxStreamSize: "${REPO_MAX_STREAM_SIZE:-1G}"
-        maxAggregation: "${REPO_MAX_AGGREGATION:-1000}"
+        {{- with .Values.repository }}
+        readCron: {{ .reader.cronSchedule | quote }}
+        maxFileScan: {{ .reader.maxFileScan }}
+        maxConcurrentMappedFiles: {{ .reader.maxConcurrentMappedFiles }}
+        maxStreamSize: {{ .aggregation.maxStreamSize | quote }}
+        maxAggregation: {{ .aggregation.maxFilesPerAggregate }}
+        {{- end }}
+        forwardThreadCount: {{ .Values.forwarding.threadCount }}
 
       # restClient is used for making feed status REST calls
       restClient:
-        timeout: "${JERSEY_TIMEOUT:-10s}"
-        connectionTimeout: "${JERSEY_CONN_TIMEOUT:-10s}"
-        timeToLive: "${JERSEY_TIME_TO_LIVE:-1h}"
+        {{- with .Values.webServer }}
+        timeout: {{ .timeout | quote }}
+        connectionTimeout: {{ .connectionTimeout | quote }}
+        timeToLive: {{ .timeToLive | quote }}
         cookiesEnabled: false
-        maxConnections: "${JERSEY_MAX_CONNECTIONS:-1024}"
-        maxConnectionsPerRoute: "${JERSEY_MAX_CONNECTIONS_PER_ROUTE:-1024}"
-        keepAlive: "${JERSEY_KEEP_ALIVE:-0ms}"
-        retries: "${JERSEY_RETRIES:-0}"
+        maxConnections: {{ .maxConnections }}
+        maxConnectionsPerRoute: {{ .maxConnectionsPerRoute }}
+        keepAlive: {{ .keepAlive | quote }}
+        retries: {{ .retries }}
+        {{- end }}
         tls:
-          verifyHostname: ${JERSEY_VERIFY_HOSTNAME:-true}
-          keyStorePath: "${STROOM_PROXY_CLIENT_KEYSTORE_PATH:-/stroom-proxy/certs/client.jks}"
-          keyStorePassword: "${STROOM_PROXY_CLIENT_KEYSTORE_PASSWORD:-password}"
-          keyStoreType: "${STROOM_PROXY_CLIENT_KEYSTORE_TYPE:-JKS}"
-          trustStorePath: "${STROOM_PROXY_CLIENT_TRUSTSTORE_PATH:-/stroom-proxy/certs/ca.jks}"
-          trustStorePassword: "${STROOM_PROXY_CLIENT_TRUSTSTORE_PASSWORD:-password}"
-          trustStoreType: "${STROOM_PROXY_CLIENT_TRUSTSTORE_TYPE:-JKS}"
-          trustSelfSignedCertificates: ${JERSEY_TRUST_SELF_SIGNED:-false}
+          keyStorePath: {{ include "stroom-proxy.keyStorePath" . }}
+          keyStorePassword: "${KEYSTORE_PASSWORD}"
+          keyStoreType: {{ .Values.keyStore.type }}
+          trustStorePath: {{ include "stroom-proxy.trustStorePath" . }}
+          trustStorePassword: "${TRUSTSTORE_PASSWORD}"
+          trustStoreType: {{ .Values.trustStore.type }}
+          verifyHostname: {{ .Values.stroom.tls.verifyHostName }}
+          trustSelfSignedCertificates: {{ .Values.stroom.tls.trustSelfSignedCertificates }}
