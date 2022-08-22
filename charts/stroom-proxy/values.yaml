@@ -16,9 +16,10 @@ fullnameOverride: ""
 advertisedHost: stroom-proxy.example.com
 
 stroom:
-  host: stroom-node.stroom.svc
-  port: 8080
-  apiScheme: http # http, https
+  baseUri: http://stroom-node.stroom.svc:8080
+  paths:
+    datafeed: /stroom/noauth/datafeed
+    feedStatus: /api/feedStatus/v1
   apiKey:
     # Requires:
     # - stroom_api_key - API key issued by Stroom, to enable feed status lookups. Secret key is `stroom_api_key`
@@ -33,7 +34,8 @@ forwarding:
   # Whether to forward to another proxy. If disabled, `clientKeyStore` and `trustStore` options are ignored.
   enabled: true
 
-  scheme: http # http, https
+  # Override the forwarding URL. By default, `{stroom.baseUri}/stroom/noauth/datafeed` is used.
+  url: ""
 
   # Number of threads to forward with
   threadCount: 4

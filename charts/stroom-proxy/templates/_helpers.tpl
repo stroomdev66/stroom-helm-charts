@@ -49,3 +49,10 @@ Selector labels
 app.kubernetes.io/name: {{ include "stroom-proxy.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Forwarding URL
+*/}}
+{{- define "stroom-proxy.forwardUrl" -}}
+{{- .Values.forwarding.url | default (printf "%s%s" .Values.stroom.baseUri .Values.stroom.paths.datafeed) }}
+{{- end }}

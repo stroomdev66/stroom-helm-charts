@@ -51,7 +51,7 @@ spec:
                   name: {{ .secretName }}
                   {{- end }}
             - name: FORWARD_URL
-              value: {{ .Values.forwarding.scheme }}://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/stroom/noauth/datafeed
+              value: {{ include "stroom-proxy.forwardUrl" . }}
             - name: FORWARDING_THREAD_COUNT
               value: {{ .Values.forwarding.threadCount | quote }}
             - name: JAVA_OPTS
@@ -75,7 +75,7 @@ spec:
             - name: STROOM_PROXY_DEBUG_PORT
               value: {{ .Values.ports.debug | quote }}
             - name: FEED_STATUS_URL
-              value: {{ .Values.stroom.apiScheme }}://{{ .Values.stroom.host }}:{{ .Values.stroom.port }}/api/feedStatus/v1
+              value: {{ printf "%s%s" .Values.stroom.baseUri .Values.stroom.paths.feedStatus }}
             - name: FEED_STATUS_API_KEY
               valueFrom:
                 secretKeyRef:
