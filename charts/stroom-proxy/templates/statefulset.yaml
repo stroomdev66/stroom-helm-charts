@@ -170,26 +170,21 @@ spec:
               containerPort: {{ $number }}
               protocol: TCP
             {{- end }}
+          startupProbe:
+            httpGet:
+              path: /proxyAdmin/filteredhealthcheck?deny=stroom.proxy.app.handler.RemoteFeedStatusService,stroom.proxy.app.handler.ForwardStreamHandlerFactory
+              port: admin
+            {{- toYaml .Values.probeTimings.startup | nindent 12 }}
           readinessProbe:
-            {{- with .Values.readinessProbe }}
-            initialDelaySeconds: {{ .initialDelaySeconds }}
-            periodSeconds: {{ .periodSeconds }}
-            timeoutSeconds: {{ .timeoutSeconds }}
-            failureThreshold: {{ .failureThreshold }}
-            {{- end }}
             httpGet:
               path: /proxyAdmin/filteredhealthcheck?deny=stroom.proxy.app.handler.RemoteFeedStatusService,stroom.proxy.app.handler.ForwardStreamHandlerFactory
               port: admin
+            {{- toYaml .Values.probeTimings.readiness | nindent 12 }}
           livenessProbe:
-            {{- with .Values.livenessProbe }}
-            initialDelaySeconds: {{ .initialDelaySeconds }}
-            periodSeconds: {{ .periodSeconds }}
-            timeoutSeconds: {{ .timeoutSeconds }}
-            failureThreshold: {{ .failureThreshold }}
-            {{- end }}
             httpGet:
               path: /proxyAdmin/filteredhealthcheck?deny=stroom.proxy.app.handler.RemoteFeedStatusService,stroom.proxy.app.handler.ForwardStreamHandlerFactory
               port: admin
+            {{- toYaml .Values.probeTimings.liveness | nindent 12 }}
           resources:
             requests:
               cpu: {{ .Values.resources.requests.cpu }}

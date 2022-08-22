@@ -130,16 +130,22 @@ resources:
     memory: 2Gi
     storage: 2Gi
 
-readinessProbe:
-  initialDelaySeconds: 5
-  periodSeconds: 5
-  timeoutSeconds: 5
-  failureThreshold: 10
-livenessProbe:
-  initialDelaySeconds: 10
-  periodSeconds: 5
-  timeoutSeconds: 5
-  failureThreshold: 5
+probeTimings:
+  startup:
+    initialDelaySeconds: 5
+    timeoutSeconds: 1
+    periodSeconds: 5
+    failureThreshold: 10
+  readiness:
+    initialDelaySeconds: 5
+    timeoutSeconds: 1
+    periodSeconds: 10
+    failureThreshold: 3
+  liveness:
+    initialDelaySeconds: 30
+    timeoutSeconds: 3
+    periodSeconds: 10
+    failureThreshold: 3
 
 podAnnotations: {}
 
