@@ -112,7 +112,7 @@ data:
             trustStorePath: {{ include "stroom-proxy.trustStorePath" . }}
             trustStorePassword: "${TRUSTSTORE_PASSWORD}"
             trustStoreType: {{ .Values.trustStore.type }}
-            hostnameVerificationEnabled: {{ .Values.forwarding.hostVerificationEnabled }}
+            hostnameVerificationEnabled: {{ .Values.forwarding.tls.verifyHostName }}
       {{- end }}
 
       path:
@@ -123,13 +123,12 @@ data:
         metaKeys: "guid,feed,system,environment,remotehost,remoteaddress,remotedn,remotecertexpiry"
 
       db:
-        dbDir: {{ .Values.db.dbDir }}
+        dbDir: db
 
       repository:
         {{- with .Values.repository }}
-        repoDir: "/stroom-proxy/repo"
+        repoDir: repo
         storingEnabled: {{ .storing.enabled }}
-        format: {{ .format }}
         {{- end }}
 
       # restClient is used for making feed status REST calls

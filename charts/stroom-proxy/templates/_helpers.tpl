@@ -65,3 +65,18 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "stroom-proxy.keyStorePath" -}}
 {{- print "/stroom-proxy/pki/" .Values.keyStore.secretRef.key }}
 {{- end }}
+
+{{- define "stroom-proxy.localDataVolumeMounts" -}}
+- mountPath: /stroom-proxy/content
+  subPath: content
+  name: data
+- mountPath: /stroom-proxy/db
+  subPath: db
+  name: data
+- mountPath: /stroom-proxy/logs
+  subPath: logs
+  name: data
+- mountPath: /stroom-proxy/repo
+  subPath: repo
+  name: data
+{{- end }}
