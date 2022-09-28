@@ -1,0 +1,36 @@
+ingress:
+  #enabled: true
+  hostName: a21ccf6caa1834b769b05b7f7be591c8-790026f529a4503d.elb.eu-west-2.amazonaws.com
+  #annotations: { } # Extra annotations to add to the Ingress resource
+
+  # Maximum size of an HTTP POST to the ingress. Ensure this is large enough to cater for posted event files
+  #maxClientBodySize: 10g
+
+  tls:
+    secretName: "tls-secret"
+
+replicaCount: 1
+
+advertisedHost: "a21ccf6caa1834b769b05b7f7be591c8-790026f529a4503d.elb.eu-west-2.amazonaws.com"
+stroomBaseUri: "stroom.example.com"
+
+forwarding:
+  enabled: true
+
+keyStore:
+  type: JKS
+  secretRef:
+    name: stroom-proxy-keystore
+    key: keystore.jks
+  passwordSecretRef:
+    name: stroom-proxy-keystore-password
+    key: password
+
+trustStore:
+  type: JKS
+  secretRef:
+    name: stroom-proxy-truststore
+    key: truststore.jks
+  passwordSecretRef:
+    name: stroom-proxy-truststore-password
+    key: password

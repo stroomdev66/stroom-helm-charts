@@ -50,10 +50,10 @@ spec:
             - name: FEED_STATUS_API_KEY
               valueFrom:
                 secretKeyRef:
-                  {{- toYaml .Values.stroom.apiKeySecretRef | nindent 18 }}
+                  {{- toYaml .Values.stroom.apiKeySecretRef | nindent 18 }}                  
             {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}
-            {{- end }}
+            {{- end }}          
           volumeMounts:
             {{- if .Values.forwarding.enabled }}
             - mountPath: {{ include "stroom-proxy.keyStorePath" . }}

@@ -34,8 +34,8 @@ stroom:
 
   # Stroom API key to enable feed status lookups
   apiKeySecretRef:
-    name: ""
-    key: ""
+    name: "stroom-api-key"
+    key: "token"
 
   tls:
     verifyHostName: true
@@ -105,7 +105,14 @@ ports:
 
 volumeClaims:
   # Local proxy storage. Recommend using fast storage tier especially when aggregation is enabled
-  data: { }
+  data:
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: ebs
+    #    storageClassName: gp2    
+    resources:
+      requests:
+        storage: 5Gi    
 #    storageClassName: ""
 #    selector:
 #      matchLabels: { }
@@ -134,7 +141,6 @@ extraVolumeMounts: [ ]
 
 ingress:
   enabled: true
-  className: nginx
   hostName: "" # stroom-proxy.example.com
   annotations: { } # Extra annotations to add to the Ingress resource
 

@@ -9,11 +9,36 @@ metadata:
     {{- with .Values.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
+    {{- if .Values.alb}}
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/security-groups: sg-09a48cae53ff077e7, sg-0a8a4dd00eb3fbb99
+    alb.ingress.kubernetes.io/manage-backend-security-group-rules: "true"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-west-2:219804503686:certificate/e0b7eb6d-8586-4e27-b8c4-abf6e23847cf
+    #external-dns.alpha.kubernetes.io/hostname: hello-kubernetes-alb.r53domain.com
+    
+    # Enable sticky sessions (requires alb.ingress.kubernetes.io/target-type be set to ip)
+    alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60
+    alb.ingress.kubernetes.io/target-type: ip
+
+    # Set load balancing algorithm to least outstanding requests
+    alb.ingress.kubernetes.io/target-group-attributes: load_balancing.algorithm.type=least_outstanding_requests
+
+    {{- else }}
+    kubernetes.io/ingress.class: "nginx"
+    
+    {{- if .Values.ingress.tls }}
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    {{- end}}
+
     nginx.ingress.kubernetes.io/proxy-body-size: {{ .Values.ingress.maxClientBodySize | quote }}
     nginx.ingress.kubernetes.io/rewrite-target: "/stroom/noauth/datafeed"
+    {{- end}}
 spec:
   {{- if .Values.ingress.tls }}
-  ingressClassName: {{ .Values.ingress.className }}
   tls:
     - hosts:
         - {{ .Values.ingress.hostName | quote }}
